@@ -1,0 +1,73 @@
+#pragma once
+
+#include "AsSectionTable.hpp"
+#include <string>
+#include <map>
+#include <list>
+
+typedef enum{
+  LOCAL = 0,
+  GLOBAL = 1,
+  EXTERN = 2,
+  SECTION = 3,
+  NONE = 4
+} SymbolType;
+
+std::ostream& operator<<(std::ostream& out, SymbolType value);
+
+struct ForwardRef{
+  std::string section;
+  int offset;
+  ForwardRef(std::string section, int offset):section(section), offset(offset){}
+};
+
+static int globalSymbolID=0;
+
+struct SymbolData{
+  int symbolID;
+  std::string section;
+  int value;  //offset in the current section
+  SymbolType type;
+  bool isDefined;
+  std::list<ForwardRef> flink;
+  SymbolData(std::string section, int value, SymbolType type, bool isDefined)
+  :symbolID(globalSymbolID++), section(section),value(value),type(type),isDefined(isDefined) {}
+  SymbolData() : symbolID(globalSymbolID++), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
+};
+
+class SymbolTable{
+    std::map<std::string, SymbolData> table;
+  public:
+    //constructor
+    SymbolTable();
+    //symbol's existential dread
+    bool symbolExists(const std::string &label);
+    bool isEmpty();
+    //symbol
+    SymbolData getSymbol(const std::string &label);
+    void addSymbol(const std::string &label, SymbolData symbolData);
+    void removeSymbol(const std::string &label);
+    //symbolID
+    int getSymbolID(const std::string &label);
+    //section
+    std::string getSymbolSecton(const std::string &label);
+    void setSymbolSection(const std::string &label, std::string newSectionName);
+    //value
+    int getSymbolValue(const std::string &label);
+    void setSymbolValue(const std::string &label, int newValue);
+    //type
+    SymbolType getSymbolType(const std::string &label);
+    void setSymbolType(const std::string &label, SymbolType newType);    
+    std::vector<std::string> getSymbolsOfType(SymbolType wantedType); //must go through reloc table and check global/local stuff   MAYBE NEEDS TO RETURN SYMBOLDATA ALSO
+    //isDefined
+    bool getSymbolIsDefined(const std::string &label);
+    void setSymbolIsDefined(const std::string &label, bool newIsDefined);
+    //flink
+    std::list<ForwardRef> getFlinks(const std::string &label);
+    void addFlink(const std::string &label, std::string section, int offset);
+    bool hasFlinks(const std::string &label);
+    void removeFlinks(const std::string &label);
+    //print
+    void printToOutput(std::string fileName);
+    void printToHelperTxt(std::string fileName);
+};
