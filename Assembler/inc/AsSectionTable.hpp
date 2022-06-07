@@ -57,5 +57,6 @@ class SectionTable{
     void setSectionDataAtOffset(const std::string &sectionName, int offset, int size, int data);
     //print
     void printToOutput(const std::string &fileName);
+    void printToBinaryOutput(const std::string &fileName);
     void printToHelperTxt(const std::string &fileName);
 };

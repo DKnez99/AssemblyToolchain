@@ -80,7 +80,7 @@ std::vector<AbsSymbolInfo> RelocationTable::getAndDeleteRelocEntriesForAbsolute(
 void RelocationTable::printToOutput(const std::string &fileName){
   int offW = 15, typW=20, datW=7, symW=20, addW=15;
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);
+  file.open(fileName, std::ios::app);
   for(const auto& relocation: RelocationTable::table){
     std::string sectionName = relocation.first;
     file<<std::left<<"#"<<sectionName<<".reloc\n";
@@ -103,7 +103,7 @@ void RelocationTable::printToOutput(const std::string &fileName){
 void RelocationTable::printToHelperTxt(const std::string &fileName){
   int offW = 15, typW=20, datW=7, symW=20, addW=15;
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);
+  file.open(fileName, std::ios::app);
   for(const auto& relocation: RelocationTable::table){
     std::string sectionName = relocation.first;
     file<<std::left<<"#"<<sectionName<<".reloc\n";

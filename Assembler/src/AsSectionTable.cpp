@@ -86,7 +86,7 @@ void SectionTable::setSectionDataAtOffset(const std::string &sectionName, int of
 
 void SectionTable::printToOutput(const std::string &fileName){
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);  //append to file
+  file.open(fileName, std::ios::app);  //append to file
   for(const auto& section: SectionTable::table){
       if(section.second.size>0){
       std::string sectionName = section.first;
@@ -114,7 +114,7 @@ void SectionTable::printToOutput(const std::string &fileName){
 
 void SectionTable::printToHelperTxt(const std::string &fileName){
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);  //append to file
+  file.open(fileName, std::ios::app);  //append to file
   for(const auto& section: SectionTable::table){
     std::string sectionName = section.first;
     file<<"#"<<sectionName<<" ("<<std::dec<<section.second.size<<" B)";

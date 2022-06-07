@@ -214,7 +214,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
 
   int idW=4, valW=10, typW=6, bndW=6, ndxW=7;
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);  //append to file
+  file.open(fileName, std::ios::app);  //append to file
   file<<std::left<<"#.symtab\n"
       <<std::setw(idW)<<"ID"
       <<std::setw(valW)<<"Value(HX)"
@@ -270,10 +270,33 @@ void SymbolTable::printToOutput(const std::string &fileName){
   file.close();
 }
 
+void SymbolTable::printToBinaryOutput(const std::string &fileName){
+  std::ofstream file(fileName, std::ios::app | std::ios::binary);
+  int numberOfSymbols = SymbolTable::table.size();
+  std::cout<<"\nNumber of symbols: "<<numberOfSymbols;
+  file.write((char *)&numberOfSymbols, sizeof(numberOfSymbols));
+  for(const auto &symbol: SymbolTable::table){
+    std::string label=symbol.first;
+    SymbolData symbolData=symbol.second;
+    int strLength=label.length();                       //label
+    file.write((char *)(&strLength),sizeof(strLength)); //label
+    file.write(label.c_str(), strLength);               //label
+    file.write((char *)&symbolData.symbolID, sizeof(symbolData.symbolID));  //symbolID
+    strLength=symbolData.section.length();              //section
+    file.write((char *)(&strLength),sizeof(strLength)); //section
+    file.write(symbolData.section.c_str(), strLength);  //section
+    file.write((char *)&symbolData.section, sizeof(symbolData.section));
+    file.write((char *)&symbolData.value, sizeof(symbolData.value));
+    file.write((char *)&symbolData.type, sizeof(symbolData.type));    //CHECK THIS - MIGHT NEED TO TREAT IT AS STRING
+    file.write((char *)&symbolData.isDefined, sizeof(symbolData.isDefined));
+  }
+  file.close();
+}
+
 void SymbolTable::printToHelperTxt(const std::string &fileName){
   int idW=4, valW=10, typW=9, nameW=20, flnW=30;
   std::ofstream file;
-  file.open(fileName, std::ios_base::app);  //append to file
+  file.open(fileName, std::ios::app);  //append to file
   file<<std::left<<"#.symtab\n"
       <<std::setw(idW)  <<"ID"
       <<std::setw(valW) <<"Value(HX)"

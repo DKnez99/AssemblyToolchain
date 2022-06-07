@@ -71,5 +71,6 @@ class SymbolTable{
     std::vector<std::string> invalidSymbols();
     //print
     void printToOutput(const std::string &fileName);
+    void printToBinaryOutput(const std::string &fileName);
     void printToHelperTxt(const std::string &fileName);
 };
