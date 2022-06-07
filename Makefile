@@ -3,6 +3,7 @@ ASSEMBLER = asembler
 ASSEMBLER_SOURCE_CPP_LIST = \
 Assembler/src/main.cpp \
 Assembler/src/AsRelocTable.cpp \
+Assembler/src/AsSectionTable.cpp \
 Assembler/src/AsSymbolTable.cpp
 
 vpath %.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))

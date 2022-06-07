@@ -263,7 +263,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
         file<<std::setw(ndxW)<<SymbolTable::getSymbolID(symbolData.section);
       }
 
-      file<<((label=="*UND*")?"":label.c_str());  //name
+      file<<((label==SECTION_UNDEFINED)?"":label.c_str());  //name
     }
   }
   file<<std::endl;

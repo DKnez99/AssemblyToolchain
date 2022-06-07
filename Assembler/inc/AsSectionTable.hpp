@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <vector>
 
-#define SECTION_UNDEFINED "*UND*"
-#define SECTION_ABSOLUTE "*ABS*"
+#define SECTION_UNDEFINED ".undefined"
+#define SECTION_ABSOLUTE ".absolute"
 
 struct Data{
   int hex1;
@@ -19,16 +19,16 @@ struct SectionEntry{
   int offset;
   int size;
   std::vector<Data> data;
-  SectionEntry(int offset, int size, long data_, bool isInstruction=false):offset(offset),size(size){
-    if(isInstruction){ //big endian (left -> right)
-      for(int i=size-1; i>=0; i--){  
-        data.push_back({int((data_ >>(i*8+4)) & 0xF), int((data_ >> (i*8)) & 0xF) });
-      }
-    }
-    else{
-      for(int i=0; i<size; i++){  //little endian (left <- right)
+  SectionEntry(int offset, int size, long data_, bool isData=true):offset(offset),size(size){
+    if(isData){ //little endian (left <- right)
+      for(int i=0; i<size; i++){  
         data.push_back({int((data_ >>4) & 0xF), int((data_ >> 0) & 0xF) });
         data_>>=8;
+      }
+    }
+    else{ //big endian (left -> right)
+      for(int i=size-1; i>=0; i--){  
+        data.push_back({int((data_ >>(i*8+4)) & 0xF), int((data_ >> (i*8)) & 0xF) });
       }
     }
   }
@@ -44,14 +44,18 @@ class SectionTable{
   private:
     std::unordered_map<std::string, SectionData> table;
   public:
-    SectionTable();
-    bool sectionExists(std::string sectionName);
-    SectionData getSection(std::string sectionName);
-    void addSection(std::string sectionName, SectionEntry entry);
-    std::vector<Data> getSectionData(std::string sectionName, int offset, int size);
-    void setSectionData(std::string sectionName, int offset, int size, int data);
-    void removeSection(std::string sectionName);
+    //constr
+    //SectionTable();
+    //section's existential dread
+    bool sectionExists(const std::string &sectionName);
     bool isEmpty();
-    void printToTxt(std::string fileName);
-    void printToHelperTxt(std::string fileName);
+    //sectionEntries
+    SectionData getSectionData(const std::string &sectionName);
+    void addSectionEntry(const std::string &sectionName, SectionEntry entry);
+    //data
+    std::vector<Data> getDataAtOffset(const std::string &sectionName, int offset, int size);
+    void setSectionDataAtOffset(const std::string &sectionName, int offset, int size, int data);
+    //print
+    void printToOutput(const std::string &fileName);
+    void printToHelperTxt(const std::string &fileName);
 };
