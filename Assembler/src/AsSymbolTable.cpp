@@ -192,6 +192,7 @@ std::vector<std::string> SymbolTable::invalidSymbols(){
       invalidSymbols.push_back(symbol.first);
     }
   }
+  return invalidSymbols;
 }
 
 //||=========================================================||
@@ -270,16 +271,16 @@ void SymbolTable::printToOutput(const std::string &fileName){
 }
 
 void SymbolTable::printToHelperTxt(const std::string &fileName){
-  int idW=4, valW=10, typW=9, nameW=20;
+  int idW=4, valW=10, typW=9, nameW=20, flnW=30;
   std::ofstream file;
   file.open(fileName, std::ios_base::app);  //append to file
   file<<std::left<<"#.symtab\n"
-      <<std::setw(idW)<<"ID"
-      <<std::setw(valW)<<"Value(HX)"
-      <<std::setw(typW)<<"MyType"
+      <<std::setw(idW)  <<"ID"
+      <<std::setw(valW) <<"Value(HX)"
+      <<std::setw(typW) <<"MyType"
       <<std::setw(nameW)<<"Section"
       <<std::setw(nameW)<<"Name"
-                     <<"Flinks(Hex)";
+                        <<"Flinks(Hex)";
 
   for(auto const &symbol: SymbolTable::table){
     std::string label = symbol.first;

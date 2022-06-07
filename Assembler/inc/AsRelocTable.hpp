@@ -46,6 +46,6 @@ class RelocationTable{
     //delete absolute symbol relocs and return places in which to insert them in mem
     std::vector<AbsSymbolInfo> getAndDeleteRelocEntriesForAbsolute(); 
     //print
-    void printToTxt(const std::string &fileName);
+    void printToOutput(const std::string &fileName);
     void printToHelperTxt(const std::string &fileName);
 };
