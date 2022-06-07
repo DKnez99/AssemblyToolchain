@@ -21,7 +21,7 @@ struct ForwardRef{
   ForwardRef(std::string section, int offset):section(section), offset(offset){}
 };
 
-static int globalSymbolID=0;
+static int globalSymbolID=-1; //starts from -1 because of ABS section
 
 struct SymbolData{
   int symbolID;
@@ -29,7 +29,7 @@ struct SymbolData{
   int value;  //offset in the current section
   SymbolType type;
   bool isDefined;
-  std::list<ForwardRef> flink;
+  std::list<ForwardRef> flinks;
   SymbolData(std::string section, int value, SymbolType type, bool isDefined)
   :symbolID(globalSymbolID++), section(section),value(value),type(type),isDefined(isDefined) {}
   SymbolData() : symbolID(globalSymbolID++), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
