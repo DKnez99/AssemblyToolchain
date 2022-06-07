@@ -180,12 +180,29 @@ void SymbolTable::removeFlinks(const std::string &label){
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
+//||                  INVALID SYMBOLS                        ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
+std::vector<std::string> SymbolTable::invalidSymbols(){
+  std::vector<std::string> invalidSymbols;
+  for(const auto &symbol: SymbolTable::table){
+    if(symbol.second.isDefined==false && symbol.second.type!=SymbolType::EXTERN){
+      invalidSymbols.push_back(symbol.first);
+    }
+  }
+}
+
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
 //||                       PRINT                             ||
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
 
-void SymbolTable::printToOutput(std::string fileName){
+void SymbolTable::printToOutput(const std::string &fileName){
   //sort symbols by transfering them to vector from map
   typedef std::pair<std::string, SymbolData> Symbol;
   std::vector<Symbol> vec;
@@ -252,7 +269,7 @@ void SymbolTable::printToOutput(std::string fileName){
   file.close();
 }
 
-void SymbolTable::printToHelperTxt(std::string fileName){
+void SymbolTable::printToHelperTxt(const std::string &fileName){
   int idW=4, valW=10, typW=9, nameW=20;
   std::ofstream file;
   file.open(fileName, std::ios_base::app);  //append to file

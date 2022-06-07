@@ -67,7 +67,9 @@ class SymbolTable{
     void addFlink(const std::string &label, std::string section, int offset);
     bool hasFlinks(const std::string &label);
     void removeFlinks(const std::string &label);
+    //invalid symbols (checked in post processing of the file)
+    std::vector<std::string> invalidSymbols();
     //print
-    void printToOutput(std::string fileName);
-    void printToHelperTxt(std::string fileName);
+    void printToOutput(const std::string &fileName);
+    void printToHelperTxt(const std::string &fileName);
 };

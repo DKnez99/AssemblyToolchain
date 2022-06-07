@@ -21,20 +21,31 @@ struct RelocEntry{
   :offset(offset), type(type), symbol(symbol), addend(addend), isData(isData) {}
 };
 
-struct Relocation{
-  std::vector<RelocEntry> entries;
+struct AbsSymbolInfo{
+  int value;
+  std::string section;
+  int offset;
+  int size;
 };
 
 class RelocationTable{
+    std::unordered_map<std::string, std::vector<RelocEntry>> table;
   public:
-    std::unordered_map<std::string, Relocation> table;
-    bool sectionExists(std::string sectionName);
-    Relocation getRelocation(std::string sectionName);
-    void addEntry(std::string sectionName, RelocEntry entry);
-    void changeSymbolAndAddend(std::string sectionName, int offset, std::string newSymbol, int newAddend);
-    void removeSection(std::string sectionName);
-    void removeAllSections();
+    //reloc's existential dread
+    bool relocationsExistsForSection(const std::string &sectionName);
     bool isEmpty();
-    void printToTxt(std::string fileName);
-    void printToHelperTxt(std::string fileName);
+    //relocation entries
+    std::vector<RelocEntry> getRelocEntriesForSection(const std::string &sectionName);
+    void addRelocEntry(const std::string &sectionName, RelocEntry entry);
+    //for local symbols which were previously undefined (will get sectName and offset by going through flinks)
+    void changeRelocEntriesForLocal(const std::string &sectionName, int offset, std::string newSymbol, int newAddend);
+    //for global symbols which were previously local
+    //  old symbol = section name in which local symbol was defined
+    //  old addend = local symbol's value
+    void changeRelocEntriesForGlobal(std::string oldSymbol, int oldAddend, std::string newSymbol, int newAddend);
+    //delete absolute symbol relocs and return places in which to insert them in mem
+    std::vector<AbsSymbolInfo> getAndDeleteRelocEntriesForAbsolute(); 
+    //print
+    void printToTxt(const std::string &fileName);
+    void printToHelperTxt(const std::string &fileName);
 };
