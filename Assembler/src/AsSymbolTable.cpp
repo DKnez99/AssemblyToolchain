@@ -273,7 +273,6 @@ void SymbolTable::printToOutput(const std::string &fileName){
 void SymbolTable::printToBinaryOutput(const std::string &fileName){
   std::ofstream file(fileName, std::ios::app | std::ios::binary);
   int numberOfSymbols = SymbolTable::table.size();
-  std::cout<<"\nNumber of symbols: "<<numberOfSymbols;
   file.write((char *)&numberOfSymbols, sizeof(numberOfSymbols));
   for(const auto &symbol: SymbolTable::table){
     std::string label=symbol.first;

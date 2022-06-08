@@ -49,6 +49,12 @@
     "utility": "cpp",
     "iomanip": "cpp",
     "iostream": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "atomic": "cpp",
+    "cstdarg": "cpp",
+    "algorithm": "cpp",
+    "iterator": "cpp",
+    "numeric": "cpp",
+    "random": "cpp"
   }
 }

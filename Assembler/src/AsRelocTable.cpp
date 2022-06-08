@@ -100,6 +100,35 @@ void RelocationTable::printToOutput(const std::string &fileName){
   file.close();
 }
 
+void RelocationTable::printToBinaryOutput(const std::string &fileName){
+  std::ofstream file(fileName, std::ios::app | std::ios::binary);
+  int numberOfRelocSections = RelocationTable::table.size();
+  file.write((char *)&numberOfRelocSections, sizeof(numberOfRelocSections));    //total number of relocSections
+  for(const auto &relocSection: RelocationTable::table){                        //for each relocSection write:
+    std::string relocSectionName=relocSection.first;
+    std::vector<RelocEntry> relocSectionData=relocSection.second;
+    int strLength=relocSectionName.length();                               //relocSectionName
+    file.write((char *)(&strLength),sizeof(strLength));                    //relocSectionName
+    file.write(relocSectionName.c_str(), strLength);                       //relocSectionName
+
+    //reloc entries
+    int numberOfRelocEntries = relocSectionData.size();
+    file.write((char *)&numberOfRelocEntries, sizeof(numberOfRelocEntries));  //number of reloc entries
+    for(const auto &relocEntry: relocSectionData){                      //for each entry write:
+      file.write((char *)&relocEntry.offset, sizeof(relocEntry.offset));      //entry offset
+      file.write((char *)&relocEntry.type, sizeof(relocEntry.type));          //entry type CHECK THIS ONE MIGHT NEED TO BE TREATED AS STRING
+      
+      strLength=relocEntry.symbol.size();                             //entry symbol
+      file.write((char *)(&strLength),sizeof(strLength));             //entry symbol
+      file.write(relocEntry.symbol.c_str(), strLength);               //entry symbol
+
+      file.write((char *)&relocEntry.addend, sizeof(relocEntry.addend));  //entry addend
+      file.write((char *)&relocEntry.isData, sizeof(relocEntry.isData));  //entry isData
+    }
+  }
+  file.close();
+}
+
 void RelocationTable::printToHelperTxt(const std::string &fileName){
   int offW = 15, typW=20, datW=7, symW=20, addW=15;
   std::ofstream file;

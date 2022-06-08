@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
-enum  RelocType{           //page 75 in psABI amd64
-  R_X86_64_16,      //S + A
-  R_X86_64_PC16,    //S + A - P
+enum  RelocType{      //page 75 in psABI amd64
+  R_X86_64_16=0,      //S + A
+  R_X86_64_PC16=1,    //S + A - P
 };
 
 std::ostream& operator<<(std::ostream& out, RelocType value);

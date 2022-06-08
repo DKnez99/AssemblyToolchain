@@ -2,6 +2,9 @@ ASSEMBLER = asembler
 
 ASSEMBLER_SOURCE_CPP_LIST = \
 Assembler/src/main.cpp \
+Assembler/src/AsMainLogic.cpp \
+Assembler/src/AsConversionsAndErrors.cpp \
+Assembler/src/AsProcess.cpp \
 Assembler/src/AsRelocTable.cpp \
 Assembler/src/AsSectionTable.cpp \
 Assembler/src/AsSymbolTable.cpp
