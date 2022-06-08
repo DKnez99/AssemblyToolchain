@@ -27,16 +27,22 @@ class Assembler{
     //important internal assembler variables
     int lineCnt;
     int locationCnt;
-    bool errorOccured;
     std::string currentSection;
     SymbolTable symbolTable;
     SectionTable sectionTable;
     RelocationTable relocTable;
     
     //error handling
+    bool errorOccured;
+    bool warningOccured;
     std::map<int, int> lineMap; //lines mapped between original input file and formatted input file - will be used for error display
     std::map<int, std::string> errorMap; //errors mapped between formatted input file line number and error msgs
+    std::map<int, std::string> warningMap; //warnings mapped between formatted input file line number and error msgs
     void addError(const std::string &errorMsg); //errors which will be displayed in terminal
+    void addWarning(const std::string &errorMsg); //warnings which will be displayed in terminal
+    void printErrors();
+    void printWarnings();
+    void printSuccess();
 
     //conversions
     int getRegNumber(const std::string& reg);
@@ -70,5 +76,5 @@ class Assembler{
   public:
     Assembler(const std::string &inputFileName, const std::string &outputFileName);
     bool assemble();
-    void printErrors();
+    
 };

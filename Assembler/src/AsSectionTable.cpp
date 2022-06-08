@@ -42,6 +42,10 @@ void SectionTable::addSectionEntry(const std::string &sectionName, SectionEntry 
   SectionTable::table[sectionName].size+=entry.size;
 }
 
+void SectionTable::addSection(const std::string &sectionName){
+  SectionTable::table[sectionName].size=0;
+}
+
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||

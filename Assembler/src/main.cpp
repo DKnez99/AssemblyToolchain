@@ -45,7 +45,6 @@ int main(){
 
   Assembler as("input.s", "output.o");
   bool assemblySuccessful=!as.assemble();
-  as.printErrors();
 
   return assemblySuccessful;
 

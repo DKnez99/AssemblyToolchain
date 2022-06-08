@@ -17,6 +17,9 @@ bool Assembler::assemble(){
   if(!Assembler::goThroughFlinksAndRelocs()){
     return false;
   }
+  Assembler::printSuccess();
+  Assembler::printErrors();
+  Assembler::printWarnings();
   Assembler::writeToOutputFiles();
   return true;
 }
@@ -89,8 +92,6 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
     Assembler::writeLineToHelperOutputTxt("Curr section: "+Assembler::currentSection+" (offset: "+std::to_string(Assembler::locationCnt)+")");
     if(std::regex_search(line, matchedRgxs, rgx_section_dir)){ //section directive
       std::string sectionName=matchedRgxs.str(1);
-      Assembler::currentSection=sectionName;  //maybe transfer this to process section
-      Assembler::locationCnt=0;               //maybe transfer this to process section
       Assembler::writeLineToHelperOutputTxt("Found > RGX_SECTION_DIR: "+sectionName);
       if(!Assembler::processSection(sectionName)){
         return false;

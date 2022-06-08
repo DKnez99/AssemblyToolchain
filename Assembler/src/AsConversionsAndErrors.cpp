@@ -17,20 +17,44 @@ void Assembler::addError(const std::string &errorMsg){
   Assembler::errorOccured=true;
 }
 
+void Assembler::addWarning(const std::string &warningMsg){
+  Assembler::warningMap[Assembler::lineCnt]=warningMsg;
+  Assembler::warningOccured=true;
+}
+
 void Assembler::printErrors(){
   if(Assembler::errorOccured){
+    std::cout<<"Errors :"<<std::endl;
     for(auto err: Assembler::errorMap){
-      std::cout<<"Error occured while assemblying input file "<<Assembler::inputFileName<<". Details below:"<<std::endl;
-      if(Assembler::lineMap[err.first]>0){
+      if(Assembler::lineMap[err.first]>0)
         std::cout<<"Line "<<Assembler::lineMap[err.first]-1<<": "<<err.second<<std::endl;
-      }
-      else{
+      else
         std::cout<<err.second<<std::endl;
-      }
     }
   }
+}
+
+void Assembler::printWarnings(){
+  if(Assembler::warningOccured){
+    std::cout<<"Warnings :"<<std::endl;
+    for(auto warning: Assembler::warningMap){
+      if(Assembler::lineMap[warning.first]>0)
+        std::cout<<"Line "<<Assembler::lineMap[warning.first]-1<<": "<<warning.second<<std::endl;
+      else
+        std::cout<<warning.second<<std::endl;
+    }
+  }
+}
+
+void Assembler::printSuccess(){
+  if(Assembler::errorOccured){
+    std::cout<<"Failed to assemble input file "<<Assembler::inputFileName<<"! Details below:"<<std::endl;
+  }
+  else if(Assembler::warningOccured){
+    std::cout<<"Assembled input file "<<Assembler::inputFileName<<"!"<<std::endl;
+  }
   else{
-    std::cout<<"File "<<Assembler::inputFileName<<" assemblied successfuly!"<<std::endl;
+    std::cout<<"Assembled input file "<<Assembler::inputFileName<<" successfuly!"<<std::endl;
   }
 }
 
@@ -42,8 +66,7 @@ void Assembler::printErrors(){
 //||=========================================================||
 //||=========================================================||
 
-std::vector<std::string> Assembler::splitString(const std::string& str, const char c) //from stack overflow :D
-{
+std::vector<std::string> Assembler::splitString(const std::string& str, const char c){ //from stack overflow :D
     std::vector<std::string> tokens;
     std::string::size_type pos = 0;
     std::string::size_type prev = 0;
@@ -57,13 +80,11 @@ std::vector<std::string> Assembler::splitString(const std::string& str, const ch
 
 std::string Assembler::stringToHex(const std::string& input){ //from stack overflow :D
     static const char hex_digits[] = "0123456789ABCDEF";
-
     std::string output;
     output.reserve(input.length() * 2);
-    for (unsigned char c : input)
-    {
-        output.push_back(hex_digits[c >> 4]);
-        output.push_back(hex_digits[c & 15]);
+    for(unsigned char c : input){
+      output.push_back(hex_digits[c >> 4]);
+      output.push_back(hex_digits[c & 15]);
     }
     return output;
 }
@@ -75,31 +96,27 @@ std::string Assembler::decToHex(int number, int size){
 }
 
 int Assembler::stringToDec(const std::string &literal){
-  int result=0;
-  if(std::regex_match(literal, rgx_literal_hex)){
-    result=std::stoi(literal.substr(2),0,16);
-  }
-  else if(std::regex_match(literal, rgx_literal_dec)){
-    result=std::stoi(literal);
-  }
-  else if(std::regex_match(literal, rgx_literal_bin)){
-    result=std::stoi(literal.substr(2),0,2);
-  }
-  return result;
+  if(std::regex_match(literal, rgx_literal_hex))
+    return std::stoi(literal.substr(2),0,16);
+
+  if(std::regex_match(literal, rgx_literal_dec))
+    return std::stoi(literal);
+
+  if(std::regex_match(literal, rgx_literal_bin))
+    return std::stoi(literal.substr(2),0,2);
+
+  return 0;
 }
 
 int Assembler::getRegNumber(const std::string &reg){
-  if(reg=="sp"){
+  if(reg=="sp")
     return 6;
-  }
 
-  if(reg=="pc"){
+  if(reg=="pc")
     return 7;
-  }
 
-  if(reg=="psw"){
+  if(reg=="psw")
     return 8;
-  }
   
   return reg.at(1)-'0';
 }

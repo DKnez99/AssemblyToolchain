@@ -52,6 +52,7 @@ class SectionTable{
     //sectionEntries
     SectionData getSectionData(const std::string &sectionName);
     void addSectionEntry(const std::string &sectionName, SectionEntry entry);
+    void addSection(const std::string &sectionName); //without an entry
     //data
     std::vector<Data> getDataAtOffset(const std::string &sectionName, int offset, int size);
     void setSectionDataAtOffset(const std::string &sectionName, int offset, int size, int data);
