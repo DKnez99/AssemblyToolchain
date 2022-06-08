@@ -62,9 +62,9 @@ class Assembler{
     bool processGlobal(const std::string &globalArgument);
     bool processExtern(const std::string &externArgument);
     bool processWord(const std::string &wordArgument);
-    bool processSkip(const std::string & kipArgument);
+    bool processSkip(const std::string &skipArgument);
     bool processAscii(const std::string &str);
-    bool processEqu(const std::string &symbolName, const std::string & expr);
+    bool processEqu(const std::string &symbolName, const std::string &expr);
     bool processLabel(const std::string &labelName);
     bool processZeroOpIns(const std::string &instruction);
     bool processOneRegIns(const std::string &instruction, const std::string &reg);

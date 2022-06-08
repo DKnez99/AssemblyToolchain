@@ -123,13 +123,15 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
       std::string literal=matchedRgxs.str(1);
       Assembler::writeLineToHelperOutputTxt("Found > RGX_SKIP_DIR: "+literal);
       if(!Assembler::processSkip(literal)){
-          return false;
-        }
+        return false;
+      }
     }
     else if(std::regex_search(line, matchedRgxs, rgx_ascii_dir)){ //ascii directive
       std::string str=matchedRgxs.str(1).substr(1, matchedRgxs.str(1).length()-2);
       Assembler::writeLineToHelperOutputTxt("Found > RGX_ASCII_DIR: "+str);
-      //process ascii
+      if(!Assembler::processAscii(str)){
+        return false;
+      }
     }
     else if(std::regex_search(line, matchedRgxs, rgx_equ_dir)){ //equ directive
       std::string newSymbol=matchedRgxs.str(1);

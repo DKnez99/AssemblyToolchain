@@ -17,7 +17,8 @@ struct RelocEntry{
   std::string symbol;
   int addend;
   bool isData;  //if it's data use little endian, if it's an instruction use big endian
-  RelocEntry(int offset, RelocType type, std::string symbol, int addend, bool isData=true)
+  bool isRealSectionSymbol; //so we dont override global (ex. local) symbols that had value 0 in reloc table when we go through it to amend relocs
+  RelocEntry(int offset, RelocType type, std::string symbol, int addend, bool isData=true, bool isActualSectionSymbol=false)
   :offset(offset), type(type), symbol(symbol), addend(addend), isData(isData) {}
 };
 

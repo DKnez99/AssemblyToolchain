@@ -1,4 +1,3 @@
-.global globA
 .section ivt
 .word isr_reset
 .skip 2
@@ -6,7 +5,6 @@
 .word isr_terminal
 .skip 8
 .extern myStart,myCounter
-.global ivt
 .section isr
 .equ term_out,0xFF00
 .equ term_in,0xFF02
@@ -18,8 +16,6 @@ push r0
 ldr r0,$asciiCode
 str r0,term_out
 pop r0
-.extern externB
-.global globA
 iret
 isr_terminal:
 push r0

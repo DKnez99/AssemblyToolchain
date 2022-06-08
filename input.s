@@ -1,5 +1,4 @@
 # file: interrupts.s
-.global globA
 .section ivt
  .word isr_reset
  .skip 2 # isr_error
@@ -7,7 +6,6 @@
  .word isr_terminal
  .skip 8
 .extern myStart, myCounter
-.global ivt
 .section isr
 .equ term_out, 0xFF00
 .equ term_in, 0xFF02
@@ -21,8 +19,6 @@ isr_timer:
  ldr r0, $asciiCode
  str r0, term_out
  pop r0
- .extern externB
- .global globA
  iret
 # prekidna rutina za terminal
 isr_terminal:
