@@ -42,7 +42,7 @@ class Assembler{
     void addWarning(const std::string &errorMsg); //warnings which will be displayed in terminal
     void printErrors();
     void printWarnings();
-    void printSuccess();
+    void printResults();
 
     //conversions
     int getRegNumber(const std::string& reg);
@@ -75,6 +75,6 @@ class Assembler{
     int processPCRelAddr(const std::string &operand, int offsetInsideInstr, int diffBetweenOffsetAndNextInstr);
   public:
     Assembler(const std::string &inputFileName, const std::string &outputFileName);
-    bool assemble();
+    void assemble();
     
 };

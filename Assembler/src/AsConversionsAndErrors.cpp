@@ -23,35 +23,33 @@ void Assembler::addWarning(const std::string &warningMsg){
 }
 
 void Assembler::printErrors(){
-  if(Assembler::errorOccured){
-    std::cout<<"Errors :"<<std::endl;
-    for(auto err: Assembler::errorMap){
-      if(Assembler::lineMap[err.first]>0)
-        std::cout<<"Line "<<Assembler::lineMap[err.first]-1<<": "<<err.second<<std::endl;
-      else
-        std::cout<<err.second<<std::endl;
-    }
+  std::cout<<"Errors:"<<std::endl;
+  for(auto err: Assembler::errorMap){
+    if(Assembler::lineMap[err.first]>0)
+      std::cout<<"Line "<<Assembler::lineMap[err.first]-1<<": "<<err.second<<std::endl;
+    else
+      std::cout<<err.second<<std::endl;
   }
 }
 
 void Assembler::printWarnings(){
-  if(Assembler::warningOccured){
-    std::cout<<"Warnings :"<<std::endl;
-    for(auto warning: Assembler::warningMap){
-      if(Assembler::lineMap[warning.first]>0)
-        std::cout<<"Line "<<Assembler::lineMap[warning.first]-1<<": "<<warning.second<<std::endl;
-      else
-        std::cout<<warning.second<<std::endl;
-    }
+  std::cout<<"Warnings:"<<std::endl;
+  for(auto warning: Assembler::warningMap){
+    if(Assembler::lineMap[warning.first]>0)
+      std::cout<<"Line "<<Assembler::lineMap[warning.first]-1<<": "<<warning.second<<std::endl;
+    else
+      std::cout<<warning.second<<std::endl;
   }
 }
 
-void Assembler::printSuccess(){
+void Assembler::printResults(){
   if(Assembler::errorOccured){
     std::cout<<"Failed to assemble input file "<<Assembler::inputFileName<<"! Details below:"<<std::endl;
+    Assembler::printErrors();
   }
   else if(Assembler::warningOccured){
     std::cout<<"Assembled input file "<<Assembler::inputFileName<<"!"<<std::endl;
+    Assembler::printWarnings();
   }
   else{
     std::cout<<"Assembled input file "<<Assembler::inputFileName<<" successfuly!"<<std::endl;

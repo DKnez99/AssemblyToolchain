@@ -18,6 +18,7 @@ push r0
 ldr r0,$asciiCode
 str r0,term_out
 pop r0
+.extern externB
 .global globA
 iret
 isr_terminal:

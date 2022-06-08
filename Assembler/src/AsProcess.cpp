@@ -50,20 +50,6 @@ bool Assembler::processGlobal(const std::string &globalArgument){
         break;
       }
     }
-
-    // if(Assembler::symbolTable.getSymbolType(globalArgument)==SymbolType::EXTERN){
-    //   Assembler::addError("Can't redefine extern symbol "+globalArgument+" as global.");
-    //   Assembler::writeLineToHelperOutputTxt("ERROR! Symbol "+globalArgument+" was already defined as an external symbol.");
-    //   return false;
-    // }
-    // if(Assembler::symbolTable.getSymbolType(globalArgument)==SymbolType::SECTION){ //gnu allows this (nothing happens tho)
-    //   Assembler::addError("Warning! Tried to redefine section "+globalArgument+" as a global symbol. Redefinition was discarded.");
-    //   Assembler::writeLineToHelperOutputTxt("WARNING! Symbol "+globalArgument+" was already defined as a section.");
-    //   return true;
-    // }
-    // Assembler::symbolTable.setSymbolType(globalArgument, SymbolType::GLOBAL);
-    // Assembler::writeLineToHelperOutputTxt("Symbol "+globalArgument+" already exists, setting it's type to global");
-    // //MUST GO THROUGH RELOC TABLE AND FIX ALL ENTRIES WITH IT
   }
   else{
     Assembler::symbolTable.addSymbol(globalArgument, SymbolData(SECTION_UNDEFINED, 0, SymbolType::GLOBAL, false));
@@ -73,6 +59,36 @@ bool Assembler::processGlobal(const std::string &globalArgument){
 }
 
 bool Assembler::processExtern(const std::string &externArgument){
+  if(Assembler::symbolTable.symbolExists(externArgument)){
+
+    if(Assembler::symbolTable.getSymbolIsDefined(externArgument)){
+      Assembler::writeLineToHelperOutputTxt("ERROR! Symbol "+externArgument+" already exists and is defined. Can't make it external.");
+      Assembler::addError("Symbol "+externArgument+" is already previously locally defined. Can't import it from other files.");
+      return false;
+    }
+
+    //if it's not already defined
+    switch (Assembler::symbolTable.getSymbolType(externArgument))
+    {
+      case (SymbolType::NONE):{
+        Assembler::symbolTable.setSymbolType(externArgument, SymbolType::EXTERN);
+        break;
+      }
+      case (SymbolType::EXTERN):{
+        Assembler::addWarning("Symbol "+externArgument+" was already previously proclaimed as extern.");
+        break;
+      }
+      default:{
+        Assembler::addError("Can't change type of "+externArgument+" to extern.");
+        Assembler::writeLineToHelperOutputTxt("ERROR! Can't assign extern type to symbol "+externArgument);
+        return false;
+      }
+    }
+  }
+  else{
+    Assembler::symbolTable.addSymbol(externArgument, SymbolData(SECTION_UNDEFINED, 0, SymbolType::EXTERN, false));
+    Assembler::writeLineToHelperOutputTxt("External symbol "+externArgument+" doesn't exists, creating new entry in SymbolTable.");
+  }
   return true;
 }
 

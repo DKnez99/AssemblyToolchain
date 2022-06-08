@@ -7,21 +7,13 @@ Assembler::Assembler(const std::string &inputFileName, const std::string &output
   Assembler::binaryOutputFileName=outputFileName.substr(0,outputFileName.find_last_of('.'))+"_binary.o";
 }
 
-bool Assembler::assemble(){
-  if(!Assembler::formatInputFile()){
-    return false;
-  }
-  if(!Assembler::goThroughFormattedInputFile()){
-    return false;
-  }
-  if(!Assembler::goThroughFlinksAndRelocs()){
-    return false;
-  }
-  Assembler::printSuccess();
-  Assembler::printErrors();
-  Assembler::printWarnings();
+void Assembler::assemble(){
+  Assembler::formatInputFile();
+  Assembler::goThroughFormattedInputFile();
+  Assembler::goThroughFlinksAndRelocs();
+
+  Assembler::printResults();
   Assembler::writeToOutputFiles();
-  return true;
 }
 
 bool Assembler::formatInputFile(){

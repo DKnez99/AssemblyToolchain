@@ -44,10 +44,8 @@ int main(){
   // relocTableStuff("output.o", "output_helper.txt", "binary_output.o");
 
   Assembler as("input.s", "output.o");
-  bool assemblySuccessful=!as.assemble();
-
-  return assemblySuccessful;
-
+  as.assemble();
+  
   return 0;
 }
 
