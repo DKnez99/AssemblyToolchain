@@ -3,80 +3,78 @@
 #include <regex>
 #include <string>
 
-//check if ^ and $ are needed somewhere
-
 //file formatting rgxs
-std::regex rgx_remove_comments("#.*");
-std::regex rgx_reduce_multiple_spaces(" {2,}");
-std::regex rgx_reduce_tabs("\\t+");
-std::regex rgx_reduce_spaces_around_commas(" *, *");
-std::regex rgx_reduce_spaces_around_colons(" *: *");
-std::regex rgx_insert_new_line_after_colon("(.+:)(.+)");
-std::regex rgx_reduce_spaces_around_pluses(" *\\+ *");
-std::regex rgx_reduce_bracket_start_spaces("\\[ *");
-std::regex rgx_reduce_bracket_end_spaces(" *\\]");
-std::regex rgx_reduce_line_start_spaces("^( *)");
-std::regex rgx_reduce_line_end_spaces("( *)$");
-std::regex rgx_line("(.+)"); //check
+extern std::regex rgx_remove_comments;
+extern std::regex rgx_reduce_multiple_spaces;
+extern std::regex rgx_reduce_tabs;
+extern std::regex rgx_reduce_spaces_around_commas;
+extern std::regex rgx_reduce_spaces_around_colons;
+extern std::regex rgx_insert_new_line_after_colon;
+extern std::regex rgx_reduce_spaces_around_pluses;
+extern std::regex rgx_reduce_bracket_start_spaces;
+extern std::regex rgx_reduce_bracket_end_spaces;
+extern std::regex rgx_reduce_line_start_spaces;
+extern std::regex rgx_reduce_line_end_spaces;
+extern std::regex rgx_line;
 
 //symbols
-std::string symbol="[a-zA-Z][a-zA-Z0-9_]*";
-std::regex rgx_symbol("("+symbol+")");
+extern std::string symbol;
+extern std::regex rgx_symbol;
 
 //literals
-std::string literal_dec="-?[0-9]+";
-std::string literal_hex="0x[0-9A-F]+";
-std::string literal_bin="0b[0-1]+";
-std::string literal=literal_dec+"|"+literal_hex+"|"+literal_bin;
+extern std::string literal_dec;
+extern std::string literal_hex;
+extern std::string literal_bin;
+extern std::string literal;
 
-std::regex rgx_literal_dec("("+literal_dec+")");
-std::regex rgx_literal_hex("("+literal_hex+")");
-std::regex rgx_literal_bin("("+literal_bin+")");
-std::regex rgx_literal("("+literal+")");
+extern std::regex rgx_literal_dec;
+extern std::regex rgx_literal_hex;
+extern std::regex rgx_literal_bin;
+extern std::regex rgx_literal;
 
 //registers
-std::string register_="r[0-7]|pc|sp|psw";
-std::regex rgx_register("("+register_+")");
+extern std::string register_;
+extern std::regex rgx_register;
 
 //directives
-std::string list_of_symbols="("+symbol+"(,"+symbol+")*)";
-std::string list_of_literals=literal+"(,"+literal+")*";
-std::string symbol_or_literal="("+symbol+"|"+literal+")";
-std::string list_of_symbols_or_literals="("+symbol_or_literal+"(,"+symbol_or_literal+")*)";
-std::string expression=".+";  //DO LATER
-std::string string_="\"[^\"]*\"";
+extern std::string list_of_symbols;
+extern std::string list_of_literals;
+extern std::string symbol_or_literal;
+extern std::string list_of_symbols_or_literals;
+extern std::string expression;
+extern std::string string_;
 
-std::regex rgx_global_dir("^\\.global "+list_of_symbols+"$");
-std::regex rgx_extern_dir("^\\.extern "+list_of_symbols+"$");
-std::regex rgx_section_dir("^\\.section ("+symbol+")$");
-std::regex rgx_word_dir("^\\.word "+list_of_symbols_or_literals+"$");
-std::regex rgx_skip_dir("^\\.skip ("+literal+")$");
-std::regex rgx_ascii_dir("^\\.ascii ("+string_+")$");
-std::regex rgx_equ_dir("^\\.equ ("+symbol+"),("+expression+")$");
-std::regex rgx_end_dir("^\\.end$");
+extern std::regex rgx_global_dir;
+extern std::regex rgx_extern_dir;
+extern std::regex rgx_section_dir;
+extern std::regex rgx_word_dir;
+extern std::regex rgx_skip_dir;
+extern std::regex rgx_ascii_dir;
+extern std::regex rgx_equ_dir;
+extern std::regex rgx_end_dir;
 
 //labels
-std::regex rgx_label("^"+symbol+":");
+extern std::regex rgx_label;
 
 //instructions
-std::regex rgx_zero_op_ins("^(halt|iret|ret)$");
-std::regex rgx_one_reg_ins("^(int|push|pop|not) ("+register_+")$");
-std::regex rgx_two_reg_ins("^(xchg|add|sub|mul|div|cmp|and|or|xor|test|shl|shr) ("+register_+"),("+register_+")$");
-std::regex rgx_one_op_ins("^(call|jmp|jeq|jne|jgt) (.+)$");
-std::regex rgx_one_reg_one_op_ins("^(ldr|str) ("+register_+"),(.+)$");
+extern std::regex rgx_zero_op_ins;
+extern std::regex rgx_one_reg_ins;
+extern std::regex rgx_two_reg_ins;
+extern std::regex rgx_one_op_ins;
+extern std::regex rgx_one_reg_one_op_ins;
 
-//load/store operands CHECK THESE
-std::regex rgx_addr_ld_str_immed("\\$"+symbol_or_literal);
-std::regex rgx_addr_ld_str_memdir(symbol_or_literal);
-std::regex rgx_addr_ld_str_mempcrel("%("+symbol+")");
-std::regex rgx_addr_ld_str_regdir("("+register_+")");
-std::regex rgx_addr_ld_str_regind("\\[("+register_+")\\]");
-std::regex rgx_addr_ld_str_regdisp("\\[("+register_+")\\+"+symbol_or_literal+"\\]");
+//load/store operands
+extern std::regex rgx_addr_ld_str_immed;
+extern std::regex rgx_addr_ld_str_memdir;
+extern std::regex rgx_addr_ld_str_mempcrel;
+extern std::regex rgx_addr_ld_str_regdir;
+extern std::regex rgx_addr_ld_str_regind;
+extern std::regex rgx_addr_ld_str_regdisp;
 
-//jmp operands CHECK THESE
-std::regex rgx_addr_jmp_abs(symbol_or_literal);
-std::regex rgx_addr_jmp_pcrel("%("+symbol+")");
-std::regex rgx_addr_jmp_memdir("\\*("+symbol_or_literal+")");
-std::regex rgx_addr_jmp_regdir("\\*("+register_+")");
-std::regex rgx_addr_jmp_regind("\\*\\[("+register_+")\\]");
-std::regex rgx_addr_jmp_regdisp("\\*\\[("+register_+")\\+"+symbol_or_literal+"\\]");
+//jmp operands
+extern std::regex rgx_addr_jmp_abs;
+extern std::regex rgx_addr_jmp_pcrel;
+extern std::regex rgx_addr_jmp_memdir;
+extern std::regex rgx_addr_jmp_regdir;
+extern std::regex rgx_addr_jmp_regind;
+extern std::regex rgx_addr_jmp_regdisp;

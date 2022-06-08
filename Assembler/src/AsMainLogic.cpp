@@ -85,8 +85,8 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
   bool eof=false;
   for(std::string line: Assembler::formattedInputFileLines){
     std::smatch matchedRgxs;
-    Assembler::writeLineToHelperOutputTxt("Line "+std::to_string(Assembler::lineCnt)+": "+line);
-    Assembler::writeLineToHelperOutputTxt("Curr section: "+Assembler::currentSection+" ("+std::to_string(Assembler::locationCnt));
+    Assembler::writeLineToHelperOutputTxt("\nLine "+std::to_string(Assembler::lineCnt)+": "+line);
+    Assembler::writeLineToHelperOutputTxt("Curr section: "+Assembler::currentSection+" (offset: "+std::to_string(Assembler::locationCnt)+")");
     if(std::regex_search(line, matchedRgxs, rgx_section_dir)){ //section directive
       std::string sectionName=matchedRgxs.str(1);
       Assembler::currentSection=sectionName;  //maybe transfer this to process section
