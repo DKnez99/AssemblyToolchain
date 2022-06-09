@@ -47,8 +47,6 @@ class SectionTable{
   private:
     std::unordered_map<std::string, std::vector<SectionData>> table;
   public:
-    //constr
-    //SectionTable();
     //section's existential dread
     bool sectionExists(const std::string &sectionName);
     bool isEmpty();

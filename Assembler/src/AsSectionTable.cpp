@@ -92,7 +92,7 @@ void SectionTable::printToOutput(const std::string &fileName){
   std::ofstream file;
   file.open(fileName, std::ios::app);  //append to file
   for(const auto& section: SectionTable::table){
-      if(section.second.size>0){
+    if(section.second.size>0){
       std::string sectionName = section.first;
       file<<"#"<<sectionName<<" ("<<std::dec<<section.second.size<<" B)\n";
       int cnt=0;
