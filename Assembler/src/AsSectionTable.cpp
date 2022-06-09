@@ -54,7 +54,7 @@ void SectionTable::addSection(const std::string &sectionName){
 //||=========================================================||
 //||=========================================================||
 
-std::vector<Data> SectionTable::getDataAtOffset(const std::string &sectionName, int offset, int size){
+std::vector<Data> SectionTable::getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size){
   std::vector<Data> result;
   for (auto &entry : SectionTable::table.at(sectionName).entries) {
     if(offset>=entry.offset && offset<(entry.offset + entry.size)){
@@ -68,12 +68,12 @@ std::vector<Data> SectionTable::getDataAtOffset(const std::string &sectionName, 
   return result;
 }
 
-void SectionTable::setSectionDataAtOffset(const std::string &sectionName, int offset, int size, int newData){
+void SectionTable::setSectionDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long newData){
   for (auto &entry : SectionTable::table.at(sectionName).entries) {
     if(offset>=entry.offset && offset<(entry.offset + entry.size)){
       int cnt=0;
       while(cnt<size && cnt<(entry.size-offset+entry.offset)){  //don't go into the next entry to fetch data
-        entry.data[offset-entry.offset+cnt++]={(newData >> 4) & 0xF, (newData >> 0) & 0xF};
+        entry.data[offset-entry.offset+cnt++]={(int)(newData >> 4) & 0xF, (int)(newData >> 0) & 0xF};
         newData>>=8;
       }
     }

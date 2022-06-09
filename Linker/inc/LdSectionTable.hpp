@@ -16,7 +16,7 @@ struct Data{
 };
 
 struct SectionEntry{
-  unsigned int offset;
+  unsigned int offset;  //should add to this rel + parent address at some point
   unsigned int size;
   std::vector<Data> data;
   SectionEntry(unsigned int offset, unsigned int size, long data_, bool isData=true):offset(offset),size(size){
@@ -37,12 +37,15 @@ struct SectionEntry{
 
 struct SectionData{
   unsigned int size; //all entry sizes added up
+  unsigned long relativeMemoryAddress;   //previous elements localMemordyAddress + previousElementSize
+  unsigned long parentMemoryAddress;     //same for all elements of the vector
+  std::string parentFileName;
   std::vector<SectionEntry> entries;
 };
 
 class SectionTable{
   private:
-    std::unordered_map<std::string, SectionData> table;
+    std::unordered_map<std::string, std::vector<SectionData>> table;
   public:
     //constr
     //SectionTable();
@@ -50,8 +53,8 @@ class SectionTable{
     bool sectionExists(const std::string &sectionName);
     bool isEmpty();
     //sectionEntries
-    SectionData getSectionData(const std::string &sectionName);
-    void addSectionEntry(const std::string &sectionName, SectionEntry entry);
+    std::vector<SectionData> getSectionData(const std::string &sectionName);
+    void addSectionEntry(const std::string &sectionName, std::string parentFileName, unsigned long parMemoAddr, unsigned long relMemAddr, SectionEntry entry);
     void addSection(const std::string &sectionName); //without an entry
     //data
     std::vector<Data> getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size);

@@ -47,7 +47,7 @@ void RelocationTable::addRelocEntry(const std::string &sectionName, RelocEntry e
 }
 
 //for local symbols which were previously undefined (will get sectName and offset by going through flinks)
-void RelocationTable::changeRelocEntriesForLocal(const std::string &sectionName, int offset, std::string newSymbol, int newAddend){
+void RelocationTable::changeRelocEntriesForLocal(const std::string &sectionName, unsigned int offset, std::string newSymbol, int newAddend){
   for(auto &entry: RelocationTable::table.at(sectionName)){
     if(entry.offset==offset){
       entry.symbol=newSymbol;

@@ -104,11 +104,11 @@ void SymbolTable::setSymbolSection(const std::string &label, std::string newSect
 //||=========================================================||
 //||=========================================================||
 
-int SymbolTable::getSymbolValue(const std::string &label){
+unsigned int SymbolTable::getSymbolValue(const std::string &label){
   return SymbolTable::table.at(label).value;
 }
 
-void SymbolTable::setSymbolValue(const std::string &label, int newValue){
+void SymbolTable::setSymbolValue(const std::string &label, unsigned int newValue){
   SymbolTable::table.at(label).value=newValue;
 }
 
@@ -165,7 +165,7 @@ std::list<ForwardRef> SymbolTable::getFlinks(const std::string &label){
   return SymbolTable::table.at(label).flinks;
 }
 
-void SymbolTable::addFlink(const std::string &label, std::string section, int offset){
+void SymbolTable::addFlink(const std::string &label, std::string section, unsigned int offset){
   SymbolTable::table.at(label).flinks.push_back(ForwardRef(section, offset));
 }
 

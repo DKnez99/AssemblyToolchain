@@ -12,21 +12,21 @@ enum  RelocType{      //page 75 in psABI amd64
 std::ostream& operator<<(std::ostream& out, RelocType value);
 
 struct RelocEntry{
-  int offset;
+  unsigned int offset;
   RelocType type; //type of relocation from System V ABI
   std::string symbol;
   int addend;
   bool isData;  //if it's data use little endian, if it's an instruction use big endian
   bool isRealSectionSymbol; //so we dont override global (ex. local) symbols that had value 0 in reloc table when we go through it to amend relocs
-  RelocEntry(int offset, RelocType type, std::string symbol, int addend, bool isData=true, bool isActualSectionSymbol=false)
+  RelocEntry(unsigned int offset, RelocType type, std::string symbol, int addend, bool isData=true, bool isActualSectionSymbol=false)
   :offset(offset), type(type), symbol(symbol), addend(addend), isData(isData) {}
 };
 
 struct AbsSymbolInfo{
   int value;
   std::string section;
-  int offset;
-  int size;
+  unsigned int offset;
+  unsigned int size;
 };
 
 class RelocationTable{
@@ -39,7 +39,7 @@ class RelocationTable{
     std::vector<RelocEntry> getRelocEntriesForSection(const std::string &sectionName);
     void addRelocEntry(const std::string &sectionName, RelocEntry entry);
     //for local symbols which were previously undefined (will get sectName and offset by going through flinks)
-    void changeRelocEntriesForLocal(const std::string &sectionName, int offset, std::string newSymbol, int newAddend);
+    void changeRelocEntriesForLocal(const std::string &sectionName, unsigned int offset, std::string newSymbol, int newAddend);
     //for section symbols which were previously undefined
     void changeRelocEntriesForSection(const std::string &sectionName);
     //for global symbols which were previously local

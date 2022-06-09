@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AsSectionTable.hpp"
+#include "LdSectionTable.hpp"
 #include <string>
 #include <map>
 #include <list>
@@ -15,24 +15,15 @@ typedef enum{
 
 std::ostream& operator<<(std::ostream& out, SymbolType value);
 
-struct ForwardRef{
-  std::string section;
-  unsigned int offset;
-  ForwardRef(std::string section, unsigned int offset):section(section), offset(offset){}
-};
-
-static int globalSymbolID=-1; //starts from -1 because of ABS section
-
 struct SymbolData{
   int symbolID;
   std::string section;
   unsigned int value;  //offset in the current section
   SymbolType type;
   bool isDefined;
-  std::list<ForwardRef> flinks;
-  SymbolData(std::string section, unsigned int value, SymbolType type, bool isDefined)
-  :symbolID(globalSymbolID++), section(section),value(value),type(type),isDefined(isDefined) {}
-  SymbolData() : symbolID(globalSymbolID++), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
+  SymbolData(int symbolID, std::string section, unsigned int value, SymbolType type, bool isDefined)
+  :symbolID(symbolID), section(section),value(value),type(type),isDefined(isDefined) {}
+  SymbolData() : symbolID(symbolID), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
 };
 
 class SymbolTable{
@@ -53,7 +44,7 @@ class SymbolTable{
     std::string getSymbolSecton(const std::string &label);
     void setSymbolSection(const std::string &label, std::string newSectionName);
     //value
-    unsigned int getSymbolValue(const std::string &label);
+    int getSymbolValue(const std::string &label);
     void setSymbolValue(const std::string &label, unsigned int newValue);
     //type
     SymbolType getSymbolType(const std::string &label);
@@ -62,11 +53,6 @@ class SymbolTable{
     //isDefined
     bool getSymbolIsDefined(const std::string &label);
     void setSymbolIsDefined(const std::string &label, bool newIsDefined);
-    //flink
-    std::list<ForwardRef> getFlinks(const std::string &label);
-    void addFlink(const std::string &label, std::string section, unsigned int offset);
-    bool hasFlinks(const std::string &label);
-    void removeFlinks(const std::string &label);
     //invalid symbols (checked in post processing of the file)
     std::vector<std::string> invalidSymbols();
     //print
