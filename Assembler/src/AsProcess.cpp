@@ -7,12 +7,24 @@ bool Assembler::processSection(const std::string &sectionName){
     return true;
   }
   else{
-    
     Assembler::writeLineToHelperOutputTxt("Creating section "+sectionName);
     if(Assembler::symbolTable.symbolExists(sectionName)){
-      Assembler::addError("Symbol "+sectionName+" already exists in the symbol table, can't redefine it as a section.");
-      Assembler::writeLineToHelperOutputTxt("ERROR! Symbol "+sectionName+" already exists is symbol table, can't redefine it as a section.");
-      return false;
+      if(Assembler::symbolTable.getSymbolType(sectionName)==SymbolType::NONE){
+        Assembler::currentSection=sectionName;
+        Assembler::locationCnt=0;
+        Assembler::symbolTable.setSymbolType(sectionName, SymbolType::SECTION);
+        Assembler::symbolTable.setSymbolIsDefined(sectionName, true);
+        Assembler::sectionTable.addSection(sectionName);
+        Assembler::relocTable.changeRelocEntriesForSection(sectionName);
+        Assembler::symbolTable.removeFlinks(sectionName);
+        Assembler::writeLineToHelperOutputTxt("Set previously undefined symbol "+sectionName+" to be defined as a section. Location counter set to 0.");
+        return true;
+      }
+      else{
+        Assembler::addError("Symbol "+sectionName+" is already defined in the symbol table, can't redefine it as a section.");
+        Assembler::writeLineToHelperOutputTxt("ERROR! Symbol "+sectionName+" is already defined in the symbol table, can't redefine it as a section.");
+        return false;
+      }
     }
     else{
       Assembler::currentSection=sectionName;
@@ -43,10 +55,17 @@ bool Assembler::processGlobal(const std::string &globalArgument){
         Assembler::writeLineToHelperOutputTxt("WARNING! Symbol "+globalArgument+" is already defined as a global symbol.");
         break;
       }
-      default:{
+      case (SymbolType::LOCAL):{
+        Assembler::addWarning("Symbol "+globalArgument+" is already defined as a local symbol.\nPlace .global directive before symbol's definition to avoid unnecessary calculations.");
+        Assembler::writeLineToHelperOutputTxt("WARNING! Symbol "+globalArgument+" is already defined as a local symbol. Changing reloc entries.");
+        Assembler::relocTable.changeRelocEntriesForGlobal(Assembler::symbolTable.getSymbolSecton(globalArgument), Assembler::symbolTable.getSymbolValue(globalArgument),globalArgument,0);
+        Assembler::symbolTable.removeFlinks(globalArgument);  //remove flinks
+        break;
+      }
+      default:{ //undefined
         Assembler::symbolTable.setSymbolType(globalArgument, SymbolType::GLOBAL);
-        Assembler::writeLineToHelperOutputTxt("Symbol "+globalArgument+" already exists, setting it's type to global");
-        //MUST GO THROUGH RELOC TABLE AND FIX ALL ENTRIES WITH IT
+        Assembler::writeLineToHelperOutputTxt("Undefined symbol "+globalArgument+" already exists, setting it's type to global");
+        Assembler::symbolTable.removeFlinks(globalArgument);  //remove flinks
         break;
       }
     }
@@ -60,7 +79,6 @@ bool Assembler::processGlobal(const std::string &globalArgument){
 
 bool Assembler::processExtern(const std::string &externArgument){
   if(Assembler::symbolTable.symbolExists(externArgument)){
-
     if(Assembler::symbolTable.getSymbolIsDefined(externArgument)){
       Assembler::writeLineToHelperOutputTxt("ERROR! Symbol "+externArgument+" already exists and is defined. Can't make it external.");
       Assembler::addError("Symbol "+externArgument+" is already previously locally defined. Can't import it from other files.");
@@ -156,6 +174,7 @@ bool Assembler::processAscii(const std::string &str){
 }
 
 bool Assembler::processEqu(const std::string &symbolName, const std::string &expr){
+  //go through reloc table and delete absolute addressings, and change stuff in memory
   return true;
 }
 
@@ -187,6 +206,9 @@ bool Assembler::processLabel(const std::string &labelName){
     Assembler::symbolTable.setSymbolSection(labelName, Assembler::currentSection);
     if(symbol.type==SymbolType::NONE){
       Assembler::symbolTable.setSymbolType(labelName, SymbolType::LOCAL);
+    }
+    if(symbol.type==SymbolType::GLOBAL){
+      Assembler::symbolTable.removeFlinks(labelName);
     }
   }
   return true;

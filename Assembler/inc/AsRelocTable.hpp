@@ -40,10 +40,12 @@ class RelocationTable{
     void addRelocEntry(const std::string &sectionName, RelocEntry entry);
     //for local symbols which were previously undefined (will get sectName and offset by going through flinks)
     void changeRelocEntriesForLocal(const std::string &sectionName, int offset, std::string newSymbol, int newAddend);
+    //for section symbols which were previously undefined
+    void changeRelocEntriesForSection(const std::string &sectionName);
     //for global symbols which were previously local
     //  old symbol = section name in which local symbol was defined
     //  old addend = local symbol's value
-    void changeRelocEntriesForGlobal(std::string oldSymbol, int oldAddend, std::string newSymbol, int newAddend);
+    void changeRelocEntriesForGlobal(const std::string &oldSymbol, int oldAddend, std::string newSymbol, int newAddend);
     //delete absolute symbol relocs and return places in which to insert them in mem
     std::vector<AbsSymbolInfo> getAndDeleteRelocEntriesForAbsolute(); 
     //print

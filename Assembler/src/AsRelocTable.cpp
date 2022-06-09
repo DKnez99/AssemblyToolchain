@@ -51,7 +51,21 @@ void RelocationTable::changeRelocEntriesForLocal(const std::string &sectionName,
   for(auto &entry: RelocationTable::table.at(sectionName)){
     if(entry.offset==offset){
       entry.symbol=newSymbol;
-      entry.addend=newAddend;
+      if(entry.type==RelocType::R_X86_64_16){
+        entry.addend=newAddend;
+      }
+      else{ //must be pc rel then
+        entry.addend=newAddend-2;
+      }
+    }
+  }
+}
+
+//for sections which were previously undefined (just set data to show that it's actual section)
+void RelocationTable::changeRelocEntriesForSection(const std::string &sectionName){
+  for(auto &entry: RelocationTable::table.at(sectionName)){
+    if(entry.symbol==sectionName){
+      entry.isRealSectionSymbol=true;
     }
   }
 }
@@ -59,12 +73,18 @@ void RelocationTable::changeRelocEntriesForLocal(const std::string &sectionName,
 //for global symbols which were previously local
 //  old symbol = section name in which local symbol was defined
 //  old addend = local symbol's value
-void RelocationTable::changeRelocEntriesForGlobal(std::string oldSymbol, int oldAddend, std::string newSymbol, int newAddend){
+void RelocationTable::changeRelocEntriesForGlobal(const std::string &oldSymbol, int oldAddend, std::string newSymbol, int newAddend){
   for(auto &relocEntries: RelocationTable::table){
     for(auto &entry: relocEntries.second){
-      if(entry.symbol==oldSymbol && entry.addend==oldAddend){
-        entry.symbol=newSymbol;
-        entry.addend=newAddend;
+      if(entry.symbol==oldSymbol && entry.isRealSectionSymbol==false){
+        if(entry.addend==oldAddend && entry.type==RelocType::R_X86_64_16){
+          entry.symbol=newSymbol;
+          entry.addend=newAddend;
+        }
+        else if(entry.addend==oldAddend-2 && entry.type==RelocType::R_X86_64_PC16){ //if it was pc rel addressing
+          entry.symbol=newSymbol;
+          entry.addend=newAddend-2;
+        }
       }
     }
   }

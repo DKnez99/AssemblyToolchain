@@ -1,14 +1,19 @@
 .section ivt
 .word isr_reset
 .skip 2
+.extern randomSymbol
 .word isr_timer
 .word isr_terminal
 .skip 8
 .extern myStart,myCounter
 .section isr
-.equ term_out,0xFF00
-.equ term_in,0xFF02
-.equ asciiCode,84
+.skip 6
+term_out:
+.skip 4
+term_in:
+.skip 15
+asciiCode:
+.skip 3
 isr_reset:
 jmp myStart
 isr_timer:

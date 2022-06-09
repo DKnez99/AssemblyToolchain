@@ -15,7 +15,6 @@ vpath %.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))
 CC = g++
 
 all : clean $(ASSEMBLER)
-	./$(ASSEMBLER)
 
 $(ASSEMBLER) : $(ASSEMBLER_SOURCE_CPP_LIST) 
 	$(CC) $(^) -o $(@)

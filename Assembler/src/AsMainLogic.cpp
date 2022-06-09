@@ -8,12 +8,12 @@ Assembler::Assembler(const std::string &inputFileName, const std::string &output
 }
 
 void Assembler::assemble(){
-  Assembler::formatInputFile();
-  Assembler::goThroughFormattedInputFile();
-  Assembler::goThroughFlinksAndRelocs();
+  Assembler::formatInputFile();             //pre-processing of input file
+  Assembler::goThroughFormattedInputFile(); //main processing
+  Assembler::goThroughFlinksAndRelocs();    //post processing of reloc table
 
-  Assembler::printResults();
-  Assembler::writeToOutputFiles();
+  Assembler::printResults();                //print results of assemblying (success, errors, warnings) to terminal
+  Assembler::writeToOutputFiles();          //write to output files
 }
 
 bool Assembler::formatInputFile(){
@@ -209,6 +209,43 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
 }  
 
 bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables
+  Assembler::helperOutputFileStream.open(Assembler::helperOutputFileName, std::ios::app);
+  Assembler::writeLineToHelperOutputTxt("\nGOING THROUGH FLINKS AND RELOCS");
+
+  std::vector<std::string> invalidSymbols=Assembler::symbolTable.invalidSymbols();
+
+  for(const auto &invalidSymbol: invalidSymbols){
+    Assembler::addError("Symbol "+invalidSymbol+" is not defined anywhere.");
+  }
+
+  std::vector<std::string> localSymbols = Assembler::symbolTable.getSymbolsOfType(SymbolType::LOCAL);
+
+  for(const auto& localSymbol: localSymbols){
+    Assembler::writeLineToHelperOutputTxt("Local symbol: "+localSymbol);
+    std::list<ForwardRef> flinks=Assembler::symbolTable.getFlinks(localSymbol);
+    for(const auto& flink: flinks){
+      Assembler::writeLineToHelperOutputTxt("\tFlink: ("+flink.section+": "+std::to_string(flink.offset)+")");
+      Assembler::relocTable.changeRelocEntriesForLocal(flink.section, flink.offset, Assembler::symbolTable.getSymbolSecton(localSymbol), Assembler::symbolTable.getSymbolValue(localSymbol));
+    }
+    Assembler::symbolTable.removeFlinks(localSymbol);
+  }
+
+  std::vector<std::string> externSymbols = Assembler::symbolTable.getSymbolsOfType(SymbolType::EXTERN);
+
+  for(const auto& externSymbol: externSymbols){
+    Assembler::writeLineToHelperOutputTxt("Extern symbol: "+externSymbol);
+    if(Assembler::symbolTable.hasFlinks(externSymbol)){
+      Assembler::writeLineToHelperOutputTxt("\tHas flinks - removing them");
+      Assembler::symbolTable.removeFlinks(externSymbol);
+    }
+    else{
+      Assembler::writeLineToHelperOutputTxt("\tDoes not have flinks - removing symbol");
+      Assembler::addWarning("Extern symbol "+externSymbol+" not used anywhere.");
+      Assembler::symbolTable.removeSymbol(externSymbol);
+    }
+  }
+  Assembler::writeLineToHelperOutputTxt("");
+  Assembler::helperOutputFileStream.close();
   return true;
 }  
 
