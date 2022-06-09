@@ -63,9 +63,11 @@ void RelocationTable::changeRelocEntriesForLocal(const std::string &sectionName,
 
 //for sections which were previously undefined (just set data to show that it's actual section)
 void RelocationTable::changeRelocEntriesForSection(const std::string &sectionName){
-  for(auto &entry: RelocationTable::table.at(sectionName)){
-    if(entry.symbol==sectionName){
-      entry.isRealSectionSymbol=true;
+  for(auto &entries: RelocationTable::table){
+    for(auto &entry: entries.second){
+      if(entry.symbol==sectionName){
+        entry.isRealSectionSymbol=true;
+      }
     }
   }
 }
