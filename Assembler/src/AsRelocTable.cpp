@@ -109,13 +109,13 @@ void RelocationTable::printToOutput(const std::string &fileName){
     file<<std::setw(offW)<<"Offset(HX)"
         <<std::setw(20)<<"Type"
         <<std::setw(20)<<"Symbol"
-        <<std::setw(15)<<"Addend(HX)";
+        <<std::setw(15)<<"Addend(DEC)";
     for(const auto& entry: relocation.second){
       file<<"\n"
           <<std::setw(offW)<<std::hex<<entry.offset<<std::dec
           <<std::setw(20)<<entry.type
           <<std::setw(20)<<entry.symbol
-          <<std::setw(15)<<std::hex<<entry.addend<<std::dec;
+          <<std::setw(15)<<entry.addend;
     }
     file<<std::endl;
   }

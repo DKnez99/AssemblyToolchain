@@ -225,6 +225,7 @@ bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables
     std::list<ForwardRef> flinks=Assembler::symbolTable.getFlinks(localSymbol);
     for(const auto& flink: flinks){
       Assembler::writeLineToHelperOutputTxt("\tFlink: ("+flink.section+": "+std::to_string(flink.offset)+")");
+      Assembler::writeLineToHelperOutputTxt("\tChanging reloc entry at #"+flink.section+".reloc: "+std::to_string(flink.offset)+" from '"+localSymbol+" + addend' to '"+Assembler::symbolTable.getSymbolSecton(localSymbol)+"' + newAddend");
       Assembler::relocTable.changeRelocEntriesForLocal(flink.section, flink.offset, Assembler::symbolTable.getSymbolSecton(localSymbol), Assembler::symbolTable.getSymbolValue(localSymbol));
     }
     Assembler::symbolTable.removeFlinks(localSymbol);

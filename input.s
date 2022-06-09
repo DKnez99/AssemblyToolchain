@@ -4,7 +4,8 @@
 jeq a
 jeq e 
 jeq b 
-jeq d
+jeq %d
+.word 2
 d: .word d
 ldr r1, d
 str r1, c

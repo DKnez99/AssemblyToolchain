@@ -214,7 +214,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
 
   int idW=4, valW=10, typW=6, bndW=6, ndxW=7;
   std::ofstream file;
-  file.open(fileName, std::ios::app);  //append to file
+  file.open(fileName);  //starts from 0!!!
   file<<std::left<<"#.symtab\n"
       <<std::setw(idW)<<"ID"
       <<std::setw(valW)<<"Value(HX)"
@@ -271,7 +271,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
 }
 
 void SymbolTable::printToBinaryOutput(const std::string &fileName){
-  std::ofstream file(fileName, std::ios::app | std::ios::binary);
+  std::ofstream file(fileName, std::ios::binary);
   int numberOfSymbols = SymbolTable::table.size();
   file.write((char *)&numberOfSymbols, sizeof(numberOfSymbols));
   for(const auto &symbol: SymbolTable::table){

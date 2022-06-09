@@ -580,21 +580,27 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
 int Assembler::processAbsoluteAddr(const std::string &operand, int offsetInsideInstr){
   Assembler::writeLineToHelperOutputTxt("Processing absolute addressing for symbol "+operand);
   if(!Assembler::symbolTable.symbolExists(operand)){
+    Assembler::writeLineToHelperOutputTxt("Added "+operand+" to symbol table.");
     Assembler::symbolTable.addSymbol(operand, SymbolData(SECTION_UNDEFINED, 0, SymbolType::NONE, false));
   }
   SymbolData symbol = Assembler::symbolTable.getSymbol(operand);
   if(symbol.section==SECTION_ABSOLUTE){
+    Assembler::writeLineToHelperOutputTxt("Absolute symbol. Returning "+symbol.value);
     return symbol.value;
   }
   if(symbol.type==SymbolType::SECTION){
+    Assembler::writeLineToHelperOutputTxt("Symbol is a section. Adding reloc entry. Returning 0.");
     Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_16, operand, 0, false, true));
   }
   else if(symbol.type==SymbolType::LOCAL){
+    Assembler::writeLineToHelperOutputTxt("Symbol is a local symbol. Adding reloc entry. Returning 0.");
     Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_16, symbol.section, symbol.value, false));
   }
   else{ //global, extern, undefined
+    Assembler::writeLineToHelperOutputTxt("Symbol is global/extern/undefined symbol. Adding reloc entry. Returning 0.");
     Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_16, operand, 0, false));
     if(!symbol.isDefined){
+      Assembler::writeLineToHelperOutputTxt("Adding flink.");
       Assembler::symbolTable.addFlink(operand, Assembler::currentSection, Assembler::locationCnt + offsetInsideInstr);
     }
   }
