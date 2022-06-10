@@ -118,25 +118,25 @@ void SectionTable::printToOutput(const std::string &fileName){
 
 void SectionTable::printToBinaryOutput(const std::string &fileName){
   std::ofstream file(fileName, std::ios::app | std::ios::binary);
-  int numberOfSections = SectionTable::table.size();
+  unsigned int numberOfSections = SectionTable::table.size();
   file.write((char *)&numberOfSections, sizeof(numberOfSections));    //total number of sections
   for(const auto &section: SectionTable::table){                      //for each section write:
     std::string sectionName=section.first;
     SectionData sectionData=section.second;
-    int strLength=sectionName.length();                               //sectionName
+    unsigned int strLength=sectionName.length();                      //sectionName
     file.write((char *)(&strLength),sizeof(strLength));               //sectionName
     file.write(sectionName.c_str(), strLength);                       //sectionName
     file.write((char *)(&sectionData.size),sizeof(sectionData.size)); //sectionSize
 
     //entries
-    int numberOfEntries = sectionData.entries.size();
+    unsigned int numberOfEntries = sectionData.entries.size();
     file.write((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
     for(const auto &entry: sectionData.entries){                    //for each entry write:
       file.write((char *)&entry.offset, sizeof(entry.offset));                //entry offset
       file.write((char *)&entry.size, sizeof(entry.size));                    //entry size
-
+      file.write((char *)&entry.isData, sizeof(entry.isData));
       //data
-      int numberOfDataEntries=entry.data.size();
+      unsigned int numberOfDataEntries=entry.data.size();
       file.write((char *)&numberOfDataEntries, sizeof(numberOfDataEntries));  //size of data
       for(const auto &data: entry.data){                                      //for every data write:
         file.write((char *)&data.hex1, sizeof(data.hex1));                      //hex1

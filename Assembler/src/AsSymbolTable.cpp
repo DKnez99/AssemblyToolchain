@@ -278,12 +278,12 @@ void SymbolTable::printToBinaryOutput(const std::string &fileName){
     std::string label=symbol.first;
     SymbolData symbolData=symbol.second;
     if(symbolData.symbolID>0){  //don't need to send absolute and undefined sections
-      unsigned int strLength=label.length();                       //label
-      file.write((char *)(&strLength),sizeof(strLength)); //label
-      file.write(label.c_str(), strLength);               //label
+      unsigned int strLength=label.length();                      //label
+      file.write((char *)&strLength,sizeof(strLength));           //label
+      file.write(label.c_str(), strLength);                       //label
       file.write((char *)&symbolData.symbolID, sizeof(symbolData.symbolID));  //symbolID
       strLength=symbolData.section.length();              //section
-      file.write((char *)(&strLength),sizeof(strLength)); //section
+      file.write((char *)&strLength,sizeof(strLength));   //section
       file.write(symbolData.section.c_str(), strLength);  //section
       file.write((char *)&symbolData.value, sizeof(symbolData.value));  //value
       file.write((char *)&symbolData.type, sizeof(symbolData.type));    //type - CHECK THIS - MIGHT NEED TO TREAT IT AS STRING

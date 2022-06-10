@@ -18,8 +18,9 @@ struct Data{
 struct SectionEntry{
   unsigned int offset;  //should add to this rel + parent address at some point
   unsigned int size;
+  bool isData;
   std::vector<Data> data;
-  SectionEntry(unsigned int offset, unsigned int size, long data_, bool isData=true):offset(offset),size(size){
+  SectionEntry(unsigned int offset, unsigned int size, long data_, bool isData=true):offset(offset),size(size), isData(isData){
     if(isData){ //little endian (left <- right)
       for(int i=0; i<size; i++){  
         data.push_back({int((data_ >>4) & 0xF), int((data_ >> 0) & 0xF) });
@@ -32,7 +33,7 @@ struct SectionEntry{
       }
     }
   }
-  SectionEntry():offset(0),size(0){}
+  SectionEntry():offset(0),size(0),isData(true){}
 };
 
 struct SectionData{
