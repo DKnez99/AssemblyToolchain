@@ -36,27 +36,46 @@ struct SectionEntry{
   SectionEntry():offset(0),size(0),isData(true){}
 };
 
-struct SectionData{
-  unsigned int size;                            //all entry sizes added up
-  unsigned long relativeMemoryAddress;          //previous elements relativeMemoryAddress + previousElementSize
-  unsigned long parentSectionMemoryAddress;     //same for all elements of the vector
+struct FileSectionData{                        //section from a single file
+  unsigned int size;                           //all entry sizes added up
+  unsigned int relativeMemoryAddress;          //previous elements relativeMemoryAddress + previousElementSize
   std::string originFile;
   std::vector<SectionEntry> entries;
+  FileSectionData(unsigned int size, unsigned int relMemAddr, std::string originFile):size(size), relativeMemoryAddress(relMemAddr), originFile(originFile){}
+  FileSectionData():size(0),relativeMemoryAddress(0), originFile(""){}
+};
+
+static int globalSectionID=0;
+
+struct SectionData{
+  unsigned int size;
+  unsigned int memoryAddress;
+  int sectionID;
+  std::vector<FileSectionData> fileSections;
+  SectionData(unsigned int size, unsigned int memAddr):size(size),memoryAddress(memAddr),sectionID(globalSectionID++){}
+  SectionData():size(0),memoryAddress(0),sectionID(globalSectionID++){}
 };
 
 class SectionTable{
   private:
-    std::unordered_map<std::string, std::vector<SectionData>> table;  //section name, vector of those sections across different files
+    std::unordered_map<std::string, SectionData> table;  //section name, vector of those sections across different files
   public:
     //section's existential dread
     bool sectionExists(const std::string &sectionName);
+    void addSection(const std::string &sectionName); //empty section
     bool isEmpty();
-    //sectionEntries
-    std::vector<SectionData> getSectionData(const std::string &sectionName);
-    void addSectionEntry(const std::string &sectionName, std::string originFile, unsigned long parMemoAddr, unsigned long relMemAddr, SectionEntry entry);
-    void addSection(const std::string &sectionName); //without an entry
-    void calculateSectionAddresses(std::vector<std::string> fileNames); //order of filenames is important
+    //sectionData
+    SectionData getSectionData(const std::string &sectionName);
+    void addSectionData(const std::string &sectionName, SectionData newSectionData);
+    //FileSectionData
+    FileSectionData getFileSectionData(const std::string &sectionName, const std::string &fileName);
+    void addFileSectionData(const std::string &sectionName, FileSectionData fileSectionData);
+    //SectionEntry
+    void addSectionEntry(const std::string &sectionName, std::string originFile, SectionEntry entry);
+    //calcs
+    void calculateSectionAddresses();
     //data
+    //STOPPED HERE, CONTINUE, THINK OF HOW WILL WE CALC RELOC ENTRIES AND SYMBOLS
     std::vector<Data> getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size);
     void setSectionDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long data);
     //print

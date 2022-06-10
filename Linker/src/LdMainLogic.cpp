@@ -62,6 +62,8 @@ bool Linker::readFromInputFiles(){
     inputFile.read((char *)&numberOfSections, sizeof(numberOfSections));
     Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfSections)+" section(s).");
     for(int i=0; i<numberOfSections; i++){
+      SectionData sectionData;
+      sectionData.originFile=fileName;
       Linker::writeLineToHelperOutputTxt("\tSection: ");
       unsigned int stringLength;
       //sectionName
@@ -69,15 +71,15 @@ bool Linker::readFromInputFiles(){
       std::string sectionName;
       sectionName.resize(stringLength);
       inputFile.read((char *)sectionName.c_str(), stringLength);
-      Linker::writeLineToHelperOutputTxt("\tSection: "+sectionName);
+      Linker::writeLineToHelperOutputTxt("\t\tName: "+sectionName);
 
       //sectionSize
       unsigned int sectionSize;
       inputFile.read((char *)&sectionSize, sizeof(sectionSize));
       Linker::writeLineToHelperOutputTxt("\t\tSize: "+std::to_string(sectionSize));
+      sectionData.size=sectionSize;
       //entries
       unsigned int numberOfEntries;
-      std::vector<SectionEntry> entries;
       inputFile.read((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
       for(int j=0; j<numberOfEntries; j++){
         SectionEntry entry;
@@ -93,8 +95,9 @@ bool Linker::readFromInputFiles(){
           inputFile.read((char *)&hex2, sizeof(hex2));                      //hex2
           entry.data.push_back({hex1,hex2});
         }
-        entries.push_back(entry);
+        sectionData.entries.push_back(entry);
       }
+      //add sectionData id and add it to global section table
     }
     
     inputFile.close();
