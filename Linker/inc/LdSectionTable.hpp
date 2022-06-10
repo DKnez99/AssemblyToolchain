@@ -36,29 +36,28 @@ struct SectionEntry{
 };
 
 struct SectionData{
-  unsigned int size; //all entry sizes added up
-  unsigned long relativeMemoryAddress;   //previous elements localMemordyAddress + previousElementSize
-  unsigned long parentMemoryAddress;     //same for all elements of the vector
-  std::string parentFileName;
+  unsigned int size;                            //all entry sizes added up
+  unsigned long relativeMemoryAddress;          //previous elements relativeMemoryAddress + previousElementSize
+  unsigned long parentSectionMemoryAddress;     //same for all elements of the vector
+  std::string originFile;
   std::vector<SectionEntry> entries;
 };
 
 class SectionTable{
   private:
-    std::unordered_map<std::string, std::vector<SectionData>> table;
+    std::unordered_map<std::string, std::vector<SectionData>> table;  //section name, vector of those sections across different files
   public:
     //section's existential dread
     bool sectionExists(const std::string &sectionName);
     bool isEmpty();
     //sectionEntries
     std::vector<SectionData> getSectionData(const std::string &sectionName);
-    void addSectionEntry(const std::string &sectionName, std::string parentFileName, unsigned long parMemoAddr, unsigned long relMemAddr, SectionEntry entry);
+    void addSectionEntry(const std::string &sectionName, std::string originFile, unsigned long parMemoAddr, unsigned long relMemAddr, SectionEntry entry);
     void addSection(const std::string &sectionName); //without an entry
+    void calculateSectionAddresses(std::vector<std::string> fileNames); //order of filenames is important
     //data
     std::vector<Data> getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size);
     void setSectionDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long data);
     //print
-    void printToOutput(const std::string &fileName);
-    void printToBinaryOutput(const std::string &fileName);
     void printToHelperTxt(const std::string &fileName);
 };

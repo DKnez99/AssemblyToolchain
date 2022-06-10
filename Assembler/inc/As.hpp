@@ -45,9 +45,9 @@ class Assembler{
     void printResults();
 
     //conversions
-    int getRegNumber(const std::string& reg);
-    std::vector<std::string> splitString(const std::string& str, const char c);
-    std::string stringToHex(const std::string& input);  //for ascii
+    int getRegNumber(const std::string &reg);
+    std::vector<std::string> splitString(const std::string &str, const char c);
+    std::string stringToHex(const std::string &input);  //for ascii
     int stringToDec(const std::string &literal);
     std::string decToHex(int number, int size);
     

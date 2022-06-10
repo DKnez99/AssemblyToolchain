@@ -1,4 +1,5 @@
 ASSEMBLER = asembler
+LINKER = linker
 
 ASSEMBLER_SOURCE_CPP_LIST = \
 Assembler/src/main.cpp \
@@ -10,13 +11,23 @@ Assembler/src/AsRelocTable.cpp \
 Assembler/src/AsSectionTable.cpp \
 Assembler/src/AsSymbolTable.cpp
 
-vpath %.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))
+LINKER_SOURCE_CPP_LIST = \
+Linker/src/main.cpp \
+Linker/src/LdMainLogic.cpp \
+Linker/src/LdSymbolTable.cpp \
+Linker/src/LdConversionsAndErrors.cpp
+
+vpath Assembler/src/%.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))
+vpath Linker/src/%.cpp $(sort $(dir $(LINKER_SOURCE_CPP_LIST)))
 
 CC = g++
 
-all : clean $(ASSEMBLER)
+all : clean $(ASSEMBLER) $(LINKER)
 
 $(ASSEMBLER) : $(ASSEMBLER_SOURCE_CPP_LIST) 
+	$(CC) $(^) -o $(@)
+
+$(LINKER) : $(LINKER_SOURCE_CPP_LIST) 
 	$(CC) $(^) -o $(@)
 
 clean:
