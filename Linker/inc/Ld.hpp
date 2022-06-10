@@ -32,6 +32,8 @@ class Linker{
     bool warningOccured;
     void addError(const std::string &errorMsg); //errors which will be displayed in terminal
     void addWarning(const std::string &errorMsg); //warnings which will be displayed in terminal
+    std::vector<std::string> errorMessages;
+    std::vector<std::string> warningMessages;
     void printErrors();
     void printWarnings();
     void printResults();

@@ -28,7 +28,7 @@ bool Linker::readFromInputFiles(){
       std::string label;
       label.resize(stringLength);
       inputFile.read((char *)label.c_str(), stringLength);
-      Linker::writeLineToHelperOutputTxt("\t\tLabel :"+label);
+      Linker::writeLineToHelperOutputTxt("\t\tLabel :"+label+"|");
       //symbolID
       int symbolID;
       inputFile.read((char *)(&symbolID), sizeof(symbolID));
