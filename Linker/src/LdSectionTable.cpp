@@ -1,4 +1,5 @@
 #include "../inc/LdSectionTable.hpp"
+#include <iostream>
 
 //||=========================================================||
 //||=========================================================||
@@ -28,6 +29,14 @@ void SectionTable::addSection(const std::string &sectionName){
   if(SectionTable::table.find(sectionName)==SectionTable::table.end()){
     SectionTable::table[sectionName]=SectionData();
   }
+}
+
+SectionData SectionTable::getSectionDataByID(int id){
+  for(auto &section: SectionTable::table){
+    if(section.second.sectionID==id)
+      return section.second;
+  }
+  return SectionData();
 }
 
 SectionData SectionTable::getSectionData(const std::string &sectionName){
@@ -67,12 +76,40 @@ unsigned int SectionTable::getFileSectionAddress(const std::string &sectionName,
   return 0;
 }
 
-void SectionTable::calculateSectionAddresses(){
-  
+void SectionTable::printDataToTerminal(){
+  for(auto &wholeSection: SectionTable::table){
+    std::cout<<"\nID: "<<wholeSection.second.sectionID;
+    std::cout<<"\nSection: "<<wholeSection.first;
+    std::cout<<"\nAddress: "<<wholeSection.second.memoryAddress;
+    std::cout<<"\nSize: "<<wholeSection.second.size;
+    for(auto &fileSection: wholeSection.second.fileSections){
+      std::cout<<"\n\tFrom file: "<<fileSection.originFile;
+      std::cout<<"\n\tAddress: "<<fileSection.memoryAddress;
+      std::cout<<"\n\tSize: "<<fileSection.size;
+      std::cout<<"\n\tNo. entries: "<<fileSection.entries.size();
+    }
+  }
 }
+
+void SectionTable::calculateSectionAddresses(){
+  std::cout<<"\nBEFORE:";
+  SectionTable::printDataToTerminal();
+  unsigned int currentAddress=0;
+  for(int i=0; i<SectionTable::table.size(); i++){
+    SectionData sectionData = SectionTable::getSectionDataByID(i);
+    sectionData.memoryAddress=currentAddress;
+    for(auto &fileSection: sectionData.fileSections){
+      //code
+    }
+  }
+  std::cout<<"\nAFTER:";
+  SectionTable::printDataToTerminal();
+}
+
 std::vector<Data> SectionTable::getDataAtOffset(unsigned int globalOffset, unsigned int size){
 
 }
+
 void SectionTable::setDataAtOffset(unsigned int globalOffset, unsigned int size, long data){
 
 }

@@ -146,11 +146,17 @@ bool Linker::readFromInputFiles(){
   return true;
 }
 
-bool Linker::calculateOffsets(){
-  return true;
+//go through global section table and set addresses
+void Linker::calculateSectionAddresses(){
+  Linker::globalSectionTable.calculateSectionAddresses();
 }
-bool Linker::calculateRelocs(){
-  return true;
+
+void Linker::calculateOffsets(){
+
+}
+
+void Linker::calculateRelocs(){
+  
 }
 
 void Linker::writeToOutputFile(){
@@ -160,6 +166,7 @@ void Linker::writeToOutputFile(){
 void Linker::link(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName);
   Linker::readFromInputFiles();
+  Linker::calculateSectionAddresses();
   Linker::calculateOffsets();
   Linker::calculateRelocs();
   Linker::printResults();

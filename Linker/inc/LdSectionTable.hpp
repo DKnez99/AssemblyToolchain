@@ -65,6 +65,7 @@ class SectionTable{
     void addSection(const std::string &sectionName); //empty section
     bool isEmpty();
     //sectionData
+    SectionData getSectionDataByID(int id);
     SectionData getSectionData(const std::string &sectionName);
     void addSectionData(const std::string &sectionName, SectionData newSectionData);
     //FileSectionData
@@ -78,4 +79,5 @@ class SectionTable{
     void setDataAtOffset(unsigned int globalOffset, unsigned int size, long data);  //after sections have been adjusted
     //print
     void printToHelperTxt(const std::string &fileName);
+    void printDataToTerminal();
 };

@@ -40,8 +40,9 @@ class Linker{
 
     //main logic parts
     bool readFromInputFiles();  //goes through formatted input file and categorizes data
-    bool calculateOffsets();
-    bool calculateRelocs();  //fixes stuff in tables
+    void calculateSectionAddresses();
+    void calculateOffsets();
+    void calculateRelocs();  //fixes stuff in tables
     void writeToOutputFile();
   public:
     Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable=false);
