@@ -33,8 +33,8 @@ SymbolTable::SymbolTable(){
 
 SymbolTable::SymbolTable(const bool isGlobal){
   if(isGlobal){
-    SymbolTable::addSymbol(SECTION_ABSOLUTE, SymbolData(-1,SECTION_ABSOLUTE,0,SymbolType::SECTION,true));
-    SymbolTable::addSymbol(SECTION_UNDEFINED, SymbolData(0,SECTION_UNDEFINED,0,SymbolType::SECTION,true));
+    SymbolTable::addSymbol(SECTION_ABSOLUTE, SymbolData(-1,SECTION_ABSOLUTE,0,SymbolType::SECTION,true,""));
+    SymbolTable::addSymbol(SECTION_UNDEFINED, SymbolData(0,SECTION_UNDEFINED,0,SymbolType::SECTION,true,""));
   }
 }
 

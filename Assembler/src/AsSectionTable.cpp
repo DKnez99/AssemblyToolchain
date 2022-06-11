@@ -3,12 +3,6 @@
 #include <fstream>
 #include <iomanip>
 
-//constr
-// SectionTable::SectionTable(){
-//   SectionTable::addSectionEntry(SECTION_ABSOLUTE, SectionEntry());
-//   SectionTable::addSectionEntry(SECTION_UNDEFINED, SectionEntry());
-// }
-
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
@@ -43,7 +37,8 @@ void SectionTable::addSectionEntry(const std::string &sectionName, SectionEntry 
 }
 
 void SectionTable::addSection(const std::string &sectionName){
-  SectionTable::table[sectionName].size=0;
+  if(SectionTable::table.find(sectionName)==SectionTable::table.end())
+    SectionTable::table[sectionName].size=0;
 }
 
 //||=========================================================||

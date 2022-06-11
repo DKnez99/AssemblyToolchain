@@ -36,13 +36,13 @@ struct SectionEntry{
   SectionEntry():offset(0),size(0),isData(true){}
 };
 
-struct FileSectionData{                        //section from a single file
-  unsigned int size;                           //all entry sizes added up
-  unsigned int relativeMemoryAddress;          //previous elements relativeMemoryAddress + previousElementSize
+struct FileSectionData{                       //section from a single file
+  unsigned int size;                          //all entry sizes added up
+  unsigned int memoryAddress;                 //sectionData mem address + previousElementsSizes
   std::string originFile;
   std::vector<SectionEntry> entries;
-  FileSectionData(unsigned int size, unsigned int relMemAddr, std::string originFile):size(size), relativeMemoryAddress(relMemAddr), originFile(originFile){}
-  FileSectionData():size(0),relativeMemoryAddress(0), originFile(""){}
+  FileSectionData(unsigned int size, std::string originFile):size(size), originFile(originFile){}
+  FileSectionData():size(0),memoryAddress(0), originFile(""){}
 };
 
 static int globalSectionID=0;
@@ -70,14 +70,12 @@ class SectionTable{
     //FileSectionData
     FileSectionData getFileSectionData(const std::string &sectionName, const std::string &fileName);
     void addFileSectionData(const std::string &sectionName, FileSectionData fileSectionData);
-    //SectionEntry
-    void addSectionEntry(const std::string &sectionName, std::string originFile, SectionEntry entry);
+    unsigned int getFileSectionAddress(const std::string &sectionName, const std::string &fileName);  //needed to calc new offsets in symb table
     //calcs
     void calculateSectionAddresses();
-    //data
-    //STOPPED HERE, CONTINUE, THINK OF HOW WILL WE CALC RELOC ENTRIES AND SYMBOLS
-    std::vector<Data> getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size);
-    void setSectionDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long data);
+    //data 
+    std::vector<Data> getDataAtOffset(unsigned int globalOffset, unsigned int size);
+    void setDataAtOffset(unsigned int globalOffset, unsigned int size, long data);  //after sections have been adjusted
     //print
     void printToHelperTxt(const std::string &fileName);
 };

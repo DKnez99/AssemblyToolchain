@@ -53,7 +53,7 @@ bool Linker::readFromInputFiles(){
       bool isDefined;
       inputFile.read((char *)(&isDefined), sizeof(isDefined));
       Linker::writeLineToHelperOutputTxt("\t\tIsDefined: "+std::to_string(isDefined));
-      symbolTable.addSymbol(label, SymbolData(symbolID,section,value,type,isDefined));
+      symbolTable.addSymbol(label, SymbolData(symbolID,section,value,type,isDefined, fileName));
     }  
     Linker::fileSymbolTables[fileName]=symbolTable;
 
@@ -62,8 +62,8 @@ bool Linker::readFromInputFiles(){
     inputFile.read((char *)&numberOfSections, sizeof(numberOfSections));
     Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfSections)+" section(s).");
     for(int i=0; i<numberOfSections; i++){
-      SectionData sectionData;
-      sectionData.originFile=fileName;
+      FileSectionData fileSectionData;
+      fileSectionData.originFile=fileName;
       Linker::writeLineToHelperOutputTxt("\tSection: ");
       unsigned int stringLength;
       //sectionName
@@ -77,10 +77,11 @@ bool Linker::readFromInputFiles(){
       unsigned int sectionSize;
       inputFile.read((char *)&sectionSize, sizeof(sectionSize));
       Linker::writeLineToHelperOutputTxt("\t\tSize: "+std::to_string(sectionSize));
-      sectionData.size=sectionSize;
+      fileSectionData.size=sectionSize;
       //entries
       unsigned int numberOfEntries;
       inputFile.read((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
+      Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfEntries)+" entries.");
       for(int j=0; j<numberOfEntries; j++){
         SectionEntry entry;
         inputFile.read((char *)&entry.offset, sizeof(entry.offset));                //entry offset
@@ -95,11 +96,13 @@ bool Linker::readFromInputFiles(){
           inputFile.read((char *)&hex2, sizeof(hex2));                      //hex2
           entry.data.push_back({hex1,hex2});
         }
-        sectionData.entries.push_back(entry);
+        fileSectionData.entries.push_back(entry);
+        fileSectionData.size+=entry.size;
       }
-      //add sectionData id and add it to global section table
+      Linker::globalSectionTable.addFileSectionData(sectionName, fileSectionData);
     }
     
+    //relocations
     inputFile.close();
   }
   return true;

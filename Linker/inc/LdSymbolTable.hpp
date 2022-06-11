@@ -22,9 +22,10 @@ struct SymbolData{
   unsigned int value;  //offset in the current section
   SymbolType type;
   bool isDefined;
-  SymbolData(int symbolID, std::string section, unsigned int value, SymbolType type, bool isDefined)
-  :symbolID(symbolID), section(section),value(value),type(type),isDefined(isDefined) {}
-  SymbolData(int symbolID) : symbolID(symbolID), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
+  std::string fileName;
+  SymbolData(int symbolID, std::string section, unsigned int value, SymbolType type, bool isDefined, const std::string &fileName)
+  :symbolID(symbolID), section(section),value(value),type(type),isDefined(isDefined), fileName(fileName) {}
+  SymbolData(int symbolID) : symbolID(symbolID), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false), fileName("") {}
 };
 
 class SymbolTable{
