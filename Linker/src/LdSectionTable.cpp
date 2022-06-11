@@ -31,12 +31,12 @@ void SectionTable::addSection(const std::string &sectionName){
   }
 }
 
-SectionData SectionTable::getSectionDataByID(int id){
+SectionData* SectionTable::getSectionDataByID(int id){
   for(auto &section: SectionTable::table){
     if(section.second.sectionID==id)
-      return section.second;
+      return &section.second;
   }
-  return SectionData();
+  return nullptr;
 }
 
 SectionData SectionTable::getSectionData(const std::string &sectionName){
@@ -96,10 +96,16 @@ void SectionTable::calculateSectionAddresses(){
   SectionTable::printDataToTerminal();
   unsigned int currentAddress=0;
   for(int i=0; i<SectionTable::table.size(); i++){
-    SectionData sectionData = SectionTable::getSectionDataByID(i);
-    sectionData.memoryAddress=currentAddress;
-    for(auto &fileSection: sectionData.fileSections){
-      //code
+    SectionData* sectionData = SectionTable::getSectionDataByID(i);
+    sectionData->memoryAddress=currentAddress;
+    for(auto &fileSection: sectionData->fileSections){
+      fileSection.memoryAddress=currentAddress;
+      std::cout<<"\nFile section mem. addr: "<<fileSection.memoryAddress;
+      for(auto &entry: fileSection.entries){
+        entry.offset=currentAddress;
+        currentAddress+=entry.size;
+        std::cout<<"\nEntry offset: "<<entry.offset;
+      }
     }
   }
   std::cout<<"\nAFTER:";

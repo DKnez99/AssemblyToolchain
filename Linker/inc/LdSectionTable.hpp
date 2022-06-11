@@ -65,7 +65,7 @@ class SectionTable{
     void addSection(const std::string &sectionName); //empty section
     bool isEmpty();
     //sectionData
-    SectionData getSectionDataByID(int id);
+    SectionData* getSectionDataByID(int id);
     SectionData getSectionData(const std::string &sectionName);
     void addSectionData(const std::string &sectionName, SectionData newSectionData);
     //FileSectionData
