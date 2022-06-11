@@ -1,20 +1,29 @@
 #include "../inc/LdRelocTable.hpp"
 
-bool RelocationTable::relocationsExistsForSection(const std::string &sectionName){
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||          RELOC TABLE's EXISTENTIAL DREAD                ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
 
+bool RelocationTable::relocationsExistsForSection(const std::string &sectionName){
+  return RelocationTable::table.find(sectionName)!=RelocationTable::table.end();
 }
 
 bool RelocationTable::isEmpty(){
-
+  return RelocationTable::table.empty();
 }
+
 
 
 std::vector<RelocEntry> RelocationTable::getRelocEntriesForSection(const std::string &sectionName){
-
+  return RelocationTable::table.at(sectionName);
 }
 
 void RelocationTable::addRelocEntry(const std::string &sectionName, RelocEntry entry){
-
+  RelocationTable::table[sectionName].push_back(entry);
 }
 
 //should be done after sections are sorted

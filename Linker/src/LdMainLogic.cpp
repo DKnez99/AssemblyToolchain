@@ -103,6 +103,44 @@ bool Linker::readFromInputFiles(){
     }
     
     //relocations
+    int numberOfRelocations=0;
+    inputFile.read((char *)&numberOfRelocations, sizeof(numberOfRelocations));
+    Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfRelocations)+" relocation sections.");
+    for(int i=0; i<numberOfRelocations; i++){
+      Linker::writeLineToHelperOutputTxt("\tRelocation section:");
+      unsigned int stringLength;
+      //sectionName
+      inputFile.read((char *)&stringLength, sizeof(stringLength));
+      std::string sectionName;
+      sectionName.resize(stringLength);
+      inputFile.read((char *)sectionName.c_str(), stringLength);
+      Linker::writeLineToHelperOutputTxt("\t\tReloc for section: "+sectionName);
+
+      int numberOfRelocEntries=0;
+      inputFile.read((char *)&numberOfRelocEntries, sizeof(numberOfRelocEntries));
+      Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfRelocEntries)+" reloc entries.");
+      for(int j=0; j<numberOfRelocEntries; j++){
+      Linker::writeLineToHelperOutputTxt("\t\tReloc entry "+std::to_string(j)+":");
+        int addend;
+        RelocType type;
+        unsigned int offset;
+        std::string symbol;
+        bool isData;
+        inputFile.read((char *)&offset, sizeof(offset));
+        inputFile.read((char *)&type, sizeof(type));
+        inputFile.read((char *)&stringLength, sizeof(stringLength));
+        symbol.resize(stringLength);
+        inputFile.read((char *)symbol.c_str(), stringLength);
+        inputFile.read((char *)&addend, sizeof(addend)); 
+        inputFile.read((char *)&isData, sizeof(isData));
+        Linker::writeLineToHelperOutputTxt("\t\t\tSymbol: "+symbol);
+        Linker::writeLineToHelperOutputTxt("\t\t\tType: "+std::to_string(type));
+        Linker::writeLineToHelperOutputTxt("\t\t\tOffset: "+std::to_string(offset));
+        Linker::writeLineToHelperOutputTxt("\t\t\tAddend: "+std::to_string(addend));
+        Linker::writeLineToHelperOutputTxt("\t\t\tIs data?: "+std::to_string(isData));
+        Linker::fileRelocTables[fileName].addRelocEntry(sectionName, RelocEntry(offset, type, symbol, addend, isData));
+      }
+    }
     inputFile.close();
   }
   return true;
