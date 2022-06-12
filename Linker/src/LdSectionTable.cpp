@@ -17,6 +17,13 @@ bool SectionTable::isEmpty(){
   return SectionTable::table.empty();
 }
 
+std::vector<std::string> SectionTable::getSectionNames(){
+  std::vector<std::string> result;
+  for(auto &section: SectionTable::table){
+    result.push_back(section.first);
+  }
+}
+
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
@@ -29,14 +36,6 @@ void SectionTable::addSection(const std::string &sectionName){
   if(SectionTable::table.find(sectionName)==SectionTable::table.end()){
     SectionTable::table[sectionName]=SectionData();
   }
-}
-
-SectionData* SectionTable::getSectionDataByID(int id){
-  for(auto &section: SectionTable::table){
-    if(section.second.sectionID==id)
-      return &section.second;
-  }
-  return nullptr;
 }
 
 SectionData SectionTable::getSectionData(const std::string &sectionName){
@@ -87,29 +86,32 @@ void SectionTable::printDataToTerminal(){
       std::cout<<"\n\tAddress: "<<fileSection.memoryAddress;
       std::cout<<"\n\tSize: "<<fileSection.size;
       std::cout<<"\n\tNo. entries: "<<fileSection.entries.size();
+      int i=1;
+      for(auto &entry: fileSection.entries){
+        std::cout<<"\n\t\tEntry "<<i++;
+        std::cout<<"\n\t\tAddress: "<<entry.offset;
+        std::cout<<"\n\t\tSize: "<<entry.size;
+      }
     }
   }
 }
 
 void SectionTable::calculateSectionAddresses(){
-  std::cout<<"\nBEFORE:";
-  SectionTable::printDataToTerminal();
   unsigned int currentAddress=0;
   for(int i=0; i<SectionTable::table.size(); i++){
-    SectionData* sectionData = SectionTable::getSectionDataByID(i);
-    sectionData->memoryAddress=currentAddress;
-    for(auto &fileSection: sectionData->fileSections){
-      fileSection.memoryAddress=currentAddress;
-      std::cout<<"\nFile section mem. addr: "<<fileSection.memoryAddress;
-      for(auto &entry: fileSection.entries){
-        entry.offset=currentAddress;
-        currentAddress+=entry.size;
-        std::cout<<"\nEntry offset: "<<entry.offset;
+    for(auto &sectionData: SectionTable::table){
+      if(sectionData.second.sectionID==i){
+        sectionData.second.memoryAddress=currentAddress;
+        for(auto &fileSection: sectionData.second.fileSections){
+          fileSection.memoryAddress=currentAddress;
+          for(auto &entry: fileSection.entries){
+            entry.offset=currentAddress;
+            currentAddress+=entry.size;
+          }
+        }
       }
     }
   }
-  std::cout<<"\nAFTER:";
-  SectionTable::printDataToTerminal();
 }
 
 std::vector<Data> SectionTable::getDataAtOffset(unsigned int globalOffset, unsigned int size){

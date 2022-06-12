@@ -97,7 +97,7 @@ bool Linker::readFromInputFiles(){
           entry.data.push_back({hex1,hex2});
         }
         fileSectionData.entries.push_back(entry);
-        fileSectionData.size+=entry.size;
+        //we already read size
       }
       Linker::globalSectionTable.addFileSectionData(sectionName, fileSectionData);
     }
@@ -152,15 +152,24 @@ void Linker::calculateSectionAddresses(){
 }
 
 void Linker::calculateOffsets(){
-
+  for(auto &sectionName: Linker::globalSectionTable.getSectionNames()){
+    for(auto &fileSection: Linker::globalSectionTable.getSectionData(sectionName).fileSections){
+      Linker::fileRelocTables.at(fileSection.originFile).updateOffsets(sectionName, fileSection.memoryAddress);
+      Linker::fileSymbolTables.at(fileSection.originFile).updateOffsets(fileSection.memoryAddress);
+    }
+  }
 }
 
 void Linker::calculateRelocs(){
   
 }
 
-void Linker::writeToOutputFile(){
-  
+void Linker::writeToOutputFiles(){
+  for(auto &fileName: Linker::inputFileNames){
+    Linker::writeLineToHelperOutputTxt("TABLES FOR FILE "+fileName);
+    Linker::fileSymbolTables.at(fileName).printToHelperTxt(Linker::helperOutputFileName);
+    Linker::fileRelocTables.at(fileName).printToHelperTxt(Linker::helperOutputFileName);
+  }
 }
 
 void Linker::link(){
@@ -170,6 +179,6 @@ void Linker::link(){
   Linker::calculateOffsets();
   Linker::calculateRelocs();
   Linker::printResults();
-  Linker::writeToOutputFile();
+  Linker::writeToOutputFiles();
   Linker::helperOutputFileStream.close();
 }

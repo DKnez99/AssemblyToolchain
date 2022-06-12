@@ -129,7 +129,7 @@ void SectionTable::printToBinaryOutput(const std::string &fileName){
     for(const auto &entry: sectionData.entries){                    //for each entry write:
       file.write((char *)&entry.offset, sizeof(entry.offset));                //entry offset
       file.write((char *)&entry.size, sizeof(entry.size));                    //entry size
-      file.write((char *)&entry.isData, sizeof(entry.isData));
+      file.write((char *)&entry.isData, sizeof(entry.isData));                //entry isData
       //data
       unsigned int numberOfDataEntries=entry.data.size();
       file.write((char *)&numberOfDataEntries, sizeof(numberOfDataEntries));  //size of data

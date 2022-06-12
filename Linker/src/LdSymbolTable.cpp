@@ -74,6 +74,11 @@ void SymbolTable::removeSymbol(const std::string &label){
   SymbolTable::table.erase(label);
 }
 
+void SymbolTable::updateOffsets(unsigned int addOffset){
+  for(auto &symbol:SymbolTable::table){
+    symbol.second.value+=addOffset;
+  }
+}
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||

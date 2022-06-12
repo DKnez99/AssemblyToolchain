@@ -64,8 +64,8 @@ class SectionTable{
     bool sectionExists(const std::string &sectionName);
     void addSection(const std::string &sectionName); //empty section
     bool isEmpty();
+    std::vector<std::string> getSectionNames();
     //sectionData
-    SectionData* getSectionDataByID(int id);
     SectionData getSectionData(const std::string &sectionName);
     void addSectionData(const std::string &sectionName, SectionData newSectionData);
     //FileSectionData

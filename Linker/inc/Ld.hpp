@@ -43,7 +43,7 @@ class Linker{
     void calculateSectionAddresses();
     void calculateOffsets();
     void calculateRelocs();  //fixes stuff in tables
-    void writeToOutputFile();
+    void writeToOutputFiles();
   public:
     Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable=false);
     void link();

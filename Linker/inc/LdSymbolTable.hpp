@@ -41,6 +41,7 @@ class SymbolTable{
     SymbolData getSymbol(const std::string &label);
     void addSymbol(const std::string &label, SymbolData symbolData);
     void removeSymbol(const std::string &label);
+    void updateOffsets(unsigned int addOffset);
     //symbolID
     int getSymbolID(const std::string &label);
     //section
