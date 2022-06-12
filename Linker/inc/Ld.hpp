@@ -4,6 +4,7 @@
 #include "LdSymbolTablesForAllAsFiles.hpp"
 #include "LdRelocTable.hpp"
 #include "LdSectionTable.hpp"
+#include "LdSectionTablesForAllAsFiles.hpp"
 #include <fstream>
 
 class Linker{
@@ -21,6 +22,7 @@ class Linker{
     std::string currentSection;
     std::string currentFileName;
     SymbolTablesForAllAsFiles symbolTablesForAllFiles;
+    SectionTablesForAllAsFiles sectionTablesForAllFiles;
     //std::unordered_map<std::string, RelocationTable> fileRelocTables;   //fileName, relocTable
     SymbolTable globalSymbolTable;
     //SectionTable globalSectionTable;

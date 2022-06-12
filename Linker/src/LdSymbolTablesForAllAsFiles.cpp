@@ -54,7 +54,14 @@ int SymbolTablesForAllAsFiles::getSymbolID(const std::string &fileName, const st
   return SymbolTablesForAllAsFiles::table.at(fileName).getSymbolID(label);
 }
 
-//section
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                     SECTION                             ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 std::string SymbolTablesForAllAsFiles::getSymbolSection(const std::string &fileName, const std::string &label){
   return SymbolTablesForAllAsFiles::table.at(fileName).getSymbolSection(label);
 }
@@ -63,7 +70,14 @@ void SymbolTablesForAllAsFiles::setSymbolSection(const std::string &fileName, co
   SymbolTablesForAllAsFiles::table.at(fileName).setSymbolSection(label, newSectionName);
 }
 
-//value
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                     VALUE                               ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 unsigned int SymbolTablesForAllAsFiles::getSymbolValue(const std::string &fileName, const std::string &label){
   return SymbolTablesForAllAsFiles::table.at(fileName).getSymbolValue(label);
 }
@@ -72,7 +86,14 @@ void SymbolTablesForAllAsFiles::setSymbolValue(const std::string &fileName, cons
   SymbolTablesForAllAsFiles::table.at(fileName).setSymbolValue(label, newValue);
 }
 
-//type
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                       TYPE                              ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 SymbolType SymbolTablesForAllAsFiles::getSymbolType(const std::string &fileName, const std::string &label){
   return SymbolTablesForAllAsFiles::table.at(fileName).getSymbolType(label);
 }
@@ -105,7 +126,14 @@ void SymbolTablesForAllAsFiles::removeAllSymbolsOfType(SymbolType wantedType){
   }
 }
 
-//isDefined
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                   IS DEFINED                            ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 bool SymbolTablesForAllAsFiles::getSymbolIsDefined(const std::string &fileName, const std::string &label){
   return SymbolTablesForAllAsFiles::table.at(fileName).getSymbolIsDefined(label);
 }
@@ -114,7 +142,14 @@ void SymbolTablesForAllAsFiles::setSymbolIsDefined(const std::string &fileName, 
   SymbolTablesForAllAsFiles::table.at(fileName).setSymbolIsDefined(label, newIsDefined);
 }
 
-//invalid symbols (checked in post processing of the file)
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||       INVALID SYMBOLS (CHECK AFTER PROCESSING)          ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 std::vector<std::string> SymbolTablesForAllAsFiles::invalidSymbols(){
   std::vector<std::string> result;
   for(auto &sectionTable: SymbolTablesForAllAsFiles::table){
@@ -125,7 +160,14 @@ std::vector<std::string> SymbolTablesForAllAsFiles::invalidSymbols(){
   return result;
 }
 
-//print
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                      PRINT                              ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
 void SymbolTablesForAllAsFiles::printToHelperTxt(const std::string &fileName){
   std::ofstream file;
   for(auto &symbolTable:SymbolTablesForAllAsFiles::table){

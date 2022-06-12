@@ -17,6 +17,7 @@ Linker/src/LdMainLogic.cpp \
 Linker/src/LdSymbolTable.cpp \
 Linker/src/LdSymbolTablesForAllAsFiles.cpp \
 Linker/src/LdSectionTable.cpp \
+Linker/src/LdSectionTablesForAllAsFiles.cpp \
 Linker/src/LdRelocTable.cpp \
 Linker/src/LdConversionsAndErrors.cpp
 

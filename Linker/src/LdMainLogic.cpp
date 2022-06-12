@@ -50,50 +50,46 @@ bool Linker::readFromInputFiles(){
       symbolTablesForAllFiles.addSymbol(Linker::currentFileName, label, SymbolData(symbolID,section,value,type,isDefined));
     }
 
-    // //section table
-    // int numberOfSections=0;
-    // inputFile.read((char *)&numberOfSections, sizeof(numberOfSections));
-    // Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfSections)+" section(s).");
-    // for(int i=0; i<numberOfSections; i++){
-    //   FileSectionData fileSectionData;
-    //   fileSectionData.originFile=fileName;
-    //   Linker::writeLineToHelperOutputTxt("\tSection: ");
-    //   unsigned int stringLength;
-    //   //sectionName
-    //   inputFile.read((char *)&stringLength, sizeof(stringLength));
-    //   std::string sectionName;
-    //   sectionName.resize(stringLength);
-    //   inputFile.read((char *)sectionName.c_str(), stringLength);
-    //   Linker::writeLineToHelperOutputTxt("\t\tName: "+sectionName);
+    //section table
+    int numberOfSections=0;
+    inputFile.read((char *)&numberOfSections, sizeof(numberOfSections));
+    Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfSections)+" section(s).");
+    for(int i=0; i<numberOfSections; i++){
+      SectionData sectionData;
+      Linker::writeLineToHelperOutputTxt("\tSection: ");
+      unsigned int stringLength;
+      //sectionName
+      inputFile.read((char *)&stringLength, sizeof(stringLength));
+      std::string sectionName;
+      sectionName.resize(stringLength);
+      inputFile.read((char *)sectionName.c_str(), stringLength);
+      Linker::writeLineToHelperOutputTxt("\t\tName: "+sectionName);
 
-    //   //sectionSize
-    //   unsigned int sectionSize;
-    //   inputFile.read((char *)&sectionSize, sizeof(sectionSize));
-    //   Linker::writeLineToHelperOutputTxt("\t\tSize: "+std::to_string(sectionSize));
-    //   fileSectionData.size=sectionSize;
-    //   //entries
-    //   unsigned int numberOfEntries;
-    //   inputFile.read((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
-    //   Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfEntries)+" entries.");
-    //   for(int j=0; j<numberOfEntries; j++){
-    //     SectionEntry entry;
-    //     inputFile.read((char *)&entry.offset, sizeof(entry.offset));                //entry offset
-    //     inputFile.read((char *)&entry.size, sizeof(entry.size));                    //entry size
-    //     inputFile.read((char *)&entry.isData, sizeof(entry.isData));                //entry isData
-    //     //data
-    //     unsigned int numberOfDataEntries;
-    //     inputFile.read((char *)&numberOfDataEntries, sizeof(numberOfDataEntries));  //size of data
-    //     for(int k=0; k<numberOfDataEntries; k++){
-    //       int hex1, hex2;
-    //       inputFile.read((char *)&hex1, sizeof(hex1));                      //hex1
-    //       inputFile.read((char *)&hex2, sizeof(hex2));                      //hex2
-    //       entry.data.push_back({hex1,hex2});
-    //     }
-    //     fileSectionData.entries.push_back(entry);
-    //     //we already read size
-    //   }
-    //   Linker::globalSectionTable.addFileSectionData(sectionName, fileSectionData);
-    // }
+      //sectionSize
+      inputFile.read((char *)&sectionData.size, sizeof(sectionData.size));
+      Linker::writeLineToHelperOutputTxt("\t\tSize: "+std::to_string(sectionData.size));
+      //entries
+      unsigned int numberOfEntries;
+      inputFile.read((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
+      Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfEntries)+" entries.");
+      for(int j=0; j<numberOfEntries; j++){
+        SectionEntry entry;
+        inputFile.read((char *)&entry.offset, sizeof(entry.offset));                //entry offset
+        inputFile.read((char *)&entry.size, sizeof(entry.size));                    //entry size
+        inputFile.read((char *)&entry.isData, sizeof(entry.isData));                //entry isData
+        //data
+        unsigned int numberOfDataEntries;
+        inputFile.read((char *)&numberOfDataEntries, sizeof(numberOfDataEntries));  //size of data
+        for(int k=0; k<numberOfDataEntries; k++){
+          int hex1, hex2;
+          inputFile.read((char *)&hex1, sizeof(hex1));                      //hex1
+          inputFile.read((char *)&hex2, sizeof(hex2));                      //hex2
+          entry.data.push_back({hex1,hex2});
+        }
+        sectionData.entries.push_back(entry); //we already read size
+      }
+      Linker::sectionTablesForAllFiles.addSectionData(Linker::currentFileName, sectionName, sectionData);
+    }
     
     // //relocations
     // int numberOfRelocations=0;
@@ -170,6 +166,7 @@ void Linker::calculateRelocsRelocatable(){
 
 void Linker::writeToOutputFiles(){
   Linker::symbolTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
 }
 
 void Linker::link(){
