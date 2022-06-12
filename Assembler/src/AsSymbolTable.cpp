@@ -88,7 +88,7 @@ int SymbolTable::getSymbolID(const std::string &label){
 //||=========================================================||
 //||=========================================================||
 
-std::string SymbolTable::getSymbolSecton(const std::string &label){
+std::string SymbolTable::getSymbolSection(const std::string &label){
   return SymbolTable::table.at(label).section;
 }
 
@@ -272,23 +272,21 @@ void SymbolTable::printToOutput(const std::string &fileName){
 
 void SymbolTable::printToBinaryOutput(const std::string &fileName){
   std::ofstream file(fileName, std::ios::binary);
-  int numberOfSymbols = SymbolTable::table.size() - 2;  //don't need to send absolute and undefined sections
+  int numberOfSymbols = SymbolTable::table.size();
   file.write((char *)&numberOfSymbols, sizeof(numberOfSymbols));
   for(const auto &symbol: SymbolTable::table){
     std::string label=symbol.first;
     SymbolData symbolData=symbol.second;
-    if(symbolData.symbolID>0){  //don't need to send absolute and undefined sections
-      unsigned int strLength=label.length();                      //label
-      file.write((char *)&strLength,sizeof(strLength));           //label
-      file.write(label.c_str(), strLength);                       //label
-      file.write((char *)&symbolData.symbolID, sizeof(symbolData.symbolID));  //symbolID
-      strLength=symbolData.section.length();              //section
-      file.write((char *)&strLength,sizeof(strLength));   //section
-      file.write(symbolData.section.c_str(), strLength);  //section
-      file.write((char *)&symbolData.value, sizeof(symbolData.value));  //value
-      file.write((char *)&symbolData.type, sizeof(symbolData.type));    //type - CHECK THIS - MIGHT NEED TO TREAT IT AS STRING
-      file.write((char *)&symbolData.isDefined, sizeof(symbolData.isDefined));  //isDefined
-    }
+    unsigned int strLength=label.length();                      //label
+    file.write((char *)&strLength,sizeof(strLength));           //label
+    file.write(label.c_str(), strLength);                       //label
+    file.write((char *)&symbolData.symbolID, sizeof(symbolData.symbolID));  //symbolID
+    strLength=symbolData.section.length();              //section
+    file.write((char *)&strLength,sizeof(strLength));   //section
+    file.write(symbolData.section.c_str(), strLength);  //section
+    file.write((char *)&symbolData.value, sizeof(symbolData.value));  //value
+    file.write((char *)&symbolData.type, sizeof(symbolData.type));    //type - CHECK THIS - MIGHT NEED TO TREAT IT AS STRING
+    file.write((char *)&symbolData.isDefined, sizeof(symbolData.isDefined));  //isDefined
   }
   file.close();
 }

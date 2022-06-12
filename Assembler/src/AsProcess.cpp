@@ -58,7 +58,7 @@ bool Assembler::processGlobal(const std::string &globalArgument){
       case (SymbolType::LOCAL):{
         Assembler::addWarning("Symbol "+globalArgument+" is already defined as a local symbol.\nPlace .global directive before symbol's definition to avoid unnecessary calculations.");
         Assembler::writeLineToHelperOutputTxt("WARNING! Symbol "+globalArgument+" is already defined as a local symbol. Changing reloc entries.");
-        Assembler::relocTable.changeRelocEntriesForGlobal(Assembler::symbolTable.getSymbolSecton(globalArgument), Assembler::symbolTable.getSymbolValue(globalArgument),globalArgument,0);
+        Assembler::relocTable.changeRelocEntriesForGlobal(Assembler::symbolTable.getSymbolSection(globalArgument), Assembler::symbolTable.getSymbolValue(globalArgument),globalArgument,0);
         Assembler::symbolTable.removeFlinks(globalArgument);  //remove flinks
         break;
       }

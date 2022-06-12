@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LdSymbolTable.hpp"
+#include "LdSymbolTablesForAllAsFiles.hpp"
 #include "LdRelocTable.hpp"
 #include "LdSectionTable.hpp"
 #include <fstream>
@@ -19,12 +20,12 @@ class Linker{
     //int locationCnt;
     std::string currentSection;
     std::string currentFileName;
-    std::unordered_map<std::string, SymbolTable> fileSymbolTables;
-    std::unordered_map<std::string, RelocationTable> fileRelocTables;
+    SymbolTablesForAllAsFiles symbolTablesForAllFiles;
+    //std::unordered_map<std::string, RelocationTable> fileRelocTables;   //fileName, relocTable
     SymbolTable globalSymbolTable;
-    SectionTable globalSectionTable;
-    RelocationTable globalRelocTable;
-    std::unordered_map<std::string, unsigned int> placeAt;  //map for saving user -placeAt input
+    //SectionTable globalSectionTable;
+    //RelocationTable globalRelocTable;
+    std::unordered_map<std::string, unsigned int> placeSectionAt;  //map for saving user -placeAt input
     bool isRelocatable;
 
     //error handling
@@ -42,8 +43,17 @@ class Linker{
     bool readFromInputFiles();  //goes through formatted input file and categorizes data
     void calculateSectionAddresses();
     void calculateOffsets();
-    void calculateRelocs();  //fixes stuff in tables
+    void calculateRelocsHex(); //if -hex option is used
+    void calculateRelocsRelocatable(); //if -relocateable option is used (misspelled in the document)
     void writeToOutputFiles();
+
+    //create global tables
+    bool createGlobalSymbolTable();
+    bool createGlobalSectionTable();
+    bool createGlobalRelocTable();
+
+    //helper stuff
+    bool sectionsIntersect(unsigned int startAddrOne, unsigned int sizeOne, unsigned int startAddrTwo, unsigned int sizeTwo);
   public:
     Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable=false);
     void link();

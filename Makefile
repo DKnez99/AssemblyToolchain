@@ -15,6 +15,7 @@ LINKER_SOURCE_CPP_LIST = \
 Linker/src/main.cpp \
 Linker/src/LdMainLogic.cpp \
 Linker/src/LdSymbolTable.cpp \
+Linker/src/LdSymbolTablesForAllAsFiles.cpp \
 Linker/src/LdSectionTable.cpp \
 Linker/src/LdRelocTable.cpp \
 Linker/src/LdConversionsAndErrors.cpp

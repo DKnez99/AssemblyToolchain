@@ -27,16 +27,8 @@ std::ostream& operator<<(std::ostream& out, SymbolType value){
 //||=========================================================||
 //||=========================================================||
 
-SymbolTable::SymbolTable(){
-  
-}
 
-SymbolTable::SymbolTable(const bool isGlobal){
-  if(isGlobal){
-    SymbolTable::addSymbol(SECTION_ABSOLUTE, SymbolData(-1,SECTION_ABSOLUTE,0,SymbolType::SECTION,true,""));
-    SymbolTable::addSymbol(SECTION_UNDEFINED, SymbolData(0,SECTION_UNDEFINED,0,SymbolType::SECTION,true,""));
-  }
-}
+
 
 //||=========================================================||
 //||=========================================================||
@@ -74,11 +66,6 @@ void SymbolTable::removeSymbol(const std::string &label){
   SymbolTable::table.erase(label);
 }
 
-void SymbolTable::updateOffsets(unsigned int addOffset){
-  for(auto &symbol:SymbolTable::table){
-    symbol.second.value+=addOffset;
-  }
-}
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
@@ -99,7 +86,7 @@ int SymbolTable::getSymbolID(const std::string &label){
 //||=========================================================||
 //||=========================================================||
 
-std::string SymbolTable::getSymbolSecton(const std::string &label){
+std::string SymbolTable::getSymbolSection(const std::string &label){
   return SymbolTable::table.at(label).section;
 }
 
@@ -139,13 +126,20 @@ void SymbolTable::setSymbolType(const std::string &label, SymbolType newType){
   SymbolTable::table.at(label).type=newType;
 } 
 
-std::vector<std::string> SymbolTable::getSymbolsOfType(const SymbolType &wantedType){
+std::vector<std::string> SymbolTable::getSymbolsOfType(SymbolType wantedType){
   std::vector<std::string> result;
   for(auto const &symbol: SymbolTable::table){
     if(symbol.second.type==wantedType)
       result.push_back(symbol.first);
   }
   return result;
+}
+
+void SymbolTable::removeSymbolsOfType(SymbolType wantedType){
+  for(auto const &symbol: SymbolTable::table){
+    if(symbol.second.type==wantedType)
+      SymbolTable::removeSymbol(symbol.first);
+  }
 }
 
 //||=========================================================||
@@ -172,11 +166,22 @@ void SymbolTable::setSymbolIsDefined(const std::string &label, bool newIsDefined
 //||=========================================================||
 //||=========================================================||
 
+//should be checked in global table after processing (removing locals, externals defined in other files and duplicate sections)
 std::vector<std::string> SymbolTable::invalidSymbols(){
   std::vector<std::string> invalidSymbols;
   for(const auto &symbol: SymbolTable::table){
-    if(symbol.second.isDefined==false && symbol.second.type!=SymbolType::EXTERN){
-      invalidSymbols.push_back(symbol.first);
+    unsigned int symbolOccuranceCnt=0;
+    std::string checkingForSymbol=symbol.first;
+    if(symbol.second.isDefined==false){
+      invalidSymbols.push_back(checkingForSymbol);
+    }
+    else{
+      for(const auto &symbol: SymbolTable::table){
+        if(symbol.first==checkingForSymbol)
+          symbolOccuranceCnt++;
+      }
+      if(symbolOccuranceCnt>1)
+        invalidSymbols.push_back(checkingForSymbol);
     }
   }
   return invalidSymbols;
@@ -210,7 +215,6 @@ void SymbolTable::printToHelperTxt(const std::string &fileName){
         <<std::setw(typW)<<symbolData.type                         //type
         <<std::setw(nameW)<<symbolData.section                      //section
         <<std::setw(nameW)<<std::left<<label.c_str();               //name
-
   }
   file<<std::endl;
   file.close();

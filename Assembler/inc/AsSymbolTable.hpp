@@ -50,7 +50,7 @@ class SymbolTable{
     //symbolID
     int getSymbolID(const std::string &label);
     //section
-    std::string getSymbolSecton(const std::string &label);
+    std::string getSymbolSection(const std::string &label);
     void setSymbolSection(const std::string &label, std::string newSectionName);
     //value
     unsigned int getSymbolValue(const std::string &label);
