@@ -3,6 +3,7 @@
 #include "LdSymbolTable.hpp"
 #include "LdSymbolTablesForAllAsFiles.hpp"
 #include "LdRelocTable.hpp"
+#include "LdRelocTablesForAllAsFiles.hpp"
 #include "LdSectionTable.hpp"
 #include "LdSectionTablesForAllAsFiles.hpp"
 #include <fstream>
@@ -23,10 +24,10 @@ class Linker{
     std::string currentFileName;
     SymbolTablesForAllAsFiles symbolTablesForAllFiles;
     SectionTablesForAllAsFiles sectionTablesForAllFiles;
-    //std::unordered_map<std::string, RelocationTable> fileRelocTables;   //fileName, relocTable
+    RelocTablesForAllAsFiles relocationTablesForAllFiles;
     SymbolTable globalSymbolTable;
-    //SectionTable globalSectionTable;
-    //RelocationTable globalRelocTable;
+    SectionTable globalSectionTable;
+    RelocationTable globalRelocTable;
     std::unordered_map<std::string, unsigned int> placeSectionAt;  //map for saving user -placeAt input
     bool isRelocatable;
 
@@ -57,6 +58,7 @@ class Linker{
     //helper stuff
     bool sectionsIntersect(unsigned int startAddrOne, unsigned int sizeOne, unsigned int startAddrTwo, unsigned int sizeTwo);
   public:
+    unsigned int memoryMappedRegisters; //unavailable locations (0xFF00 - 0xFFFF)
     Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable=false);
     void link();
 };

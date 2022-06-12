@@ -4,6 +4,7 @@
 Linker::Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable)
 :inputFileNames(inputFileNames), outputFileName(outputFileName), placeSectionAt(placeAt), isRelocatable(isRelocatable), errorOccured(false), warningOccured(false) {
   Linker::helperOutputFileName=outputFileName.substr(0,outputFileName.find_last_of('.'))+"_helper.txt";
+  Linker::memoryMappedRegisters=0xFF00;
 }
 
 //1. symbol, 2. section, 3. relocs
@@ -53,25 +54,21 @@ bool Linker::readFromInputFiles(){
     //section table
     int numberOfSections=0;
     inputFile.read((char *)&numberOfSections, sizeof(numberOfSections));
-    Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfSections)+" section(s).");
+    Linker::writeLineToHelperOutputTxt("Reading "+std::to_string(numberOfSections)+" section(s).");
     for(int i=0; i<numberOfSections; i++){
       SectionData sectionData;
-      Linker::writeLineToHelperOutputTxt("\tSection: ");
       unsigned int stringLength;
       //sectionName
       inputFile.read((char *)&stringLength, sizeof(stringLength));
       std::string sectionName;
       sectionName.resize(stringLength);
       inputFile.read((char *)sectionName.c_str(), stringLength);
-      Linker::writeLineToHelperOutputTxt("\t\tName: "+sectionName);
 
       //sectionSize
       inputFile.read((char *)&sectionData.size, sizeof(sectionData.size));
-      Linker::writeLineToHelperOutputTxt("\t\tSize: "+std::to_string(sectionData.size));
       //entries
       unsigned int numberOfEntries;
       inputFile.read((char *)&numberOfEntries, sizeof(numberOfEntries));  //number of entries
-      Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfEntries)+" entries.");
       for(int j=0; j<numberOfEntries; j++){
         SectionEntry entry;
         inputFile.read((char *)&entry.offset, sizeof(entry.offset));                //entry offset
@@ -91,51 +88,43 @@ bool Linker::readFromInputFiles(){
       Linker::sectionTablesForAllFiles.addSectionData(Linker::currentFileName, sectionName, sectionData);
     }
     
-    // //relocations
-    // int numberOfRelocations=0;
-    // inputFile.read((char *)&numberOfRelocations, sizeof(numberOfRelocations));
-    // Linker::writeLineToHelperOutputTxt("Found "+std::to_string(numberOfRelocations)+" relocation sections.");
-    // for(int i=0; i<numberOfRelocations; i++){
-    //   Linker::writeLineToHelperOutputTxt("\tRelocation section:");
-    //   unsigned int stringLength;
-    //   //sectionName
-    //   inputFile.read((char *)&stringLength, sizeof(stringLength));
-    //   std::string sectionName;
-    //   sectionName.resize(stringLength);
-    //   inputFile.read((char *)sectionName.c_str(), stringLength);
-    //   Linker::writeLineToHelperOutputTxt("\t\tReloc for section: "+sectionName);
+    //relocations
+    int numberOfRelocations=0;
+    inputFile.read((char *)&numberOfRelocations, sizeof(numberOfRelocations));
+    Linker::writeLineToHelperOutputTxt("Reading "+std::to_string(numberOfRelocations)+" relocation section(s).");
+    for(int i=0; i<numberOfRelocations; i++){
+      unsigned int stringLength;
+      //sectionName
+      inputFile.read((char *)&stringLength, sizeof(stringLength));
+      std::string sectionName;
+      sectionName.resize(stringLength);
+      inputFile.read((char *)sectionName.c_str(), stringLength);
 
-    //   int numberOfRelocEntries=0;
-    //   inputFile.read((char *)&numberOfRelocEntries, sizeof(numberOfRelocEntries));
-    //   Linker::writeLineToHelperOutputTxt("\t\tFound "+std::to_string(numberOfRelocEntries)+" reloc entries.");
-    //   for(int j=0; j<numberOfRelocEntries; j++){
-    //   Linker::writeLineToHelperOutputTxt("\t\tReloc entry "+std::to_string(j)+":");
-    //     int addend;
-    //     RelocType type;
-    //     unsigned int offset;
-    //     std::string symbol;
-    //     bool isData;
-    //     inputFile.read((char *)&offset, sizeof(offset));
-    //     inputFile.read((char *)&type, sizeof(type));
-    //     inputFile.read((char *)&stringLength, sizeof(stringLength));
-    //     symbol.resize(stringLength);
-    //     inputFile.read((char *)symbol.c_str(), stringLength);
-    //     inputFile.read((char *)&addend, sizeof(addend)); 
-    //     inputFile.read((char *)&isData, sizeof(isData));
-    //     Linker::writeLineToHelperOutputTxt("\t\t\tSymbol: "+symbol);
-    //     Linker::writeLineToHelperOutputTxt("\t\t\tType: "+std::to_string(type));
-    //     Linker::writeLineToHelperOutputTxt("\t\t\tOffset: "+std::to_string(offset));
-    //     Linker::writeLineToHelperOutputTxt("\t\t\tAddend: "+std::to_string(addend));
-    //     Linker::writeLineToHelperOutputTxt("\t\t\tIs data?: "+std::to_string(isData));
-    //     Linker::fileRelocTables[fileName].addRelocEntry(sectionName, RelocEntry(offset, type, symbol, addend, isData));
-    //   }
-    // }
+      int numberOfRelocEntries=0;
+      inputFile.read((char *)&numberOfRelocEntries, sizeof(numberOfRelocEntries));
+      for(int j=0; j<numberOfRelocEntries; j++){
+        int addend;
+        RelocType type;
+        unsigned int offset;
+        std::string symbol;
+        bool isData;
+        inputFile.read((char *)&offset, sizeof(offset));
+        inputFile.read((char *)&type, sizeof(type));
+        inputFile.read((char *)&stringLength, sizeof(stringLength));
+        symbol.resize(stringLength);
+        inputFile.read((char *)symbol.c_str(), stringLength);
+        inputFile.read((char *)&addend, sizeof(addend)); 
+        inputFile.read((char *)&isData, sizeof(isData));
+        Linker::relocationTablesForAllFiles.addRelocEntry(Linker::currentFileName, sectionName, RelocEntry(offset, type, symbol, addend, isData));
+      }
+    }
     inputFile.close();
   }
   return true;
 }
 
-//go through global section table and set addresses
+//must take into account placeAt
+//sections not included in placeAt option are placed starting from the next available address after highest placeAt option
 void Linker::calculateSectionAddresses(){
   
 }
@@ -167,6 +156,7 @@ void Linker::calculateRelocsRelocatable(){
 void Linker::writeToOutputFiles(){
   Linker::symbolTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::relocationTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
 }
 
 void Linker::link(){

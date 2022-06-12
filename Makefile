@@ -19,6 +19,7 @@ Linker/src/LdSymbolTablesForAllAsFiles.cpp \
 Linker/src/LdSectionTable.cpp \
 Linker/src/LdSectionTablesForAllAsFiles.cpp \
 Linker/src/LdRelocTable.cpp \
+Linker/src/LdRelocTablesForAllAsFiles.cpp \
 Linker/src/LdConversionsAndErrors.cpp
 
 vpath Assembler/src/%.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))
