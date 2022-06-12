@@ -10,6 +10,9 @@ bool SectionTable::isEmpty(){
   return SectionTable::table.empty();
 }
 
+std::unordered_map<std::string, SectionData> SectionTable::getTable(){
+  return SectionTable::table;
+}
 //sectionData
 SectionData SectionTable::getSectionData(const std::string &sectionName){
   return SectionTable::table.at(sectionName);
@@ -38,6 +41,14 @@ unsigned int SectionTable::getSectionMemAddr(const std::string &sectionName){
 void SectionTable::setSectionMemAddr(const std::string &sectionName, unsigned int newMemAddr){
   SectionTable::table.at(sectionName).size=newMemAddr;
 }
+//originFile
+std::string SectionTable::getSectionOriginFile(const std::string &sectionName){
+  return SectionTable::table.at(sectionName).originFile;
+}
+void SectionTable::setSectionOriginFile(const std::string &sectionName, std::string newOriginFile){
+  SectionTable:;table.at(sectionName).originFile=newOriginFile;
+}
+
 //sectionEntries
 void SectionTable::addSectionEntry(const std::string &sectionName, SectionEntry entry){
   SectionTable::table[sectionName].entries.push_back(entry);
@@ -79,7 +90,7 @@ void SectionTable::printToHelperTxt(const std::string &fileName){
   file.open(fileName, std::ios::app);  //append to file
   for(const auto& section: SectionTable::table){
     std::string sectionName = section.first;
-    file<<"#"<<sectionName<<" ("<<std::dec<<section.second.size<<" B) @"<<section.second.memAddr;
+    file<<"#"<<sectionName<<" ("<<std::dec<<section.second.size<<" B) @"<<section.second.memAddr<<", From file '"<<section.second.originFile<<"'";
     file<<"\n"<<std::setw(15)<<std::left<<"Offset"
         <<std::dec<<std::setw(15)<<std::left<<"Size"
         <<std::hex<<std::setw(15)<<std::left<<"Data"

@@ -57,6 +57,7 @@ bool Linker::readFromInputFiles(){
     Linker::writeLineToHelperOutputTxt("Reading "+std::to_string(numberOfSections)+" section(s).");
     for(int i=0; i<numberOfSections; i++){
       SectionData sectionData;
+      sectionData.originFile=Linker::currentFileName;
       unsigned int stringLength;
       //sectionName
       inputFile.read((char *)&stringLength, sizeof(stringLength));
@@ -123,10 +124,31 @@ bool Linker::readFromInputFiles(){
   return true;
 }
 
+bool Linker::createGlobalSectionTable(){
+  Linker::writeLineToHelperOutputTxt("CREATING GLOBAL SECTIONS TABLE");
+  for(auto &fileName:Linker::inputFileNames){
+    Linker::currentFileName=fileName;
+    for(auto &sectionTable: Linker::sectionTablesForAllFiles.getSectionTable(Linker::currentFileName).getTable()){
+      Linker::currentSection=sectionTable.first;
+      sectionTable.second.originFile=Linker::outputFileName;
+      if(!Linker::globalSectionTable.sectionExists(Linker::currentSection))//if we haven't encountered the section yet, add it
+        Linker::globalSectionTable.addSectionData(Linker::currentSection, SectionData(0,0,Linker::outputFileName));
+      for(auto &sectionEntry:sectionTable.second.entries)
+        Linker::globalSectionTable.addSectionEntry(Linker::currentSection, sectionEntry);
+    }
+  }
+  return true;
+}
+
 //must take into account placeAt
 //sections not included in placeAt option are placed starting from the next available address after highest placeAt option
 void Linker::calculateSectionAddresses(){
-  
+  Linker::writeLineToHelperOutputTxt("CALCULATING NEW ADDRESSES FOR SECTIONS");
+  unsigned int currentAddr=0;
+  for(auto &placeAt:Linker::placeSectionAt){
+    Linker::writeLineToHelperOutputTxt("Going through placeAt option "+placeAt.first+"@"+std::to_string(placeAt.second));
+    
+  }
 }
 
 void Linker::calculateOffsets(){
@@ -157,11 +179,13 @@ void Linker::writeToOutputFiles(){
   Linker::symbolTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::relocationTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
 }
 
 void Linker::link(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName);
   Linker::readFromInputFiles();
+  Linker::createGlobalSectionTable();
   Linker::calculateSectionAddresses();
   Linker::calculateOffsets();
   if(Linker::isRelocatable){

@@ -39,9 +39,9 @@ struct SectionEntry{
 struct SectionData{  //section from one file
   unsigned int size; //all entry sizes added up
   unsigned int memAddr;
-  //origin File
+  std::string originFile;
   std::vector<SectionEntry> entries;
-  SectionData(unsigned int size, unsigned int memAddr):size(size),memAddr(memAddr){}
+  SectionData(unsigned int size, unsigned int memAddr, std::string originFile):size(size),memAddr(memAddr),originFile(originFile){}
   SectionData():size(0),memAddr(0){}
 };
 
@@ -52,6 +52,7 @@ class SectionTable{
     //section's existential dread
     bool sectionExists(const std::string &sectionName);
     bool isEmpty();
+    std::unordered_map<std::string, SectionData> getTable();
     //sectionData
     SectionData getSectionData(const std::string &sectionName);
     void addSectionData(const std::string &sectionName, SectionData sectionData);
@@ -62,6 +63,9 @@ class SectionTable{
     //memAddr
     unsigned int getSectionMemAddr(const std::string &sectionName);
     void setSectionMemAddr(const std::string &sectionName, unsigned int newMemAddr);
+    //originFile
+    std::string getSectionOriginFile(const std::string &sectionName);
+    void setSectionOriginFile(const std::string &sectionName, std::string newOriginFile);
     //sectionEntries
     void addSectionEntry(const std::string &sectionName, SectionEntry entry);
     std::vector<SectionEntry> getSectionEntries(const std::string &sectioName);
