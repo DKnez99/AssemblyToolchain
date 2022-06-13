@@ -22,6 +22,7 @@ class Linker{
     //int locationCnt;
     std::string currentSection;
     std::string currentFileName;
+    unsigned int highestAddress;
     SymbolTablesForAllAsFiles symbolTablesForAllFiles;
     SectionTablesForAllAsFiles sectionTablesForAllFiles;
     RelocTablesForAllAsFiles relocationTablesForAllFiles;
@@ -44,7 +45,8 @@ class Linker{
 
     //main logic parts
     bool readFromInputFiles();  //goes through formatted input file and categorizes data
-    void calculateSectionAddresses();
+    bool calculatePlaceAtSectionAddresses();
+    bool calculateAllSectionAddresses();
     void calculateOffsets();
     void calculateRelocsHex(); //if -hex option is used
     void calculateRelocsRelocatable(); //if -relocateable option is used (misspelled in the document)

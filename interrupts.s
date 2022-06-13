@@ -29,6 +29,7 @@ isr_terminal:
  str r0, term_out
  ldr r0, %myCounter # pcrel
  ldr r1, $1
+ .section testSection
  add r0, r1
  str r0, myCounter # abs
  pop r1

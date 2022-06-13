@@ -48,7 +48,7 @@ bool Linker::readFromInputFiles(){
       //symbolIsDefined
       bool isDefined;
       inputFile.read((char *)(&isDefined), sizeof(isDefined));
-      symbolTablesForAllFiles.addSymbol(Linker::currentFileName, label, SymbolData(symbolID,section,value,type,isDefined));
+      symbolTablesForAllFiles.addSymbol(Linker::currentFileName, label, SymbolData(symbolID,section,value,type,isDefined, Linker::currentFileName));
     }
 
     //section table
@@ -116,7 +116,7 @@ bool Linker::readFromInputFiles(){
         inputFile.read((char *)symbol.c_str(), stringLength);
         inputFile.read((char *)&addend, sizeof(addend)); 
         inputFile.read((char *)&isData, sizeof(isData));
-        Linker::relocationTablesForAllFiles.addRelocEntry(Linker::currentFileName, sectionName, RelocEntry(offset, type, symbol, addend, isData));
+        Linker::relocationTablesForAllFiles.addRelocEntry(Linker::currentFileName, sectionName, RelocEntry(offset, type, symbol, addend, Linker::currentFileName, isData));
       }
     }
     inputFile.close();
@@ -126,15 +126,21 @@ bool Linker::readFromInputFiles(){
 
 bool Linker::createGlobalSectionTable(){
   Linker::writeLineToHelperOutputTxt("CREATING GLOBAL SECTIONS TABLE");
+  std::unordered_map<std::string, unsigned int> relativeSectionAddressMap;
   for(auto &fileName:Linker::inputFileNames){
     Linker::currentFileName=fileName;
     for(auto &sectionTable: Linker::sectionTablesForAllFiles.getSectionTable(Linker::currentFileName).getTable()){
       Linker::currentSection=sectionTable.first;
       sectionTable.second.originFile=Linker::outputFileName;
-      if(!Linker::globalSectionTable.sectionExists(Linker::currentSection))//if we haven't encountered the section yet, add it
+      if(!Linker::globalSectionTable.sectionExists(Linker::currentSection)){//if we haven't encountered the section yet, add it
         Linker::globalSectionTable.addSectionData(Linker::currentSection, SectionData(0,0,Linker::outputFileName));
-      for(auto &sectionEntry:sectionTable.second.entries)
+        relativeSectionAddressMap[Linker::currentSection]=0;
+      }
+      for(auto &sectionEntry:sectionTable.second.entries){
+        Linker::sectionTablesForAllFiles.setSectionMemAddr(Linker::currentFileName, Linker::currentSection, relativeSectionAddressMap[Linker::currentSection]);
         Linker::globalSectionTable.addSectionEntry(Linker::currentSection, sectionEntry);
+        relativeSectionAddressMap[Linker::currentSection]+=sectionEntry.size;
+      }
     }
   }
   return true;
@@ -142,29 +148,70 @@ bool Linker::createGlobalSectionTable(){
 
 //must take into account placeAt
 //sections not included in placeAt option are placed starting from the next available address after highest placeAt option
-void Linker::calculateSectionAddresses(){
-  Linker::writeLineToHelperOutputTxt("CALCULATING NEW ADDRESSES FOR SECTIONS");
-  unsigned int currentAddr=0;
-  for(auto &placeAt:Linker::placeSectionAt){
-    Linker::writeLineToHelperOutputTxt("Going through placeAt option "+placeAt.first+"@"+std::to_string(placeAt.second));
-    
+bool Linker::calculateAllSectionAddresses(){
+  Linker::writeLineToHelperOutputTxt("CALCULATING ALL ADDRESSES FOR SECTIONS");
+  if(!Linker::isRelocatable){
+    if(!Linker::calculatePlaceAtSectionAddresses()){
+      return false;
+    }
   }
+
+  std::unordered_map<std::string, bool> doneSections; //map of done sections, so we dont go through them again in diff files
+  //calculate addresses for sections not included in placeAt
+  for(auto &fileName: Linker::inputFileNames){  //go in order of sections being mentioned in input files
+    Linker::currentFileName=fileName;
+    for(auto &section:Linker::sectionTablesForAllFiles.getSectionTable(Linker::currentFileName).getTable()){
+      Linker::currentSection=section.first;
+      if(Linker::placeSectionAt.find(Linker::currentSection)==Linker::placeSectionAt.end() && doneSections.find(Linker::currentSection)==doneSections.end()){ //if it's not in placeAt
+        Linker::globalSectionTable.setSectionMemAddr(Linker::currentSection, Linker::highestAddress);
+        Linker::highestAddress+=Linker::globalSectionTable.getSectionSize(Linker::currentSection);
+        if(Linker::highestAddress>=Linker::memoryMappedRegisters){
+          Linker::addError("Section '"+Linker::currentSection+"' overlaps into memory mapped registers at addr. 65280 (0xFF00).");
+          return false;
+        }
+        doneSections.insert({Linker::currentSection, true});
+      }
+    }
+  }
+
+  return true;
+}
+
+bool Linker::calculatePlaceAtSectionAddresses(){
+  Linker::writeLineToHelperOutputTxt("CALCULATING PLACE AT ADDRESSES FOR SECTIONS");
+  Linker::highestAddress=0;
+  for(auto &placeAt:Linker::placeSectionAt){//placing them
+    Linker::writeLineToHelperOutputTxt("Going through placeAt option "+placeAt.first+"@"+std::to_string(placeAt.second));
+    if(Linker::globalSectionTable.sectionExists(placeAt.first)){
+      Linker::globalSectionTable.setSectionMemAddr(placeAt.first, placeAt.second);
+      if(placeAt.second+Linker::globalSectionTable.getSectionSize(placeAt.first)>Linker::highestAddress)
+        Linker::highestAddress=placeAt.second+Linker::globalSectionTable.getSectionSize(placeAt.first);
+    }
+    else{
+      Linker::addError("Section '"+placeAt.first+"' mentioned in -placeAt option doesn't exist.");
+      return false;
+    }
+  }
+  //check for intersections
+  for(auto &sectionOne:Linker::placeSectionAt){ //ineffiecient
+    if(Linker::globalSectionTable.getSectionData(sectionOne.first).memAddr+Linker::globalSectionTable.getSectionData(sectionOne.first).size >= Linker::memoryMappedRegisters){
+      Linker::addError("Section '"+sectionOne.first+"' overlaps with memory mapped registers at addr. 65280 (0xFF00).");
+      return false;
+    }
+    for(auto &sectionTwo:Linker::placeSectionAt){
+      if(sectionOne.first!=sectionTwo.first){
+        if(Linker::sectionsIntersect(sectionOne.second, Linker::globalSectionTable.getSectionSize(sectionOne.first),
+        sectionTwo.second, Linker::globalSectionTable.getSectionSize(sectionTwo.first))){
+          Linker::addError("Sections '"+sectionOne.first+"' and '"+sectionTwo.first+"' overlap.");
+          return false;
+        }
+      }
+    }
+  }
+  return true;
 }
 
 void Linker::calculateOffsets(){
-  // for(auto &sectionName: Linker::globalSectionTable.getSectionNames()){
-  //   for(auto &fileSection: Linker::globalSectionTable.getSectionData(sectionName).fileSections){
-  //     std::cout<<"\nFile: "<<fileSection.originFile;
-  //     std::cout<<"\nUpdating RelocTables...";
-  //     if(Linker::fileRelocTables.find(fileSection.originFile)!=Linker::fileRelocTables.end())
-  //       Linker::fileRelocTables.at(fileSection.originFile).updateOffsets(sectionName, fileSection.memoryAddress);
-  //     std::cout<<"\nRelocTables updated!";
-  //     std::cout<<"\nUpdating SymbolTables...";
-  //     if(Linker::fileSymbolTables.find(fileSection.originFile)!=Linker::fileSymbolTables.end())
-  //       Linker::fileSymbolTables.at(fileSection.originFile).updateSymbolValues(sectionName, fileSection.memoryAddress);
-  //     std::cout<<"\nSymbolTables updated!";
-  //   }
-  // }
 }
 
 void Linker::calculateRelocsHex(){
@@ -186,7 +233,7 @@ void Linker::link(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName);
   Linker::readFromInputFiles();
   Linker::createGlobalSectionTable();
-  Linker::calculateSectionAddresses();
+  Linker::calculateAllSectionAddresses();
   Linker::calculateOffsets();
   if(Linker::isRelocatable){
     Linker::calculateRelocsRelocatable();

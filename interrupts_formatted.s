@@ -27,6 +27,7 @@ ldr r0,term_in
 str r0,term_out
 ldr r0,%myCounter
 ldr r1,$1
+.section testSection
 add r0,r1
 str r0,myCounter
 pop r1

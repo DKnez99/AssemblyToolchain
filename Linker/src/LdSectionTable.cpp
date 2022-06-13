@@ -39,7 +39,7 @@ unsigned int SectionTable::getSectionMemAddr(const std::string &sectionName){
   return SectionTable::table.at(sectionName).memAddr;
 }
 void SectionTable::setSectionMemAddr(const std::string &sectionName, unsigned int newMemAddr){
-  SectionTable::table.at(sectionName).size=newMemAddr;
+  SectionTable::table.at(sectionName).memAddr=newMemAddr;
 }
 //originFile
 std::string SectionTable::getSectionOriginFile(const std::string &sectionName){

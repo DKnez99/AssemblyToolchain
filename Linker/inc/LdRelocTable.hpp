@@ -17,9 +17,10 @@ struct RelocEntry{
   std::string symbol;
   int addend;
   bool isData;  //if it's data use little endian, if it's an instruction use big endian
-  RelocEntry(unsigned int offset, RelocType type, std::string symbol, int addend, bool isData=true)
-  :offset(offset), type(type), symbol(symbol), addend(addend), isData(isData){}
-  RelocEntry():offset(0), type(RelocType::R_X86_64_16), symbol(""), addend(0), isData(true){}
+  std::string originFile;
+  RelocEntry(unsigned int offset, RelocType type, std::string symbol, int addend, std::string originFile, bool isData=true)
+  :offset(offset), type(type), symbol(symbol), addend(addend), originFile(originFile), isData(isData){}
+  RelocEntry():offset(0), type(RelocType::R_X86_64_16), symbol(""), addend(0), originFile(""), isData(true){}
 };
 
 struct AbsSymbolInfo{

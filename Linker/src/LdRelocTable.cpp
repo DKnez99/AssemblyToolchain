@@ -47,14 +47,16 @@ void RelocationTable::printToHelperTxt(const std::string &fileName){
         <<std::setw(typW)<<"Type"
         <<std::setw(datW)<<"Data?"
         <<std::setw(symW)<<"Symbol"
-        <<std::setw(addW)<<"Addend(DEC)";
+        <<std::setw(addW)<<"Addend(DEC)"
+                         <<"File";
     for(const auto& entry: relocation.second){
       file<<"\n"
           <<std::setw(offW)<<entry.offset
           <<std::setw(typW)<<entry.type
           <<std::setw(datW)<<((entry.isData)?"Yes":"No")
           <<std::setw(symW)<<entry.symbol
-          <<std::setw(addW)<<entry.addend;
+          <<std::setw(addW)<<entry.addend
+                           <<entry.originFile;
     }
     file<<std::endl;
   }

@@ -23,9 +23,10 @@ struct SymbolData{
   unsigned int value;  //offset in the current section
   SymbolType type;
   bool isDefined;
-  SymbolData(int symbolID, std::string section, unsigned int value, SymbolType type, bool isDefined)
-  :symbolID(symbolID), section(section),value(value),type(type),isDefined(isDefined) {}
-  SymbolData() : symbolID(symbolID), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false) {}
+  std::string originFile;
+  SymbolData(int symbolID, std::string section, unsigned int value, SymbolType type, bool isDefined, std::string originFile)
+  :symbolID(symbolID), section(section),value(value),type(type),isDefined(isDefined), originFile(originFile) {}
+  SymbolData() : symbolID(symbolID), section(SECTION_UNDEFINED),value(0),type(SymbolType::NONE),isDefined(false), originFile("") {}
 };
 
 class SymbolTable{  //symbol table from 1 assembler file  (and 1 global symbol Table)
@@ -54,6 +55,9 @@ public:
   //isDefined
   bool getSymbolIsDefined(const std::string &label);
   void setSymbolIsDefined(const std::string &label, bool newIsDefined);
+  //originFile
+  std::string getSymbolOriginFile(const std::string &label);
+  void setSymbolOriginFIle(const std::string &label, std::string newOriginFile);
   //invalid symbols (checked in post processing of the file)
   std::vector<std::string> invalidSymbols();
   //print

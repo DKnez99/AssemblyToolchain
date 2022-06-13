@@ -161,6 +161,22 @@ void SymbolTable::setSymbolIsDefined(const std::string &label, bool newIsDefined
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||
+//||                  ORIGIN FILE                            ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
+std::string SymbolTable::getSymbolOriginFile(const std::string &label){
+  return SymbolTable::table.at(label).originFile;
+}
+
+void SymbolTable::setSymbolOriginFIle(const std::string &label, std::string newOriginFile){
+  SymbolTable::table.at(label).originFile=newOriginFile;
+}
+
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
 //||                  INVALID SYMBOLS                        ||
 //||=========================================================||
 //||=========================================================||
@@ -204,7 +220,8 @@ void SymbolTable::printToHelperTxt(const std::string &fileName){
       <<std::setw(valW) <<"Value(HX)"
       <<std::setw(typW) <<"MyType"
       <<std::setw(nameW)<<"Section"
-      <<std::setw(nameW)<<"Name";
+      <<std::setw(nameW)<<"Name"
+                        <<"File";
 
   for(auto const &symbol: SymbolTable::table){
     std::string label = symbol.first;
@@ -213,8 +230,9 @@ void SymbolTable::printToHelperTxt(const std::string &fileName){
         <<std::setw(idW)<<symbolData.symbolID                      //num
         <<std::setw(valW)<<std::hex<<std::right<<(std::to_string(symbolData.value)+" ")<<std::left<<std::dec     //value
         <<std::setw(typW)<<symbolData.type                         //type
-        <<std::setw(nameW)<<symbolData.section                      //section
-        <<std::setw(nameW)<<std::left<<label.c_str();               //name
+        <<std::setw(nameW)<<symbolData.section                     //section
+        <<std::setw(nameW)<<std::left<<label.c_str()               //name
+                          <<std::left<<symbolData.originFile;
   }
   file<<std::endl;
   file.close();
