@@ -46,6 +46,10 @@ bool SymbolTable::isEmpty(){
   return SymbolTable::table.empty();
 }
 
+std::map<std::string, SymbolData> SymbolTable::getTable(){
+  return SymbolTable::table;
+}
+
 //||=========================================================||
 //||=========================================================||
 //||=========================================================||

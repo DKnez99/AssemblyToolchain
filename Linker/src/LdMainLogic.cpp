@@ -146,23 +146,77 @@ bool Linker::createGlobalSectionTable(){
   return true;
 }
 
+bool Linker::createGlobalSymbolTable(){
+  int symbolID=-1;
+  std::unordered_map<std::string, SymbolType> doneSymbols;  //prob unnecessary
+  for(auto &fileName: Linker::inputFileNames){
+    Linker::currentFileName=fileName;
+    for(auto &symbol: Linker::symbolTablesForAllFiles.getSymbolTable(fileName).getTable()){
+      if(symbol.second.type==SymbolType::LOCAL) //skip local symbols
+        continue;
+
+      if(Linker::globalSymbolTable.symbolExists(symbol.first)){
+        if(symbol.second.type==SymbolType::SECTION){
+          continue;
+        }
+
+        SymbolData alreadyExistingSymbol = Linker::globalSymbolTable.getSymbol(symbol.first);
+        if(alreadyExistingSymbol.type==SymbolType::GLOBAL){ //test if isDefined needs checking
+          if(symbol.second.type==SymbolType::EXTERN){
+            continue;
+          }
+          else{
+            Linker::addError("Symbol '"+symbol.first+"' is defined both in file '"+alreadyExistingSymbol.originFile+"' and file '"+symbol.second.originFile+"'.");
+            return false;
+          }
+        }
+
+        if(alreadyExistingSymbol.type==SymbolType::EXTERN){//if symbol extern, check if existing is
+          symbol.second.symbolID=Linker::globalSymbolTable.getSymbolID(symbol.first);
+          //maybe calculate symbol offset immediately?
+          Linker::globalSymbolTable.removeSymbol(symbol.first);
+          Linker::globalSymbolTable.addSymbol(symbol.first, symbol.second);
+        }
+      }
+      else{ //add it
+        //maybe calculate symbol offset immediately?
+        symbol.second.symbolID=symbolID++;
+        Linker::globalSymbolTable.addSymbol(symbol.first, symbol.second);
+      }
+    }
+  }
+
+  //after going through all symbols, check if there are still unresolved ones
+  for(auto &symbol:Linker::globalSymbolTable.getTable()){
+    if(symbol.second.isDefined==false || symbol.second.type==SymbolType::EXTERN){
+      Linker::addError("Symbol '"+symbol.first+"' can't be resolved.");
+      return false;
+    }
+  }
+  return true;
+}
+
 //must take into account placeAt
 //sections not included in placeAt option are placed starting from the next available address after highest placeAt option
 bool Linker::calculateAllSectionAddresses(){
   Linker::writeLineToHelperOutputTxt("CALCULATING ALL ADDRESSES FOR SECTIONS");
+  std::unordered_map<std::string, bool> doneSections; //map of done sections, so we dont go through them again in diff files
   if(!Linker::isRelocatable){
     if(!Linker::calculatePlaceAtSectionAddresses()){
       return false;
     }
+    for(auto &section:Linker::placeSectionAt){
+      doneSections.insert({section.first, true});
+    }
   }
 
-  std::unordered_map<std::string, bool> doneSections; //map of done sections, so we dont go through them again in diff files
+  
   //calculate addresses for sections not included in placeAt
   for(auto &fileName: Linker::inputFileNames){  //go in order of sections being mentioned in input files
     Linker::currentFileName=fileName;
     for(auto &section:Linker::sectionTablesForAllFiles.getSectionTable(Linker::currentFileName).getTable()){
       Linker::currentSection=section.first;
-      if(Linker::placeSectionAt.find(Linker::currentSection)==Linker::placeSectionAt.end() && doneSections.find(Linker::currentSection)==doneSections.end()){ //if it's not in placeAt
+      if(doneSections.find(Linker::currentSection)==doneSections.end()){ //if it's not already placed
         Linker::globalSectionTable.setSectionMemAddr(Linker::currentSection, Linker::highestAddress);
         Linker::highestAddress+=Linker::globalSectionTable.getSectionSize(Linker::currentSection);
         if(Linker::highestAddress>=Linker::memoryMappedRegisters){
@@ -227,6 +281,7 @@ void Linker::writeToOutputFiles(){
   Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::relocationTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::globalSymbolTable.printToHelperTxt(Linker::helperOutputFileName);
 }
 
 void Linker::link(){
@@ -234,6 +289,7 @@ void Linker::link(){
   Linker::readFromInputFiles();
   Linker::createGlobalSectionTable();
   Linker::calculateAllSectionAddresses();
+  Linker::createGlobalSymbolTable();
   Linker::calculateOffsets();
   if(Linker::isRelocatable){
     Linker::calculateRelocsRelocatable();

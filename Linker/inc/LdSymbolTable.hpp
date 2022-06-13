@@ -35,6 +35,7 @@ public:
   //symbol's existential dread
   bool symbolExists(const std::string &label);
   bool isEmpty();
+  std::map<std::string, SymbolData> getTable();
   //symbol
   SymbolData getSymbol(const std::string &label);
   void addSymbol(const std::string &label, SymbolData symbolData);

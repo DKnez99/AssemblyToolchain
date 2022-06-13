@@ -8,10 +8,20 @@ Assembler::Assembler(const std::string &inputFileName, const std::string &output
 }
 
 void Assembler::assemble(){
-  Assembler::formatInputFile();             //pre-processing of input file
-  Assembler::goThroughFormattedInputFile(); //main processing
-  Assembler::goThroughFlinksAndRelocs();    //post processing of reloc table
+  if(!Assembler::formatInputFile()){  //pre-processing of input file
+    Assembler::printResults();
+    return;
+  }
 
+  if(!Assembler::goThroughFormattedInputFile()){     //main processing       
+    Assembler::printResults();
+    return;
+  }
+  if(Assembler::goThroughFlinksAndRelocs()){ //post processing of reloc table
+    Assembler::printResults();
+    return;
+  }
+  
   Assembler::printResults();                //print results of assemblying (success, errors, warnings) to terminal
   Assembler::writeToOutputFiles();          //write to output files
 }

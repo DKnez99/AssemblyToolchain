@@ -8,13 +8,15 @@
 .section myCode
 term_out:
 .word 0xFF00
+.global myStart
+myStart:
+isr_timer:
 term_in:
 .word 0xFF02
 asciiCode:
 .word 84
 isr_reset:
 jmp myStart
-isr_timer:
 push r0
 ldr r0,$asciiCode
 str r0,term_out
