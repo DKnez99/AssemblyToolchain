@@ -1,8 +1,8 @@
-.global myStart
+.global WOWOOWOWOWOW
 .global myCounter
 .section myCode
 tim_cfg: .word 0xFF10
-myStart:
+WOWOOWOWOWOW:
  ldr r0, $0x1
  str r0, tim_cfg
 wait:

@@ -415,8 +415,24 @@ void Linker::writeToTxtFile(){
 void Linker::writeToBinaryFile(){
   std::ofstream outputFileStream;
   outputFileStream.open(Linker::outputBinaryFileName, std::ios::out | std::ios::binary);
-  int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
-  std::cout<<"\nNumber of sections: "<<numberOfSections<<std::endl;
+  unsigned int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
+  outputFileStream.write((char *)&numberOfSections,sizeof(numberOfSections));
+  for(auto &section : Linker::globalSectionTable.getTable()){
+    if(section.first==".undefined" || section.first==".absolute"){
+      std::cout<<"UND/ABS section appeared while writing to binary from ld";
+      continue;
+    }
+    unsigned int memAddr=Linker::globalSymbolTable.getSymbolValue(section.first); //get mem addr
+    unsigned int numberOfChars=section.second.size*2;
+    std::cout<<"Number of characters = "<<numberOfChars<<std::endl;
+    outputFileStream.write((char *)&numberOfChars, sizeof(numberOfChars));
+    for(auto &entry:section.second.entries){
+      for(auto &data:entry.data){
+        outputFileStream.write((char *)&data.hex1,sizeof(data.hex1));
+        outputFileStream.write((char *)&data.hex2,sizeof(data.hex2));
+      }
+    }
+  }
 }
 
 void Linker::link(){

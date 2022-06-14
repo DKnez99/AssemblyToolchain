@@ -4,7 +4,7 @@
  .word isr_timer
  .word isr_terminal
  .skip 8
-.extern myStart, myCounter
+.extern TESTESTESTEST, myCounter, myStart
 .section myCode
 term_out:
 .word 0xFF00
@@ -25,7 +25,7 @@ isr_reset:
 isr_terminal:
  push r0
  push r1
- ldr r0, term_in
+ ldr r0, TESTESTESTEST
  str r0, term_out
  ldr r0, %myCounter # pcrel
  ldr r1, $1
