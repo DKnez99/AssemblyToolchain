@@ -294,7 +294,7 @@ void Linker::calculateSymbolOffsets(){  //for symbol table
   Linker::writeLineToHelperOutputTxt("\nSetting other symbol values");
   for(auto &symbol: Linker::globalSymbolTable.getTable()){
     if(symbol.second.type!=SymbolType::SECTION){ //if not already fixed
-      unsigned int newSymbolValue = symbol.second.value + Linker::sectionTablesForAllFiles.getSectionMemAddr(symbol.second.originFile, symbol.second.section);
+      unsigned int newSymbolValue = symbol.second.value + Linker::sectionTablesForAllFiles.getSectionMemAddr(symbol.second.originFile, symbol.second.section) + Linker::globalSymbolTable.getSymbolValue(symbol.second.section);
       Linker::writeLineToHelperOutputTxt("Setting value of symbol "+symbol.first+" in symbol table to "+std::to_string(newSymbolValue));
       Linker::globalSymbolTable.setSymbolValue(symbol.first, newSymbolValue);
       Linker::globalSymbolTable.setSymbolOriginFIle(symbol.first, Linker::outputFileName);
@@ -413,7 +413,10 @@ void Linker::writeToTxtFile(){
 }
 
 void Linker::writeToBinaryFile(){
-  
+  std::ofstream outputFileStream;
+  outputFileStream.open(Linker::outputBinaryFileName, std::ios::out | std::ios::binary);
+  int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
+  std::cout<<"\nNumber of sections: "<<numberOfSections<<std::endl;
 }
 
 void Linker::link(){

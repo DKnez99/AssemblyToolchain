@@ -75,26 +75,27 @@ std::vector<Data> SectionTable::getDataAtOffset(const std::string &sectionName, 
 }
 
 void SectionTable::setDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long newData, bool isData){
-  //std::cout<<"Going through section entries until we find the right one. ("<<sectionName<<":"<<std::to_string(offset)<<")"<<std::endl;
+  std::cout<<"Going through section entries until we find the right one. ("<<sectionName<<":"<<std::to_string(offset)<<"); Data = "<<std::to_string(newData)<<std::endl;
   for (auto &entry : SectionTable::table.at(sectionName).entries) {
     //std::cout<<"\tChecking entry: "<<sectionName<<":"<<std::to_string(entry.offset)<<"-"<<std::to_string(entry.offset + entry.size)<<std::endl;
     if(offset>=entry.offset && offset<(entry.offset + entry.size)){
-      //std::cout<<"Found entry: "<<sectionName<<":"<<std::to_string(entry.offset)<<"-"<<std::to_string(entry.offset + entry.size)<<std::endl;
+      std::cout<<"Found entry: "<<sectionName<<":"<<std::to_string(entry.offset)<<"-"<<std::to_string(entry.offset + entry.size)<<std::endl;
       if(isData){ //little endian (left <- right)
-        //std::cout<<"Little endian (left <- right)"<<std::endl;
+        std::cout<<"Little endian (left <- right)"<<std::endl;
         int cnt=0;
         while(cnt<size && cnt<((int)entry.size-(int)offset+(int)entry.offset)){  //don't go into the next entry to set data
           entry.data[offset-entry.offset+cnt++]={(int)(newData >> 4) & 0xF, (int)(newData >> 0) & 0xF};
-          //std::cout<<"Inserted data @"<<std::to_string(offset+cnt-1)<<": "<<std::to_string((int)(newData >> 4) & 0xF)<<std::to_string((int)(newData >> 0) & 0xF)<<std::endl;
+          std::cout<<"Inserted data @"<<std::to_string(offset+cnt-1)<<": "<<std::to_string((int)(newData >> 4) & 0xF)<<std::to_string((int)(newData >> 0) & 0xF)<<std::endl;
           newData>>=8;
         }
       }
       else{ //big endian (left -> right)
-        //std::cout<<"Big endian (left -> right)"<<std::endl;
+        std::cout<<"Big endian (left -> right)"<<std::endl;
         int cnt=size-1;
         while(cnt>=0 && cnt>=((int)entry.offset-(int)offset)){
-          entry.data[offset-entry.offset+cnt--]={(int)(newData >> (cnt*8+4)) & 0xF, (int)(newData >> (cnt*8)) & 0xF};
-          //std::cout<<"Inserted data @"<<std::to_string(offset+cnt+1)<<": "<<std::to_string((int)(newData >> (cnt*8+4)) & 0xF)<<std::to_string((int)(newData >> (cnt*8)) & 0xF)<<std::endl;
+          entry.data[offset-entry.offset+(size-cnt-1)]={(int)(newData >> (cnt*8+4)) & 0xF, (int)(newData >> (cnt*8)) & 0xF};
+          std::cout<<"Inserted data @"<<std::to_string(offset+size-cnt-1)<<": "<<std::to_string((int)(newData >> (cnt*8+4)) & 0xF)<<std::to_string((int)(newData >> (cnt*8)) & 0xF)<<std::endl;
+          cnt--;
         }
       }
       break;
