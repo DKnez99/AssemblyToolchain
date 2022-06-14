@@ -340,12 +340,19 @@ void Linker::calculateRelocsHex(){  //test
       unsigned int size=0;
       long data=0;
       if(entry.type==RelocType::R_X86_64_16){
+        //std::cout<<"Symbol ("+entry.symbol+") = "<<Linker::globalSymbolTable.getSymbolValue(entry.symbol)<<std::endl;
+        //std::cout<<"Addend = "<<entry.addend<<std::endl;
         size=2;
         data=Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend;
+        //std::cout<<"Data (S+A) = "<<data<<std::endl;
       }
       else if(entry.type==RelocType::R_X86_64_PC16){
         size=2;
-        data=Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend-entry.offset;
+       // std::cout<<"Symbol ("+entry.symbol+") = "<<Linker::globalSymbolTable.getSymbolValue(entry.symbol)<<std::endl;
+        //std::cout<<"Addend = "<<entry.addend<<std::endl;
+        //std::cout<<"Offset = "<<entry.offset<<std::endl;
+        data=(int)Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend-(int)entry.offset;
+        //std::cout<<"Data (S+A-O) = "<<data<<std::endl;
       }
       if(entry.isData){
         Linker::writeLineToHelperOutputTxt("Inserting data "+std::to_string(data)+"(DEC) to section '"+relocSection.first+"' at offset '"+std::to_string(entry.offset)+"' backwards.");
