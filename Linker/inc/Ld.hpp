@@ -47,11 +47,13 @@ class Linker{
     bool readFromInputFiles();  //goes through formatted input file and categorizes data
     bool calculatePlaceAtSectionAddresses();
     bool calculateAllSectionAddresses();
-    void calculateOffsets();
+    void calculateSymbolOffsets();
+    void calculateRelocOffsetsAndAddends();
     void calculateRelocsHex(); //if -hex option is used
     void calculateRelocsRelocatable(); //if -relocateable option is used (misspelled in the document)
     void writeToOutputFiles();
-
+    void printInputTables();
+    void printHelperOutputTables();
     //create global tables
     bool createGlobalSymbolTable();
     bool createGlobalSectionTable();

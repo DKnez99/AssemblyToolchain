@@ -14,6 +14,10 @@ public:
   std::vector<RelocEntry> getRelocEntries(const std::string &fileName, const std::string &sectionName);
   std::vector<RelocEntry> getAllRelocEntriesForSection(const std::string &sectionName);
   void addRelocEntry(const std::string &fileName, const std::string &sectionName, RelocEntry entry);
+  //offsets
+  void increaseOffsetsForFileAndSection(const std::string &fileName, const std::string &sectionName, unsigned int offsetIncrease);
+  //addends
+  void increaseAddendsForFileAndSection(const std::string &fileName, const std::string &sectionName, const std::string symbolName, unsigned int oaddendIncrease);
   //print
   void printToHelperTxt(const std::string &fileName);
 };

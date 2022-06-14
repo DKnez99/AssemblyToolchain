@@ -146,6 +146,7 @@ void RelocationTable::printToBinaryOutput(const std::string &fileName){
 
       file.write((char *)&relocEntry.addend, sizeof(relocEntry.addend));  //entry addend
       file.write((char *)&relocEntry.isData, sizeof(relocEntry.isData));  //entry isData
+      file.write((char *)&relocEntry.isRealSectionSymbol, sizeof(relocEntry.isRealSectionSymbol));  //is real section (don't increase addend in ld)
     }
   }
   file.close();

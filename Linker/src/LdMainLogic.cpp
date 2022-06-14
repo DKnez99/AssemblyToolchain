@@ -109,6 +109,7 @@ bool Linker::readFromInputFiles(){
         unsigned int offset;
         std::string symbol;
         bool isData;
+        bool isRealSectionSymb;
         inputFile.read((char *)&offset, sizeof(offset));
         inputFile.read((char *)&type, sizeof(type));
         inputFile.read((char *)&stringLength, sizeof(stringLength));
@@ -116,7 +117,8 @@ bool Linker::readFromInputFiles(){
         inputFile.read((char *)symbol.c_str(), stringLength);
         inputFile.read((char *)&addend, sizeof(addend)); 
         inputFile.read((char *)&isData, sizeof(isData));
-        Linker::relocationTablesForAllFiles.addRelocEntry(Linker::currentFileName, sectionName, RelocEntry(offset, type, symbol, addend, Linker::currentFileName, isData));
+        inputFile.read((char *)&isRealSectionSymb, sizeof(isRealSectionSymb));
+        Linker::relocationTablesForAllFiles.addRelocEntry(Linker::currentFileName, sectionName, RelocEntry(offset, type, symbol, addend, Linker::currentFileName, isData, isRealSectionSymb));
       }
     }
     inputFile.close();
@@ -137,7 +139,9 @@ bool Linker::createGlobalSectionTable(){
         relativeSectionAddressMap[Linker::currentSection]=0;
       }
       Linker::sectionTablesForAllFiles.setSectionMemAddr(Linker::currentFileName, Linker::currentSection, relativeSectionAddressMap[Linker::currentSection]);
+      unsigned int offsetAdder=relativeSectionAddressMap[Linker::currentSection];
       for(auto &sectionEntry:sectionTable.second.entries){
+        sectionEntry.offset+=offsetAdder; //newly added
         Linker::globalSectionTable.addSectionEntry(Linker::currentSection, sectionEntry);
         relativeSectionAddressMap[Linker::currentSection]+=sectionEntry.size;
       }
@@ -210,7 +214,7 @@ bool Linker::createGlobalRelocTable(){
 //must take into account placeAt
 //sections not included in placeAt option are placed starting from the next available address after highest placeAt option
 bool Linker::calculateAllSectionAddresses(){
-  Linker::writeLineToHelperOutputTxt("CALCULATING ALL ADDRESSES FOR SECTIONS");
+  Linker::writeLineToHelperOutputTxt("\nCALCULATING ALL ADDRESSES FOR SECTIONS");
   std::unordered_map<std::string, bool> doneSections; //map of done sections, so we dont go through them again in diff files
   if(!Linker::isRelocatable){
     if(!Linker::calculatePlaceAtSectionAddresses()){
@@ -243,7 +247,7 @@ bool Linker::calculateAllSectionAddresses(){
 }
 
 bool Linker::calculatePlaceAtSectionAddresses(){
-  Linker::writeLineToHelperOutputTxt("CALCULATING PLACE AT ADDRESSES FOR SECTIONS");
+  Linker::writeLineToHelperOutputTxt("\nCALCULATING PLACE AT ADDRESSES FOR SECTIONS");
   Linker::highestAddress=0;
   for(auto &placeAt:Linker::placeSectionAt){//placing them
     Linker::writeLineToHelperOutputTxt("Going through placeAt option "+placeAt.first+"@"+std::to_string(placeAt.second));
@@ -276,57 +280,99 @@ bool Linker::calculatePlaceAtSectionAddresses(){
   return true;
 }
 
-void Linker::calculateOffsets(){  //for reloc and symbols table
-  Linker::writeLineToHelperOutputTxt("CALCULATING NEW, GLOBAL OFFSETS");
-  for(auto &fileName: Linker::inputFileNames){
-    Linker::currentFileName=fileName;
-    //relocs
-    for(auto &relocSection: Linker::globalRelocTable.getTable()){
-      Linker::currentSection=relocSection.first;
-      try{ //index out of bounds can happen
-        unsigned int addOffset=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
-        Linker::globalRelocTable.increaseOffsetBy(Linker::currentSection, Linker::currentFileName, addOffset);
-        Linker::writeLineToHelperOutputTxt("Increased offsets of reloc entries in section '"+Linker::currentSection+"' from file '"+Linker::currentFileName+"' by "+std::to_string(addOffset));
-      }
-      catch(...){
+void Linker::calculateSymbolOffsets(){  //for symbol table
+  Linker::writeLineToHelperOutputTxt("\nCALCULATING NEW, GLOBAL SYMBOL OFFSETS");
+  //sections
+  Linker::writeLineToHelperOutputTxt("\nSetting section values");
+  for(auto &section: Linker::globalSectionTable.getTable()){
+    Linker::writeLineToHelperOutputTxt("Setting value of symbol "+section.first+" in symbol table to "+std::to_string(section.second.memAddr));
+    Linker::globalSymbolTable.setSymbolValue(section.first, section.second.memAddr);
+  }
 
-      }
+  //other symbols
+  Linker::writeLineToHelperOutputTxt("\nSetting other symbol values");
+  for(auto &symbol: Linker::globalSymbolTable.getTable()){
+    if(symbol.second.type!=SymbolType::SECTION){ //if not already fixed
+      unsigned int newSymbolValue = symbol.second.value + Linker::sectionTablesForAllFiles.getSectionMemAddr(symbol.second.originFile, symbol.second.section);
+      Linker::writeLineToHelperOutputTxt("Setting value of symbol "+symbol.first+" in symbol table to "+std::to_string(newSymbolValue));
+      Linker::globalSymbolTable.setSymbolValue(symbol.first, newSymbolValue);
+      Linker::globalSymbolTable.setSymbolOriginFIle(symbol.first, Linker::outputFileName);
     }
-    //symbols
-    for(auto &symbol: Linker::globalSymbolTable.getTable()){
-      if(symbol.second.symbolID>0){ //skip undefined and absolute symbol
-        Linker::currentSection=symbol.second.section;
-        try{ //index out of bounds can happen
-          unsigned int addOffset=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
-          Linker::globalSymbolTable.increaseValueBy(Linker::currentSection, Linker::currentFileName, addOffset);
-          Linker::writeLineToHelperOutputTxt("Increased offsets of symbols defined in section '"+Linker::currentSection+"', of file '"+Linker::currentFileName+"' by "+std::to_string(addOffset));
-        }
-        catch(...){
-
-        }
-      }
+    else{
+      Linker::globalSymbolTable.setSymbolOriginFIle(symbol.first, Linker::outputFileName);
     }
   }
 }
 
-void Linker::calculateRelocsHex(){
-  
+void Linker::calculateRelocOffsetsAndAddends(){
+  Linker::writeLineToHelperOutputTxt("\nCALCULATING NEW RELOC OFFSETS AND ADDENDS");
+  for(auto &fileName: Linker::inputFileNames){
+    Linker::writeLineToHelperOutputTxt("Going through file "+fileName);
+    Linker::currentFileName=fileName;
+    if(Linker::relocationTablesForAllFiles.sectionTableExists(fileName)){//maybe file doesn't have reloc table
+      for(auto &relocTable:Linker::relocationTablesForAllFiles.getRelocationTable(fileName).getTable()){
+        Linker::currentSection=relocTable.first;
+        Linker::writeLineToHelperOutputTxt("Going through reloc section "+Linker::currentSection);
+        unsigned int offsetIncrease=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
+        Linker::relocationTablesForAllFiles.increaseOffsetsForFileAndSection(Linker::currentFileName, Linker::currentSection, offsetIncrease);
+        Linker::writeLineToHelperOutputTxt("Increasing offset of all reloc entries by "+std::to_string(offsetIncrease));
+        for(auto &symbol:Linker::globalSymbolTable.getSymbolsOfType(SymbolType::SECTION)){
+          if(Linker::globalSymbolTable.getSymbolID(symbol)>0){  //skip undefined and absolute section
+            try{
+              unsigned int addendIncrease=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, symbol);
+              Linker::writeLineToHelperOutputTxt("Increasing addend of reloc entries with symbol "+symbol+" by "+std::to_string(addendIncrease));
+              Linker::relocationTablesForAllFiles.increaseAddendsForFileAndSection(Linker::currentFileName, Linker::currentSection, symbol, addendIncrease);
+            }
+            catch(...){
+              //if filename doesn't have that section
+            }  
+          }
+        }
+      }
+    } 
+  }
+}
+
+void Linker::calculateRelocsHex(){  //test
+  Linker::writeLineToHelperOutputTxt("\nSOLVING HEX RELOCATIONS");
+  for(auto &relocSection: Linker::globalRelocTable.getTable()){
+    for(auto &entry: relocSection.second){
+      unsigned int size=0;
+      long data=0;
+      if(entry.type==RelocType::R_X86_64_16){
+        size=2;
+        data=Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend;
+      }
+      else if(entry.type==RelocType::R_X86_64_PC16){
+        size=2;
+        data=Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend-entry.offset;
+      }
+      if(entry.isData){
+        Linker::writeLineToHelperOutputTxt("Inserting data "+std::to_string(data)+"(DEC) to section '"+relocSection.first+"' at offset '"+std::to_string(entry.offset)+"' backwards.");
+      }
+      else{
+        Linker::writeLineToHelperOutputTxt("Inserting data "+std::to_string(data)+"(DEC) to section '"+relocSection.first+"' at offset '"+std::to_string(entry.offset)+"' forwards.");
+      }
+      Linker::globalSectionTable.setDataAtOffset(relocSection.first, entry.offset, size, data, entry.isData);
+    }
+  }
 }
 
 void Linker::calculateRelocsRelocatable(){
 
 }
 
-void Linker::writeToOutputFiles(){
-  Linker::writeLineToHelperOutputTxt("CONJOINED TABLES:");
+void Linker::printInputTables(){
+  Linker::writeLineToHelperOutputTxt("\nINPUT TABLES:");
   Linker::helperOutputFileStream.close();
-
   Linker::symbolTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::relocationTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
-
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName, std::ios::app);
-  Linker::writeLineToHelperOutputTxt("GLOBAL TABLES:");
+}
+
+void Linker::printHelperOutputTables(){
+  Linker::writeLineToHelperOutputTxt("\nGLOBAL LD TABLES:");
   Linker::helperOutputFileStream.close();
   Linker::globalSymbolTable.printToHelperTxt(Linker::helperOutputFileName);
   Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
@@ -334,20 +380,27 @@ void Linker::writeToOutputFiles(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName, std::ios::app);
 }
 
+void Linker::writeToOutputFiles(){
+
+}
+
 void Linker::link(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName);
   Linker::readFromInputFiles();
+  Linker::printInputTables();
   Linker::createGlobalSectionTable();
   Linker::calculateAllSectionAddresses();
   Linker::createGlobalSymbolTable();
+  Linker::calculateSymbolOffsets();
+  Linker::calculateRelocOffsetsAndAddends();
   Linker::createGlobalRelocTable();
-  Linker::calculateOffsets();
   if(Linker::isRelocatable){
     Linker::calculateRelocsRelocatable();
   }
   else{
     Linker::calculateRelocsHex();
   }
+  Linker::printHelperOutputTables();
   Linker::printResults();
   Linker::writeToOutputFiles();
   Linker::helperOutputFileStream.close();

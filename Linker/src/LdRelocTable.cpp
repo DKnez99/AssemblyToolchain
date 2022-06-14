@@ -36,17 +36,31 @@ void RelocationTable::addRelocEntry(const std::string &sectionName, RelocEntry e
 }
 
 std::vector<AbsSymbolInfo> RelocationTable::getAndDeleteRelocEntriesForAbsolute(){
-
+  std::vector<AbsSymbolInfo> result;
+  
+  return result;
 }
 
 //offset
 
-void RelocationTable::increaseOffsetBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset){
+void RelocationTable::increaseAllOffsetsBy(const std::string &sectionName, unsigned int addOffset){
   for(auto &entries: RelocationTable::table){
     if(entries.first==sectionName){
       for(auto &entry:entries.second){
-        if(entry.originFile==originFile){
-          entry.offset+=addOffset;
+        entry.offset+=addOffset;
+      }
+    }
+  }
+}
+
+//addend
+
+void RelocationTable::increaseAddendsForLocalRelocsBy(const std::string &sectionName, const std::string &symbolName, unsigned int addendIncrease){
+  for(auto &entries: RelocationTable::table){
+    if(entries.first==sectionName){
+      for(auto &entry:entries.second){
+        if(entry.isRealSectionSymbol==false && entry.symbol==symbolName){
+          entry.addend+=addendIncrease;
         }
       }
     }

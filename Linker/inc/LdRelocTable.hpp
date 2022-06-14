@@ -18,9 +18,10 @@ struct RelocEntry{
   int addend;
   bool isData;  //if it's data use little endian, if it's an instruction use big endian
   std::string originFile;
-  RelocEntry(unsigned int offset, RelocType type, std::string symbol, int addend, std::string originFile, bool isData=true)
-  :offset(offset), type(type), symbol(symbol), addend(addend), originFile(originFile), isData(isData){}
-  RelocEntry():offset(0), type(RelocType::R_X86_64_16), symbol(""), addend(0), originFile(""), isData(true){}
+  bool isRealSectionSymbol; //so we dont override global (ex. local) symbols that had value 0 in reloc table when we go through it to amend relocs
+  RelocEntry(unsigned int offset, RelocType type, std::string symbol, int addend, std::string originFile, bool isData=true, bool isRealSectionSymb=false)
+  :offset(offset), type(type), symbol(symbol), addend(addend), originFile(originFile), isData(isData), isRealSectionSymbol(isRealSectionSymb){}
+  RelocEntry():offset(0), type(RelocType::R_X86_64_16), symbol(""), addend(0), originFile(""), isData(true), isRealSectionSymbol(false){}
 };
 
 struct AbsSymbolInfo{
@@ -42,7 +43,9 @@ class RelocationTable{
     void addRelocEntry(const std::string &sectionName, RelocEntry entry);
     std::vector<AbsSymbolInfo> getAndDeleteRelocEntriesForAbsolute(); 
     //offset
-    void increaseOffsetBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset);
+    void increaseAllOffsetsBy(const std::string &sectionName, unsigned int addOffset);
+    //addend
+    void increaseAddendsForLocalRelocsBy(const std::string &sectionName, const std::string &symbolName, unsigned int addendIncrease);
     //print
     void printToHelperTxt(const std::string &fileName);
 };

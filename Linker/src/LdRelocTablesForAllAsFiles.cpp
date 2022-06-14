@@ -41,6 +41,17 @@ std::vector<RelocEntry> RelocTablesForAllAsFiles::getAllRelocEntriesForSection(c
 void RelocTablesForAllAsFiles::addRelocEntry(const std::string &fileName, const std::string &sectionName, RelocEntry entry){
   RelocTablesForAllAsFiles::table[fileName].addRelocEntry(sectionName,entry);
 }
+
+//offsets
+void RelocTablesForAllAsFiles::increaseOffsetsForFileAndSection(const std::string &fileName, const std::string &sectionName, unsigned int offsetIncrease){
+  RelocTablesForAllAsFiles::table.at(fileName).increaseAllOffsetsBy(sectionName, offsetIncrease);
+}
+
+//addends
+void RelocTablesForAllAsFiles::increaseAddendsForFileAndSection(const std::string &fileName, const std::string &sectionName, const std::string symbolName, unsigned int addendIncrease){
+  RelocTablesForAllAsFiles::table.at(fileName).increaseAddendsForLocalRelocsBy(sectionName, symbolName, addendIncrease);
+}
+
 //print
 void RelocTablesForAllAsFiles::printToHelperTxt(const std::string &fileName){
   std::ofstream file;

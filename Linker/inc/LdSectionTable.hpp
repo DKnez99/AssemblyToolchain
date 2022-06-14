@@ -71,7 +71,7 @@ class SectionTable{
     std::vector<SectionEntry> getSectionEntries(const std::string &sectioName);
     //data
     std::vector<Data> getDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size);
-    void setDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long data);
+    void setDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long data, bool isData);
     //print
     void printToHelperTxt(const std::string &fileName);
 };

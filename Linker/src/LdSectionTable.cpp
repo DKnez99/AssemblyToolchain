@@ -1,6 +1,7 @@
 #include "../inc/LdSectionTable.hpp"
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 
 //section's existential dread
 bool SectionTable::sectionExists(const std::string &sectionName){
@@ -73,17 +74,46 @@ std::vector<Data> SectionTable::getDataAtOffset(const std::string &sectionName, 
   return result;
 }
 
-void SectionTable::setDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long newData){
+void SectionTable::setDataAtOffset(const std::string &sectionName, unsigned int offset, unsigned int size, long newData, bool isData){
+  // if(isData){ //little endian (left <- right)
+  //     for(int i=0; i<size; i++){  
+  //       data.push_back({int((data_ >>4) & 0xF), int((data_ >> 0) & 0xF) });
+  //       data_>>=8;
+  //     }
+  //   }
+  //   else{ //big endian (left -> right)
+  //     for(int i=size-1; i>=0; i--){  
+  //       data.push_back({int((data_ >>(i*8+4)) & 0xF), int((data_ >> (i*8)) & 0xF) });
+  //     }
+  //   }
+  std::cout<<"Going through section entries until we find the right one. ("<<sectionName<<":"<<std::to_string(offset)<<")"<<std::endl;
   for (auto &entry : SectionTable::table.at(sectionName).entries) {
+    //std::cout<<"\tChecking entry: "<<sectionName<<":"<<std::to_string(entry.offset)<<"-"<<std::to_string(entry.offset + entry.size)<<std::endl;
     if(offset>=entry.offset && offset<(entry.offset + entry.size)){
-      int cnt=0;
-      while(cnt<size && cnt<(entry.size-offset+entry.offset)){  //don't go into the next entry to fetch data
-        entry.data[offset-entry.offset+cnt++]={(int)(newData >> 4) & 0xF, (int)(newData >> 0) & 0xF};
-        newData>>=8;
+      std::cout<<"Found entry: "<<sectionName<<":"<<std::to_string(entry.offset)<<"-"<<std::to_string(entry.offset + entry.size)<<std::endl;
+      if(isData){ //little endian (left <- right)
+        std::cout<<"Little endian (left <- right)"<<std::endl;
+        int cnt=0;
+        while(cnt<size && cnt<((int)entry.size-(int)offset+(int)entry.offset)){  //don't go into the next entry to set data
+          entry.data[offset-entry.offset+cnt++]={(int)(newData >> 4) & 0xF, (int)(newData >> 0) & 0xF};
+          std::cout<<"Inserted data @"<<std::to_string(offset+cnt-1)<<": "<<std::to_string((int)(newData >> 4) & 0xF)<<std::to_string((int)(newData >> 0) & 0xF)<<std::endl;
+          newData>>=8;
+        }
       }
+      else{ //big endian (left -> right)
+        std::cout<<"Big endian (left -> right)"<<std::endl;
+        int cnt=size-1;
+        while(cnt>=0 && cnt>=((int)entry.offset-(int)offset)){
+          entry.data[offset-entry.offset+cnt--]={(int)(newData >> (cnt*8+4)) & 0xF, (int)(newData >> (cnt*8+4)) & 0xF};
+          std::cout<<"Inserted data @"<<std::to_string(offset+cnt+1)<<": "<<std::to_string((int)(newData >> (cnt*8+4)) & 0xF)<<std::to_string((int)(newData >> (cnt*8+4)) & 0xF)<<std::endl;
+        }
+      }
+      break;
     }
   }
+  std::cout<<std::endl;
 }
+
 //print
 void SectionTable::printToHelperTxt(const std::string &fileName){
   std::ofstream file;

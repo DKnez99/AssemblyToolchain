@@ -114,10 +114,13 @@ void SymbolTable::setSymbolValue(const std::string &label, unsigned int newValue
   SymbolTable::table.at(label).value=newValue;
 }
 
-void SymbolTable::increaseValueBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset){
+void SymbolTable::increaseValueByAndSetOriginFile(const std::string &sectionName, const std::string &originFile, unsigned int addOffset, const std::string &newOriginFile){
   for(auto &symbol: SymbolTable::table){
-    if(symbol.second.section==sectionName && symbol.second.originFile==originFile){
-      symbol.second.value+=addOffset;
+    if(symbol.second.type!=SymbolType::SECTION){
+      if(symbol.second.section==sectionName && symbol.second.originFile==originFile){
+        symbol.second.originFile=newOriginFile;
+        symbol.second.value+=addOffset;
+      }
     }
   }
 }
