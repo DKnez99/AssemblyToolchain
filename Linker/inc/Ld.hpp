@@ -14,6 +14,7 @@ class Linker{
     std::vector<std::string> inputFileNames;
     std::string helperOutputFileName;
     std::string outputFileName;
+    std::string outputBinaryFileName;
     void writeLineToHelperOutputTxt(const std::string &line);
     std::ofstream helperOutputFileStream;
     
@@ -52,6 +53,8 @@ class Linker{
     void calculateRelocsHex(); //if -hex option is used
     void calculateRelocsRelocatable(); //if -relocateable option is used (misspelled in the document)
     void writeToOutputFiles();
+    void writeToTxtFile();
+    void writeToBinaryFile();
     void printInputTables();
     void printHelperOutputTables();
     //create global tables

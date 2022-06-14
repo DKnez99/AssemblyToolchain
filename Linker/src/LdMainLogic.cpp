@@ -5,6 +5,7 @@ Linker::Linker(std::vector<std::string> inputFileNames, const std::string &outpu
 :inputFileNames(inputFileNames), outputFileName(outputFileName), placeSectionAt(placeAt), isRelocatable(isRelocatable), errorOccured(false), warningOccured(false) {
   Linker::helperOutputFileName=outputFileName.substr(0,outputFileName.find_last_of('.'))+"_helper.txt";
   Linker::memoryMappedRegisters=0xFF00;
+  Linker::outputBinaryFileName=outputFileName.substr(0,outputFileName.find_last_of('.'))+"_binary.o";
 }
 
 //1. symbol, 2. section, 3. relocs
@@ -340,19 +341,12 @@ void Linker::calculateRelocsHex(){  //test
       unsigned int size=0;
       long data=0;
       if(entry.type==RelocType::R_X86_64_16){
-        //std::cout<<"Symbol ("+entry.symbol+") = "<<Linker::globalSymbolTable.getSymbolValue(entry.symbol)<<std::endl;
-        //std::cout<<"Addend = "<<entry.addend<<std::endl;
         size=2;
         data=Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend;
-        //std::cout<<"Data (S+A) = "<<data<<std::endl;
       }
       else if(entry.type==RelocType::R_X86_64_PC16){
         size=2;
-       // std::cout<<"Symbol ("+entry.symbol+") = "<<Linker::globalSymbolTable.getSymbolValue(entry.symbol)<<std::endl;
-        //std::cout<<"Addend = "<<entry.addend<<std::endl;
-        //std::cout<<"Offset = "<<entry.offset<<std::endl;
         data=(int)Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend-(int)entry.offset;
-        //std::cout<<"Data (S+A-O) = "<<data<<std::endl;
       }
       if(entry.isData){
         Linker::writeLineToHelperOutputTxt("Inserting data "+std::to_string(data)+"(DEC) to section '"+relocSection.first+"' at offset '"+std::to_string(entry.offset)+"' backwards.");
@@ -388,7 +382,38 @@ void Linker::printHelperOutputTables(){
 }
 
 void Linker::writeToOutputFiles(){
+  Linker::writeToTxtFile();
+  Linker::writeToBinaryFile();
+}
 
+void Linker::writeToTxtFile(){
+  std::ofstream outputFileStream;
+  outputFileStream.open(Linker::outputFileName);
+  for(auto &section: Linker::globalSectionTable.getTable()){
+    outputFileStream<<"Section "<<section.first<<" ("<<std::dec<<section.second.size<<"B) @0x"<<std::hex<<section.second.memAddr<<":"<<std::endl;
+    int cnt=0;
+    for(auto &entry:section.second.entries){
+      int internalCnt=0;
+      for(auto &data: entry.data){
+        if(cnt==0){
+          outputFileStream<<entry.offset+section.second.memAddr+internalCnt<<": ";
+        }
+        outputFileStream<<data.hex1<<data.hex2<<" ";
+        internalCnt++;
+        cnt++;
+        if(cnt==8){
+          outputFileStream<<std::endl;
+          cnt=0;
+        }
+      }
+    }
+    outputFileStream<<std::endl;
+  }
+  outputFileStream.close();
+}
+
+void Linker::writeToBinaryFile(){
+  
 }
 
 void Linker::link(){

@@ -100,7 +100,6 @@ void SectionTable::setDataAtOffset(const std::string &sectionName, unsigned int 
       break;
     }
   }
-  std::cout<<std::endl;
 }
 
 //print

@@ -23,10 +23,10 @@ int main(int argc, const char *argv[]){
       std::string section=regexMatcher.str(1);
       std::string strAddr=regexMatcher.str(2);
       unsigned int intAddr;
-      if(std::regex_match(strAddr, rgx_decAddr)){
-        intAddr=std::stoi(strAddr,0,16);
+      if(std::regex_match(strAddr, rgx_hexAddr)){
+        intAddr=std::stoi(strAddr,nullptr,16);
       }
-      else if(std::regex_match(strAddr, rgx_hexAddr)){
+      else if(std::regex_match(strAddr, rgx_decAddr)){
         intAddr=std::stoi(strAddr);
       }
       placeAt.insert({section,intAddr});
