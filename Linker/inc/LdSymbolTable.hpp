@@ -48,6 +48,7 @@ public:
   //value
   unsigned int getSymbolValue(const std::string &label);
   void setSymbolValue(const std::string &label, unsigned int newValue);
+  void increaseValueBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset);
   //type
   SymbolType getSymbolType(const std::string &label);
   void setSymbolType(const std::string &label, SymbolType newType);    

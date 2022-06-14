@@ -17,7 +17,7 @@ void Assembler::assemble(){
     Assembler::printResults();
     return;
   }
-  if(Assembler::goThroughFlinksAndRelocs()){ //post processing of reloc table
+  if(!Assembler::goThroughFlinksAndRelocs()){ //post processing of reloc table
     Assembler::printResults();
     return;
   }

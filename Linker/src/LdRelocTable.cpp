@@ -22,6 +22,10 @@ bool RelocationTable::isEmpty(){
   return RelocationTable::table.empty();
 }
 
+std::unordered_map<std::string, std::vector<RelocEntry>> RelocationTable::getTable(){
+  return RelocationTable::table;
+}
+
 //relocation entries
 std::vector<RelocEntry> RelocationTable::getRelocEntriesForSection(const std::string &sectionName){
   return RelocationTable::table.at(sectionName);
@@ -33,6 +37,20 @@ void RelocationTable::addRelocEntry(const std::string &sectionName, RelocEntry e
 
 std::vector<AbsSymbolInfo> RelocationTable::getAndDeleteRelocEntriesForAbsolute(){
 
+}
+
+//offset
+
+void RelocationTable::increaseOffsetBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset){
+  for(auto &entries: RelocationTable::table){
+    if(entries.first==sectionName){
+      for(auto &entry:entries.second){
+        if(entry.originFile==originFile){
+          entry.offset+=addOffset;
+        }
+      }
+    }
+  }
 }
 
 //print

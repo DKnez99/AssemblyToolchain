@@ -8,8 +8,6 @@
 .section myCode
 term_out:
 .word 0xFF00
-.global myStart
-myStart:
 isr_timer:
 term_in:
 .word 0xFF02

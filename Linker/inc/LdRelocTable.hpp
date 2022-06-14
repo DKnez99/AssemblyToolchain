@@ -36,10 +36,13 @@ class RelocationTable{
     //reloc's existential dread
     bool relocationsExistsForSection(const std::string &sectionName);
     bool isEmpty();
+    std::unordered_map<std::string, std::vector<RelocEntry>> getTable();
     //relocation entries
     std::vector<RelocEntry> getRelocEntriesForSection(const std::string &sectionName);
     void addRelocEntry(const std::string &sectionName, RelocEntry entry);
     std::vector<AbsSymbolInfo> getAndDeleteRelocEntriesForAbsolute(); 
+    //offset
+    void increaseOffsetBy(const std::string &sectionName, const std::string &originFile, unsigned int addOffset);
     //print
     void printToHelperTxt(const std::string &fileName);
 };

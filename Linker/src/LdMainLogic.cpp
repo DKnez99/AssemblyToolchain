@@ -136,8 +136,8 @@ bool Linker::createGlobalSectionTable(){
         Linker::globalSectionTable.addSectionData(Linker::currentSection, SectionData(0,0,Linker::outputFileName));
         relativeSectionAddressMap[Linker::currentSection]=0;
       }
+      Linker::sectionTablesForAllFiles.setSectionMemAddr(Linker::currentFileName, Linker::currentSection, relativeSectionAddressMap[Linker::currentSection]);
       for(auto &sectionEntry:sectionTable.second.entries){
-        Linker::sectionTablesForAllFiles.setSectionMemAddr(Linker::currentFileName, Linker::currentSection, relativeSectionAddressMap[Linker::currentSection]);
         Linker::globalSectionTable.addSectionEntry(Linker::currentSection, sectionEntry);
         relativeSectionAddressMap[Linker::currentSection]+=sectionEntry.size;
       }
@@ -185,12 +185,23 @@ bool Linker::createGlobalSymbolTable(){
       }
     }
   }
-
   //after going through all symbols, check if there are still unresolved ones
   for(auto &symbol:Linker::globalSymbolTable.getTable()){
     if(symbol.second.isDefined==false || symbol.second.type==SymbolType::EXTERN){
       Linker::addError("Symbol '"+symbol.first+"' can't be resolved.");
       return false;
+    }
+  }
+  return true;
+}
+
+bool Linker::createGlobalRelocTable(){
+  for(auto &fileName: Linker::inputFileNames){
+    Linker::currentFileName=fileName;
+    for(auto &relocs: Linker::relocationTablesForAllFiles.getRelocationTable(Linker::currentFileName).getTable()){
+      for(auto &reloc: relocs.second){
+        Linker::globalRelocTable.addRelocEntry(relocs.first, reloc);
+      }
     }
   }
   return true;
@@ -265,7 +276,37 @@ bool Linker::calculatePlaceAtSectionAddresses(){
   return true;
 }
 
-void Linker::calculateOffsets(){
+void Linker::calculateOffsets(){  //for reloc and symbols table
+  Linker::writeLineToHelperOutputTxt("CALCULATING NEW, GLOBAL OFFSETS");
+  for(auto &fileName: Linker::inputFileNames){
+    Linker::currentFileName=fileName;
+    //relocs
+    for(auto &relocSection: Linker::globalRelocTable.getTable()){
+      Linker::currentSection=relocSection.first;
+      try{ //index out of bounds can happen
+        unsigned int addOffset=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
+        Linker::globalRelocTable.increaseOffsetBy(Linker::currentSection, Linker::currentFileName, addOffset);
+        Linker::writeLineToHelperOutputTxt("Increased offsets of reloc entries in section '"+Linker::currentSection+"' from file '"+Linker::currentFileName+"' by "+std::to_string(addOffset));
+      }
+      catch(...){
+
+      }
+    }
+    //symbols
+    for(auto &symbol: Linker::globalSymbolTable.getTable()){
+      if(symbol.second.symbolID>0){ //skip undefined and absolute symbol
+        Linker::currentSection=symbol.second.section;
+        try{ //index out of bounds can happen
+          unsigned int addOffset=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
+          Linker::globalSymbolTable.increaseValueBy(Linker::currentSection, Linker::currentFileName, addOffset);
+          Linker::writeLineToHelperOutputTxt("Increased offsets of symbols defined in section '"+Linker::currentSection+"', of file '"+Linker::currentFileName+"' by "+std::to_string(addOffset));
+        }
+        catch(...){
+
+        }
+      }
+    }
+  }
 }
 
 void Linker::calculateRelocsHex(){
@@ -277,11 +318,20 @@ void Linker::calculateRelocsRelocatable(){
 }
 
 void Linker::writeToOutputFiles(){
+  Linker::writeLineToHelperOutputTxt("CONJOINED TABLES:");
+  Linker::helperOutputFileStream.close();
+
   Linker::symbolTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::sectionTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
   Linker::relocationTablesForAllFiles.printToHelperTxt(Linker::helperOutputFileName);
-  Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
+
+  Linker::helperOutputFileStream.open(Linker::helperOutputFileName, std::ios::app);
+  Linker::writeLineToHelperOutputTxt("GLOBAL TABLES:");
+  Linker::helperOutputFileStream.close();
   Linker::globalSymbolTable.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::globalRelocTable.printToHelperTxt(Linker::helperOutputFileName);
+  Linker::helperOutputFileStream.open(Linker::helperOutputFileName, std::ios::app);
 }
 
 void Linker::link(){
@@ -290,6 +340,7 @@ void Linker::link(){
   Linker::createGlobalSectionTable();
   Linker::calculateAllSectionAddresses();
   Linker::createGlobalSymbolTable();
+  Linker::createGlobalRelocTable();
   Linker::calculateOffsets();
   if(Linker::isRelocatable){
     Linker::calculateRelocsRelocatable();

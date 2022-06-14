@@ -8,7 +8,6 @@
 .section myCode
 term_out:
 .word 0xFF00
-myStart:
 isr_timer:
 term_in:
 .word 0xFF02
@@ -17,7 +16,6 @@ asciiCode: .word 84 # ascii(’T’)
 isr_reset:
  jmp myStart
 # prekidna rutina za tajmer
-
  push r0
  ldr r0, $asciiCode
  str r0, term_out
