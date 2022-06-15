@@ -28,3 +28,4 @@ void Emulator::writeToMemory(short value, uint offset, uint size, bool isData){
     Emulator::memory[offset+1].set(value & 0xFF);
   }
 }
+
