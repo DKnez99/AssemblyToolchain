@@ -128,7 +128,7 @@ bool Linker::readFromInputFiles(){
 }
 
 bool Linker::createGlobalSectionTable(){
-  Linker::writeLineToHelperOutputTxt("CREATING GLOBAL SECTIONS TABLE");
+  Linker::writeLineToHelperOutputTxt("\nCREATING GLOBAL SECTIONS TABLE");
   std::unordered_map<std::string, unsigned int> relativeSectionAddressMap;
   for(auto &fileName:Linker::inputFileNames){
     Linker::currentFileName=fileName;
@@ -152,6 +152,7 @@ bool Linker::createGlobalSectionTable(){
 }
 
 bool Linker::createGlobalSymbolTable(){
+  Linker::writeLineToHelperOutputTxt("\nCREATING GLOBAL SYMBOL TABLE");
   int symbolID=-1;
   std::unordered_map<std::string, SymbolType> doneSymbols;  //prob unnecessary
   for(auto &fileName: Linker::inputFileNames){
@@ -373,7 +374,7 @@ void Linker::printInputTables(){
 }
 
 void Linker::printHelperOutputTables(){
-  Linker::writeLineToHelperOutputTxt("\nGLOBAL LD TABLES:");
+  Linker::writeLineToHelperOutputTxt("\nGLOBAL LINKER TABLES:");
   Linker::helperOutputFileStream.close();
   Linker::globalSymbolTable.printToHelperTxt(Linker::helperOutputFileName);
   Linker::globalSectionTable.printToHelperTxt(Linker::helperOutputFileName);
@@ -387,6 +388,7 @@ void Linker::writeToOutputFiles(){
 }
 
 void Linker::writeToTxtFile(){
+  Linker::writeLineToHelperOutputTxt("\nWRITING TO OUTPUT TXT FILE");
   std::ofstream outputFileStream;
   outputFileStream.open(Linker::outputFileName);
   for(auto &section: Linker::globalSectionTable.getTable()){
@@ -413,6 +415,7 @@ void Linker::writeToTxtFile(){
 }
 
 void Linker::writeToBinaryFile(){
+  Linker::writeLineToHelperOutputTxt("\nWRITING TO OUTPUT BINARY FILE");
   std::ofstream outputFileStream;
   outputFileStream.open(Linker::outputBinaryFileName, std::ios::out | std::ios::binary);
   unsigned int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
@@ -424,7 +427,7 @@ void Linker::writeToBinaryFile(){
     }
     unsigned int memAddr=Linker::globalSymbolTable.getSymbolValue(section.first); //get mem addr
     unsigned int numberOfChars=section.second.size*2;
-    std::cout<<"Number of characters = "<<numberOfChars<<std::endl;
+    
     outputFileStream.write((char *)&numberOfChars, sizeof(numberOfChars));
     for(auto &entry:section.second.entries){
       for(auto &data:entry.data){
@@ -437,14 +440,29 @@ void Linker::writeToBinaryFile(){
 
 void Linker::link(){
   Linker::helperOutputFileStream.open(Linker::helperOutputFileName);
-  Linker::readFromInputFiles();
+  if(!Linker::readFromInputFiles()){
+    Linker::printResults();
+    return;
+  }
   Linker::printInputTables();
-  Linker::createGlobalSectionTable();
-  Linker::calculateAllSectionAddresses();
-  Linker::createGlobalSymbolTable();
+  if(!Linker::createGlobalSectionTable()){
+    Linker::printResults();
+    return;
+  }
+  if(!Linker::calculateAllSectionAddresses()){
+    Linker::printResults();
+    return;
+  }
+  if(!Linker::createGlobalSymbolTable()){
+    Linker::printResults();
+    return;
+  }
   Linker::calculateSymbolOffsets();
   Linker::calculateRelocOffsetsAndAddends();
-  Linker::createGlobalRelocTable();
+  if(!Linker::createGlobalRelocTable()){
+    Linker::printResults();
+    return;
+  }
   if(Linker::isRelocatable){
     Linker::calculateRelocsRelocatable();
   }

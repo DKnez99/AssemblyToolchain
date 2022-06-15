@@ -1,5 +1,5 @@
-.global WOWOOWOWOWOW
-.global myCounter
+.global WOWOOWOWOWOW, myStart
+.global myCounter, TESTESTESTEST
 .section myCode
 tim_cfg: .word 0xFF10
 WOWOOWOWOWOW:
@@ -8,8 +8,10 @@ WOWOOWOWOWOW:
 wait:
  ldr r0, myCounter
  ldr r1, $5
+ TESTESTESTEST:
  cmp r0, r1
  jne wait
+ myStart:
  halt
 .section myData
 myCounter:
