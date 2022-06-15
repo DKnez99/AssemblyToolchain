@@ -143,10 +143,10 @@ class Emulator{
   void printMemory();
 
   //reg stuff
-  std::vector<short> reg;  //r1-psw
-  short &rsp=reg[Register::sp];
-  short &rpc=reg[Register::pc];
-  short &rpsw=reg[Register::psw];
+  std::vector<ushort> reg;  //r1-psw
+  ushort &rsp=reg[Register::sp];
+  ushort &rpc=reg[Register::pc];
+  ushort &rpsw=reg[Register::psw];
   void pushOnStack(short value);
   short popFromStack();
   void setFlag(short flag);
@@ -182,7 +182,7 @@ class Emulator{
 
   //setup
   bool emulationLoop();
-  
+
   //terminal
   //add
 

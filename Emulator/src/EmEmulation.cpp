@@ -10,14 +10,13 @@ bool Emulator::emulationLoop(){
   Emulator::writeLineToHelperOutputTxt("sp = "+std::to_string(Emulator::rsp));
   //psw = 0 at the start
   Emulator::resetAllFlags();
-  Emulator::writeLineToHelperOutputTxt("psw = "+std::to_string(Emulator::rpsw));
 
   Emulator::isRunning=true;
   while(Emulator::isRunning){
     Emulator::prevPc=Emulator::rpc;
 
     if(!Emulator::fetchAndDecodeInstr()){ //can't read/decode instr
-      std::cout<<"Can't fetch and decode instruction at pc = "<<Emulator::rpc;
+      std::cout<<"Can't fetch and decode instruction at pc = "<<std::hex<<Emulator::rpc;
       Emulator::rpc=Emulator::prevPc;
       Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR);
     }
@@ -42,7 +41,7 @@ bool Emulator::emulationLoop(){
 }
 
 bool Emulator::fetchAndDecodeInstr(){
-  Emulator::writeLineToHelperOutputTxt("\nReading instruction description (pc="+std::to_string(rpc)+")");
+  Emulator::helperOutputFileStream<<"\n\nReading instruction description (pc="<<std::hex<<rpc<<")"<<std::endl;
   Emulator::instr_descr=Emulator::readFromMemory(Emulator::rpc,BYTE);
   Emulator::rpc+=1;
   switch(Emulator::instr_descr){
@@ -58,8 +57,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_size=2;
       Emulator::getRegDescr(Emulator::readFromMemory(Emulator::rpc,BYTE));
       Emulator::rpc+=1;
-      Emulator::writeLineToHelperOutputTxt("Dest reg: "+Emulator::instr_destReg);
-      Emulator::writeLineToHelperOutputTxt("Src reg: "+Emulator::instr_srcReg);
       if(Emulator::instr_srcReg!=Register::noreg){
         Emulator::addError("Instruction INT must have 0xF as source reg.");
         return false;
