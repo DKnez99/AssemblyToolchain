@@ -3,7 +3,7 @@
 bool Emulator::emulationLoop(){
   Emulator::writeLineToHelperOutputTxt("ENTERING EMULATION LOOP");
   //user program location is in ivt[0]
-  Emulator::rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD);
+  Emulator::rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD,true);
   Emulator::writeLineToHelperOutputTxt("pc = "+std::to_string(Emulator::rpc));
   //sp points to last occupied location and grows towards lower addresses
   Emulator::rsp=MEMORY_MAPPED_REGISTERS;
@@ -286,6 +286,16 @@ bool Emulator::threeOrFiveByteInstr(){
   { 
     Emulator::addError("Invalid update type for instruction on pc="+std::to_string(Emulator::rpc));
     return false;
+  }
+  return true;
+}
+
+bool Emulator::execInstr(){
+  switch(Emulator::instr_mnemonic){
+    case Instruction::instr_halt:{
+      Emulator::isRunning=false;
+      return true;
+    }
   }
   return true;
 }

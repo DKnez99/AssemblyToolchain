@@ -635,30 +635,4 @@ int Assembler::processPCRelAddr(const std::string &operand, int offsetInsideInst
     }
   }
   return 0;
-
-  ///////////////////////////////////////////////////////
-  // if(symbol.section!=SECTION_ABSOLUTE){
-  //   if(symbol.type==SymbolType::SECTION){
-  //     Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_PC16, operand, -diffBetweenOffsetAndNextInstr, false, true));
-  //   }
-  //   else if(symbol.type==SymbolType::LOCAL){
-  //     if(symbol.section==Assembler::currentSection){  //always the same distance between symbol and jmp instruction, so no need to make a reloc entry
-  //       Assembler::writeLineToHelperOutputTxt("Symbol is defined in this section, always the same distance of: "+std::to_string(symbol.value - (Assembler::locationCnt + offsetInsideInstr + diffBetweenOffsetAndNextInstr)));
-  //       return symbol.value - (Assembler::locationCnt + offsetInsideInstr + diffBetweenOffsetAndNextInstr); //check math!
-  //     }
-  //     else{
-  //       Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_PC16, symbol.section, symbol.value-diffBetweenOffsetAndNextInstr, false));
-  //     }
-  //   }
-  //   else{ //global, extern, undefined
-  //     Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_PC16, operand, -diffBetweenOffsetAndNextInstr, false));
-  //     if(!symbol.isDefined){
-  //       Assembler::symbolTable.addFlink(operand, Assembler::currentSection, Assembler::locationCnt + offsetInsideInstr);
-  //     }
-  //   }
-  // }
-  // else{
-  //   Assembler::relocTable.addRelocEntry(Assembler::currentSection, RelocEntry(Assembler::locationCnt + offsetInsideInstr, RelocType::R_X86_64_PC16, operand, -diffBetweenOffsetAndNextInstr, false));
-  // }
-  // return 0; //fill data with zeros for now, will amend it later from reloc table
 }

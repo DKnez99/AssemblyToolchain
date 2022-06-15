@@ -1,21 +1,20 @@
-.section myData
+# file: interrupts.s
+.section ivt
  .word isr_reset
  .skip 2 # isr_error
  .word isr_timer
  .word isr_terminal
  .skip 8
-.extern TESTESTESTEST, myCounter, myStart
-.section myCode
+.extern myStart, myCounter
+.section isr
 term_out:
-.word 0xFF00
-isr_timer:
 term_in:
-.word 0xFF02
-asciiCode: .word 84 # ascii(’T’)
+asciiCode:
 # prekidna rutina za reset
 isr_reset:
  jmp myStart
 # prekidna rutina za tajmer
+isr_timer:
  push r0
  ldr r0, $asciiCode
  str r0, term_out
@@ -25,11 +24,10 @@ isr_reset:
 isr_terminal:
  push r0
  push r1
- ldr r0, TESTESTESTEST
+ ldr r0, term_in
  str r0, term_out
  ldr r0, %myCounter # pcrel
  ldr r1, $1
- .section testSection
  add r0, r1
  str r0, myCounter # abs
  pop r1

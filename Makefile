@@ -29,6 +29,8 @@ Emulator/src/EmMainLogic.cpp \
 Emulator/src/EmDataAndFiles.cpp \
 Emulator/src/EmMemoryOperations.cpp \
 Emulator/src/EmRegStackFlag.cpp \
+Emulator/src/EmEmulation.cpp \
+Emulator/src/EmInterrupts.cpp \
 Emulator/src/EmErrors.cpp \
 
 vpath Assembler/src/%.cpp $(sort $(dir $(ASSEMBLER_SOURCE_CPP_LIST)))

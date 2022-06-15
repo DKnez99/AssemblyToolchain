@@ -1,1 +1,1 @@
-./emulator Emulator/tests/linker_output_binary.o
+./emulator Emulator/tests/program_binary.o

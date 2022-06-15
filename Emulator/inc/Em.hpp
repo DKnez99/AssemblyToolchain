@@ -177,10 +177,12 @@ class Emulator{
   //interrupts
   std::vector<bool> interruptRequests;
   void requestIntOnLine(char intLineNumber);
+  void processInterrupt();
   void jmpOnInterruptRoutine(char ivtEntry);  //push(pc); push(psw); pc=mem[(ivtEntry%8)*2];
 
   //setup
   bool emulationLoop();
+  
   //terminal
   //add
 

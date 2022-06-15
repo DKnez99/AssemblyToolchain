@@ -48,13 +48,14 @@ bool Emulator::conditionMet(Instruction instr){
   switch (instr)
   {
     case Instruction::instr_jeq:{
-      return Emulator::getFlag(Z);
+      return Emulator::getFlag(Flag::Z);
     }
     case Instruction::instr_jne:{
-      return !Emulator::getFlag(Z);
+      return !Emulator::getFlag(Flag::Z);
     }
     case Instruction::instr_jgt:{
-      return !(Emulator::getFlag(N) ^ Emulator::getFlag(O)) & !Emulator::getFlag(Z);
+      return !(Emulator::getFlag(Flag::N) ^ Emulator::getFlag(Flag::O)) & !Emulator::getFlag(Flag::Z);
     }
   }
+  return false;
 }
