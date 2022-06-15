@@ -16,35 +16,10 @@ void Emulator::emulate(){
     return;
   }
 
+  Emulator::emulationLoop();
+
   Emulator::printResults();
   Emulator::helperOutputFileStream.close();
   return;
 }
 
-bool Emulator::emulationLoop(){
-  Emulator::writeLineToHelperOutputTxt("ENTERING EMULATION LOOP");
-  //user program location is in ivt[0]
-  rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD);
-  Emulator::writeLineToHelperOutputTxt("pc = "+std::to_string(rpc));
-  //sp points to last occupied location and grows towards lower addresses
-  rsp=MEMORY_MAPPED_REGISTERS;
-  Emulator::writeLineToHelperOutputTxt("sp = "+std::to_string(rsp));
-  //psw = 0 at the start
-  Emulator::resetAllFlags();
-  Emulator::writeLineToHelperOutputTxt("psw = "+std::to_string(rpsw));
-
-  Emulator::isRunning=true;
-  while(Emulator::isRunning){
-    Emulator::prevPc=rpc;
-
-    if(!Emulator::fetchAndDecodeInstr()){ //can't read/decode instr
-
-    }
-    else{
-      Emulator::writeLineToHelperOutputTxt("")
-    }
-    if(!Emulator::execInstr()){ //can't execute the instruction
-
-    }
-  }
-}

@@ -138,8 +138,8 @@ class Emulator{
 
   //memory
   std::vector<Data> memory;
-  short readFromMemory(uint offset, uint size, bool isData=true);
-  void writeToMemory(short data, uint offset, uint size, bool isData=true);
+  short readFromMemory(uint offset, uint size, bool isData=false);
+  void writeToMemory(short data, uint offset, uint size, bool isData=false);
   void printMemory();
 
   //reg stuff
@@ -157,19 +157,23 @@ class Emulator{
 
   //instruction stuff
   uint instr_size;
+  short instr_descr;
+  void getRegDescr(short value); //regDescr
+  void getAddrDescr(short value); //regDescr
   Instruction instr_mnemonic;
-  Register instr_destReg;
-  Register instr_srcReg;
-  UpdateType instr_updateType;
-  AddressingMode instr_addrMode;
-  Data instr_payload; //hex1,hex2
+  char instr_destReg;
+  char instr_srcReg;
+  char instr_updateType;
+  char instr_addrMode;
+  short instr_payload;
   bool fetchAndDecodeInstr();
   bool execInstr();
   short getOperandByAddrMode();
   bool setOperandByAddrMode(short operand);
   void updateBeforeInstr(); //need to split them, so they can be called both b4 and after ins
   void updateAfterInstr();  //need to split them, so they can be called both b4 and after ins
-  
+  bool threeOrFiveByteInstr(); //helper function to shorten the code
+
   //interrupts
   std::vector<bool> interruptRequests;
   void requestIntOnLine(char intLineNumber);
