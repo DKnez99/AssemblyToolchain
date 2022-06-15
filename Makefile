@@ -29,6 +29,7 @@ Emulator/src/EmMainLogic.cpp \
 Emulator/src/EmDataAndFiles.cpp \
 Emulator/src/EmMemoryOperations.cpp \
 Emulator/src/EmRegStackFlag.cpp \
+Emulator/src/EmExecHelper.cpp \
 Emulator/src/EmEmulation.cpp \
 Emulator/src/EmInterrupts.cpp \
 Emulator/src/EmErrors.cpp \
