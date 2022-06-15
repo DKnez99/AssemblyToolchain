@@ -5,9 +5,26 @@
 #include <fstream>
 #include <iostream>
 
-#define MEMORY_SIZE 1<<16
-#define MEMORY_MAPPED_REGISTERS = 0xFF00
+struct Data{
+  int hex1;
+  int hex2;
+  bool operator==(Data d) const {
+    return d.hex1==hex1 && d.hex2==hex2;
+  }
+  short get(){
+    return (short)(((hex1 & 0xF)<<4) + (hex2 & 0xF));
+  }
 
+  void set(short val){
+    hex1=val & 0xF0;
+    hex2=val & 0xF;
+  }
+};
+
+#define MEMORY_SIZE 1<<16
+#define MEMORY_MAPPED_REGISTERS 0xFF00
+
+#define NUMBER_OF_PERIFERIES 2
 #define IVT_ENTRY_PROGRAM_START 0
 #define IVT_ENTRY_INSTRUCTION_ERROR 1
 #define IVT_ENTRY_TIMER 2
@@ -29,7 +46,7 @@ enum Register{
   sp=r6,
   pc=r7,
   psw=0x8,
-  none=0xF
+  noreg=0xF
 };
 
 enum Flag{
@@ -52,7 +69,7 @@ enum AddressingMode{
 };
 
 enum UpdateType{
-  none=0x0,
+  noupdate=0x0,
   decb=0x1, //decrement b4
   incb=0x2, //increment b4
   deca=0x3, //decrement after
@@ -88,15 +105,15 @@ enum Instruction{
 
 struct Segment{
   unsigned int startAddress;
-  unsigned int size;  //in bytes
-  std::vector<char> data;
+  unsigned int size;      //in bytes
+  std::vector<Data> data;
 };
 
 class Emulator{
   //vars
   bool isRunning;
   std::vector<Segment> segments;
-  unsigned int pc;
+  unsigned int prevPc; //in case errors happen
 
   //errors
   bool errorOccured;
@@ -120,36 +137,36 @@ class Emulator{
   bool loadDataToMemory();
 
   //memory
-  std::vector<char> memory;
-  char readFromMemory(uint offset, uint size, bool isData=true);
-  void writeToMemory(char data, uint offset, uint size, bool isData=true);
-  void printMemory(const std::string &fileName);
+  std::vector<Data> memory;
+  short readFromMemory(uint offset, uint size, bool isData=true);
+  void writeToMemory(short data, uint offset, uint size, bool isData=true);
+  void printMemory();
 
   //reg stuff
-  std::vector<char> reg;  //r1-psw
-  char &rsp=reg[Register::sp];
-  char &rpc=reg[Register::pc];
-  char &rpsw=reg[Register::psw];
-  void pushOnStack(char reg);
-  char popFromStack();
-  void setFlag(char flag);
-  bool getFlag(char flag);
-  void resetFlag(char flag);
+  std::vector<short> reg;  //r1-psw
+  short &rsp=reg[Register::sp];
+  short &rpc=reg[Register::pc];
+  short &rpsw=reg[Register::psw];
+  void pushOnStack(short value);
+  short popFromStack();
+  void setFlag(short flag);
+  bool getFlag(short flag);
+  void resetFlag(short flag);
   void resetAllFlags();
   bool conditionMet(Instruction instr);
 
   //instruction stuff
-  char instr_size;
+  uint instr_size;
   Instruction instr_mnemonic;
   Register instr_destReg;
   Register instr_srcReg;
   UpdateType instr_updateType;
   AddressingMode instr_addrMode;
-  char instr_payload; //hex1,hex2
+  Data instr_payload; //hex1,hex2
   bool fetchAndDecodeInstr();
   bool execInstr();
-  char getOperandByAddrMode();
-  bool setOperandByAddrMode(char operand);
+  short getOperandByAddrMode();
+  bool setOperandByAddrMode(short operand);
   void updateBeforeInstr(); //need to split them, so they can be called both b4 and after ins
   void updateAfterInstr();  //need to split them, so they can be called both b4 and after ins
   
@@ -158,6 +175,8 @@ class Emulator{
   void requestIntOnLine(char intLineNumber);
   void jmpOnInterruptRoutine(char ivtEntry);  //push(pc); push(psw); pc=mem[(ivtEntry%8)*2];
 
+  //setup
+  bool emulationLoop();
   //terminal
   //add
 

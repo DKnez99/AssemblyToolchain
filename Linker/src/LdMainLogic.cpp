@@ -416,19 +416,14 @@ void Linker::writeToTxtFile(){
 
 void Linker::writeToBinaryFile(){
   Linker::writeLineToHelperOutputTxt("\nWRITING TO OUTPUT BINARY FILE");
-  std::ofstream outputFileStream;
-  outputFileStream.open(Linker::outputBinaryFileName, std::ios::out | std::ios::binary);
-  unsigned int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
+  std::ofstream outputFileStream(Linker::outputBinaryFileName, std::ios::binary);
+  int numberOfSections=Linker::globalSectionTable.getTable().size(); //absolute and undefined sections not included
   outputFileStream.write((char *)&numberOfSections,sizeof(numberOfSections));
   for(auto &section : Linker::globalSectionTable.getTable()){
-    if(section.first==".undefined" || section.first==".absolute"){
-      std::cout<<"UND/ABS section appeared while writing to binary from ld";
-      continue;
-    }
     unsigned int memAddr=Linker::globalSymbolTable.getSymbolValue(section.first); //get mem addr
-    unsigned int numberOfChars=section.second.size*2;
-    
-    outputFileStream.write((char *)&numberOfChars, sizeof(numberOfChars));
+    outputFileStream.write((char *)&memAddr, sizeof(memAddr));
+    unsigned int size=section.second.size;
+    outputFileStream.write((char *)&size, sizeof(size));
     for(auto &entry:section.second.entries){
       for(auto &data:entry.data){
         outputFileStream.write((char *)&data.hex1,sizeof(data.hex1));
