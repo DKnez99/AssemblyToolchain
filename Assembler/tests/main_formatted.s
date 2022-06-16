@@ -16,8 +16,11 @@ jne loop
 ldr r0,myCounterInner
 ldr r1,myCounterOutter
 mul r1,r0
-cmp r1,r2
+cmp r2,r1
 jeq loop
+ldr r4,$4
+ldr r5,$0b11
+shl r4,r5
 halt
 .section myData
 myCounterInner:

@@ -156,6 +156,8 @@ class Emulator{
   bool conditionMet(Instruction instr);
   void printSrcAndDestReg(bool instrExecuted=false);
   void printPswReg(bool instrExecuted=false);
+  void printState();
+
   //instruction stuff
   uint instr_size;
   short instr_descr;

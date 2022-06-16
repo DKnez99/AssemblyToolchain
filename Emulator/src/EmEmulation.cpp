@@ -17,7 +17,7 @@ bool Emulator::emulationLoop(){
     Emulator::prevPc=Emulator::rpc; //in case of an error
 
     if(!Emulator::fetchAndDecodeInstr()){ //can't read/decode instr
-      std::cout<<"Can't fetch and decode instruction at pc = 0x"<<std::hex<<Emulator::rpc;
+      std::cout<<"Can't fetch and decode instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
       Emulator::rpc=Emulator::prevPc;
       Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
     }
@@ -25,7 +25,7 @@ bool Emulator::emulationLoop(){
       Emulator::writeLineToHelperOutputTxt("Instruction fetched and decoded");
     }
     if(!Emulator::execInstr()){ //can't execute the instruction
-      std::cout<<"Can't execute instruction at pc = 0x"<<std::hex<<Emulator::rpc;
+      std::cout<<"Can't execute instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
       Emulator::rpc=Emulator::prevPc;
       Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
     }

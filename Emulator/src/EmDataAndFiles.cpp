@@ -1,6 +1,7 @@
 #include "../inc/Em.hpp"
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 void Emulator::writeLineToHelperOutputTxt(const std::string &line){
     Emulator::helperOutputFileStream<<line<<std::endl;
@@ -67,4 +68,19 @@ bool Emulator::loadDataToMemory(){
   }
   Emulator::printMemory();
   return true;
+}
+
+void Emulator::printState(){
+  std::cout<<"------------------------------------------------"<<std::endl;
+  std::cout<<"Emulated processor executed halt instruction"<<std::endl;
+  std::cout<<"Emulated processor state: psw=0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
+  std::cout<<"r0=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r0];
+  std::cout<<"    r1=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r1];
+  std::cout<<"    r2=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r2];
+  std::cout<<"    r3=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r3]<<std::endl;
+  std::cout<<"r4=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r4];
+  std::cout<<"    r5=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r5];
+  std::cout<<"    r6=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r6];
+  std::cout<<"    r7=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r7]<<std::endl;
+  std::cout<<"------------------------------------------------"<<std::endl;
 }

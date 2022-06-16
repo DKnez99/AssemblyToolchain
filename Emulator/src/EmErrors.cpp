@@ -25,6 +25,7 @@ void Emulator::printWarnings(){
 }
 
 void Emulator::printResults(){
+  Emulator::printState();
   if(Emulator::errorOccured){
     std::cout<<"Failed to emulate input file! Details below:"<<std::endl;
     Emulator::printErrors();
@@ -36,4 +37,5 @@ void Emulator::printResults(){
   else{
     std::cout<<"Emulated input file successfuly!"<<std::endl;
   }
+  
 }
