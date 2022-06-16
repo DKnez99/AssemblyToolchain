@@ -154,7 +154,8 @@ class Emulator{
   void resetFlag(short flag);
   void resetAllFlags();
   bool conditionMet(Instruction instr);
-
+  void printSrcAndDestReg(bool instrExecuted=false);
+  void printPswReg(bool instrExecuted=false);
   //instruction stuff
   uint instr_size;
   short instr_descr;

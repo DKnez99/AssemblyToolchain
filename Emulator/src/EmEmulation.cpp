@@ -58,7 +58,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(Emulator::rpc,BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_srcReg!=Register::noreg){
-        Emulator::addError("Instruction INT must have 0xF as source reg.");
+        Emulator::addWarning("Instruction INT must have 0xF as source reg.");
         return false;
       }
       return true;
@@ -75,7 +75,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(Emulator::rpc, BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_destReg!=Register::noreg){
-        Emulator::addError("Instruction CALL must have 0xF as destination reg.");
+        Emulator::addWarning("Instruction CALL must have 0xF as destination reg.");
         return false;
       }
       return Emulator::threeOrFiveByteInstr();
@@ -92,7 +92,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_destReg!=Register::noreg){
-        Emulator::addError("Instruction JMP must have 0xF as destination reg.");
+        Emulator::addWarning("Instruction JMP must have 0xF as destination reg.");
         return false;
       }
       return Emulator::threeOrFiveByteInstr();
@@ -103,7 +103,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_destReg!=Register::noreg){
-        Emulator::addError("Instruction JEQ must have 0xF as destination reg.");
+        Emulator::addWarning("Instruction JEQ must have 0xF as destination reg.");
         return false;
       }
       return Emulator::threeOrFiveByteInstr();
@@ -114,7 +114,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_destReg!=Register::noreg){
-        Emulator::addError("Instruction JNE must have 0xF as destination reg.");
+        Emulator::addWarning("Instruction JNE must have 0xF as destination reg.");
         return false;
       }
       return Emulator::threeOrFiveByteInstr();
@@ -125,7 +125,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_destReg!=Register::noreg){
-        Emulator::addError("Instruction JGT must have 0xF as destination reg.");
+        Emulator::addWarning("Instruction JGT must have 0xF as destination reg.");
         return false;
       }
       return Emulator::threeOrFiveByteInstr();
@@ -249,7 +249,7 @@ bool Emulator::fetchAndDecodeInstr(){
       return Emulator::threeOrFiveByteInstr();
     }
     default:{
-      Emulator::addError("Instruction not recognized!");
+      Emulator::addWarning("Instruction not recognized!");
       return false; //might need to return true
     }
   }
@@ -271,7 +271,7 @@ bool Emulator::threeOrFiveByteInstr(){
     Emulator::instr_size+=2;
   }
   else{
-    Emulator::addError("Invalid addressing mode for instruction on pc="+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid addressing mode for instruction on pc="+std::to_string(Emulator::rpc));
     return false;
   }
 
@@ -281,7 +281,7 @@ bool Emulator::threeOrFiveByteInstr(){
      Emulator::instr_updateType!=UpdateType::inca &&
      Emulator::instr_updateType!=UpdateType::incb)
   { 
-    Emulator::addError("Invalid update type for instruction on pc="+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid update type for instruction on pc="+std::to_string(Emulator::rpc));
     return false;
   }
   return true;
@@ -290,9 +290,275 @@ bool Emulator::threeOrFiveByteInstr(){
 bool Emulator::execInstr(){
   switch(Emulator::instr_mnemonic){
     case Instruction::instr_halt:{
+      Emulator::writeLineToHelperOutputTxt("Processor stopped.");
       Emulator::isRunning=false;
       return true;
     }
+    case Instruction::instr_int:{
+      Emulator::jmpOnInterruptRoutine(Emulator::reg[Emulator::instr_destReg]);
+      return true;
+    }
+    case Instruction::instr_iret:{
+      //just pop pc and psw
+      Emulator::rpsw=Emulator::popFromStack();
+      Emulator::rpc=Emulator::popFromStack();
+      Emulator::helperOutputFileStream<<"New psw = "<<std::hex<<rpsw<<std::endl;
+      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      return true;
+    }
+    case Instruction::instr_call:{
+      Emulator::updateBeforeInstr();
+      Emulator::rpc=Emulator::getOperandByAddrMode();
+      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::updateAfterInstr();
+      return true;
+    }
+    case Instruction::instr_ret:{
+      Emulator::rpc=Emulator::getOperandByAddrMode();
+      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      return true;
+    }
+    case Instruction::instr_jmp:{
+      Emulator::updateBeforeInstr();
+      Emulator::rpc=Emulator::getOperandByAddrMode();
+      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::updateAfterInstr();
+      return true;
+    }
+    case Instruction::instr_jeq:{
+      Emulator::updateBeforeInstr();
+      if(Emulator::conditionMet(Instruction::instr_jeq)){
+        Emulator::rpc=Emulator::getOperandByAddrMode();
+        Emulator::writeLineToHelperOutputTxt("Condition met!");
+        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      }
+      Emulator::updateAfterInstr();
+      return true;
+    }
+    case Instruction::instr_jne:{
+      Emulator::updateBeforeInstr();
+      if(Emulator::conditionMet(Instruction::instr_jne)){
+        Emulator::rpc=Emulator::getOperandByAddrMode();
+        Emulator::writeLineToHelperOutputTxt("Condition met!");
+        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      }
+      Emulator::updateAfterInstr();
+      return true;
+    }
+    case Instruction::instr_jgt:{
+      Emulator::updateBeforeInstr();
+      if(Emulator::conditionMet(Instruction::instr_jgt)){
+        Emulator::rpc=Emulator::getOperandByAddrMode();
+        Emulator::writeLineToHelperOutputTxt("Condition met!");
+        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      }
+      Emulator::updateAfterInstr();
+      return true;
+    }
+    case Instruction::instr_xchg:{
+      Emulator::printSrcAndDestReg();
+      short temp=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::reg[Emulator::instr_srcReg]=Emulator::reg[Emulator::instr_destReg];
+      Emulator::reg[instr_destReg]=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_add:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[instr_destReg]+=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_sub:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[instr_destReg]-=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_mul:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[instr_destReg]*=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_div:{
+      Emulator::printSrcAndDestReg();
+      if(Emulator::reg[Emulator::instr_srcReg]==0){
+        Emulator::addWarning("Can't divide by zero.");
+        Emulator::writeLineToHelperOutputTxt("Can't divide by zero.");
+        return false; //might need to return true
+      }
+      Emulator::reg[instr_destReg]/=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_cmp:{
+      Emulator::printPswReg();
+      short d=Emulator::reg[Emulator::instr_destReg];
+      short s=Emulator::reg[Emulator::instr_srcReg];
+      if(d==s){
+        Emulator::setFlag(Flag::Z);
+      }
+      else{
+        Emulator::resetFlag(Flag::Z);
+      }
+
+      if((d-s)<0){
+        Emulator::setFlag(Flag::N);
+      }
+      else{
+        Emulator::resetFlag(Flag::N);
+      }
+
+      if(d < s){
+        Emulator::setFlag(Flag::C);  
+      }
+      else{
+        Emulator::resetFlag(Flag::C);
+      }
+
+      if((s>0 && d<0 && (d-s)>0) || (s<0 && d>0 && (d-s)>0)){
+        Emulator::setFlag(Flag::O);
+      }
+      else{
+        Emulator::resetFlag(Flag::O);
+      }
+      Emulator::printPswReg(true);
+      return true;
+    }
+    case Instruction::instr_not:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[Emulator::instr_destReg]=!Emulator::reg[Emulator::instr_destReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_and:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[Emulator::instr_destReg]&=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_or:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[Emulator::instr_destReg]|=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_xor:{
+      Emulator::printSrcAndDestReg();
+      Emulator::reg[Emulator::instr_destReg]^=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_test:{
+      Emulator::printPswReg();
+      short d=Emulator::reg[Emulator::instr_destReg];
+      short s=Emulator::reg[Emulator::instr_srcReg];
+      if((d&s)==0){
+        Emulator::setFlag(Flag::Z);
+      }
+      else{
+        Emulator::resetFlag(Flag::Z);
+      }
+
+      if((d&s)<0){
+        Emulator::setFlag(Flag::N);
+      }
+      else{
+        Emulator::resetFlag(Flag::N);
+      }
+
+      Emulator::printPswReg(true);
+      return true;
+    }
+    case Instruction::instr_shl:{
+      Emulator::printSrcAndDestReg();
+      Emulator::printPswReg();
+
+      short pd=Emulator::reg[Emulator::instr_destReg];
+      
+      Emulator::reg[Emulator::instr_destReg]<<=Emulator::reg[Emulator::instr_srcReg];
+      short cd=Emulator::reg[Emulator::instr_destReg];
+      short cs=Emulator::reg[Emulator::instr_srcReg];
+
+      if(cd==0){
+        Emulator::setFlag(Flag::Z);
+      }
+      else{
+        Emulator::resetFlag(Flag::Z);
+      }
+
+      if(cd<0){
+        Emulator::setFlag(Flag::N);
+      }
+      else{
+        Emulator::resetFlag(Flag::N);
+      }
+
+      if(cs <= 16 && ((pd>>(16-cs))&0b1)){ //dest[src]==1?  CHECK IF ITS <=16 or <16
+        Emulator::setFlag(Flag::C);
+      }
+      else{
+        Emulator::resetFlag(Flag::C);
+      }
+
+      Emulator::printSrcAndDestReg(true);
+      Emulator::printPswReg(true);
+      return true;
+    }
+    case Instruction::instr_shr:{
+      Emulator::printSrcAndDestReg();
+      Emulator::printPswReg();
+
+      short pd=Emulator::reg[Emulator::instr_destReg];
+      
+      Emulator::reg[Emulator::instr_destReg]>>=Emulator::reg[Emulator::instr_srcReg];
+      short cd=Emulator::reg[Emulator::instr_destReg];
+      short cs=Emulator::reg[Emulator::instr_srcReg];
+
+      if(cd==0){
+        Emulator::setFlag(Flag::Z);
+      }
+      else{
+        Emulator::resetFlag(Flag::Z);
+      }
+
+      if(cd<0){
+        Emulator::setFlag(Flag::N);
+      }
+      else{
+        Emulator::resetFlag(Flag::N);
+      }
+
+      if(cs <= 16 && ((pd>>(cs-1))&0b1)){ //dest[src-1]==1?
+        Emulator::setFlag(Flag::C);
+      }
+      else{
+        Emulator::resetFlag(Flag::C);
+      }
+
+      Emulator::printSrcAndDestReg(true);
+      Emulator::printPswReg(true);
+      return true;
+    }
+    case Instruction::instr_ldr:{
+      Emulator::printSrcAndDestReg();
+      Emulator::updateBeforeInstr();
+      Emulator::reg[Emulator::instr_destReg]=Emulator::getOperandByAddrMode();
+      Emulator::updateAfterInstr();
+      Emulator::printSrcAndDestReg(true);
+      return true;
+    }
+    case Instruction::instr_str:{
+      Emulator::updateBeforeInstr();
+      if(Emulator::setOperandByAddrMode(Emulator::reg[Emulator::instr_destReg])){
+        return false;
+      }
+      Emulator::updateAfterInstr();
+      return true;
+    }
   }
+  Emulator::addWarning("Instruction didn't match any of the mnemonics.");
+  Emulator::writeLineToHelperOutputTxt("Instruction didn't match any of the mnemonics.");
   return true;
 }

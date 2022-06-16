@@ -1,17 +1,25 @@
 .global myStart
-.global myCounter
+.extern myCounterOutter
 .section myCode
-tim_cfg:
 myStart:
-ldr r0,$0x1
-str r0,tim_cfg
-wait:
-ldr r0,myCounter
-ldr r1,$5
-cmp r0,r1
-jne wait
+ldr r0,$0x4
+ldr r1,$0x1
+ldr r2,$0x8
+loop:
+add r0,r1
+ldr r3,%myCounterInner
+add r3,r1
+str r3,myCounterInner
+str r3,myCounterOutter
+cmp r0,r2
+jne loop
+ldr r0,%myCounterInner
+ldr r1,%myCounterOutter
+mul r1,r0
+cmp r1,r2
+jeq loop
 halt
 .section myData
-myCounter:
+myCounterInner:
 .word 0
 .end

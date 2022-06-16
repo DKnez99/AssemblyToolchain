@@ -308,13 +308,13 @@ void SymbolTable::printToHelperTxt(const std::string &fileName){
     SymbolData symbolData = symbol.second;
     file<<"\n"
         <<std::setw(idW)<<symbolData.symbolID                      //num
-        <<std::setw(valW)<<std::hex<<std::right<<(std::to_string(symbolData.value)+" ")<<std::left<<std::dec     //value
+        <<std::setw(valW)<<std::hex<<std::right<<symbolData.value<<" "<<std::left<<std::dec     //value
         <<std::setw(typW)<<symbolData.type                         //type
         <<std::setw(nameW)<<symbolData.section                      //section
         <<std::setw(nameW)<<std::left<<label.c_str();               //name
     
     for(auto const& flink: symbolData.flinks){                   //flinks
-      file<<"("<<flink.section<<": "<<flink.offset<<") -> ";
+      file<<"("<<flink.section<<": "<<std::hex<<flink.offset<<") -> ";
     }
   }
   file<<std::endl;

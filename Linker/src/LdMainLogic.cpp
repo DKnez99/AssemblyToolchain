@@ -309,8 +309,8 @@ void Linker::calculateSymbolOffsets(){  //for symbol table
 void Linker::calculateRelocOffsetsAndAddends(){
   Linker::writeLineToHelperOutputTxt("\nCALCULATING NEW RELOC OFFSETS AND ADDENDS");
   for(auto &fileName: Linker::inputFileNames){
-    Linker::writeLineToHelperOutputTxt("Going through file "+fileName);
     Linker::currentFileName=fileName;
+    Linker::writeLineToHelperOutputTxt("Going through file "+Linker::currentFileName);
     if(Linker::relocationTablesForAllFiles.sectionTableExists(fileName)){//maybe file doesn't have reloc table
       for(auto &relocTable:Linker::relocationTablesForAllFiles.getRelocationTable(fileName).getTable()){
         Linker::currentSection=relocTable.first;
@@ -331,7 +331,8 @@ void Linker::calculateRelocOffsetsAndAddends(){
           }
         }
       }
-    } 
+    }
+    Linker::writeLineToHelperOutputTxt("Ended with file "+Linker::currentFileName);
   }
 }
 
