@@ -48,27 +48,27 @@ short Emulator::getOperandByAddrMode(){
       return Emulator::instr_payload;
     }
     case AddressingMode::regdir:{
-      Emulator::helperOutputFileStream<<"AddrMode: Regdir | Operand = "<<std::hex<<Emulator::reg[Emulator::instr_srcReg]<<std::endl;
+      Emulator::helperOutputFileStream<<"AddrMode: Regdir | Operand = Reg["<<std::hex<<(int)Emulator::instr_srcReg<<"] = "<<Emulator::reg[Emulator::instr_srcReg]<<std::endl;
       return Emulator::reg[Emulator::instr_srcReg];
     }
     case AddressingMode::regind:{
       result=Emulator::readFromMemory(Emulator::reg[Emulator::instr_srcReg], WORD, true);
-      Emulator::helperOutputFileStream<<"AddrMode: Regind | Operand = "<<std::hex<<result<<std::endl;
+      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Regind | Operand = Mem(Reg["<<(int)Emulator::instr_srcReg<<"]) = Mem ("<<Emulator::reg[Emulator::instr_srcReg]<<") = "<<result<<std::endl;
       return result;
     }
     case AddressingMode::regindmv:{
       result=Emulator::readFromMemory(Emulator::reg[Emulator::instr_srcReg]+Emulator::instr_payload, WORD, true);
-      Emulator::helperOutputFileStream<<"AddrMode: Regind with displ | Operand = "<<std::hex<<result<<std::endl;
+      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Regind with displ | Operand = Mem(Reg["<<(int)Emulator::instr_srcReg<<"]+"<<Emulator::instr_payload<<") = Mem ("<<Emulator::reg[Emulator::instr_srcReg]<<"+"<<Emulator::instr_payload<<") = "<<result<<std::endl;
       return result;
     }
     case AddressingMode::memdir:{
       result=Emulator::readFromMemory(Emulator::instr_payload, WORD, true);
-      Emulator::helperOutputFileStream<<"AddrMode: Memdir| Operand = "<<std::hex<<result<<std::endl;
+      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Memdir| Operand = Mem("<<Emulator::instr_payload<<") = "<<result<<std::endl;
       return result;
     }
     case AddressingMode::regdirmv:{
       result=Emulator::reg[Emulator::instr_srcReg]+Emulator::instr_payload;
-      Emulator::helperOutputFileStream<<"AddrMode: Regdir with displ| Operand = "<<std::hex<<result<<std::endl;
+      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Regdir with displ| Operand = Reg["<<(int)Emulator::instr_srcReg<<"]+"<<Emulator::instr_payload<<" = "<<Emulator::reg[Emulator::instr_srcReg]<<"+"<<Emulator::instr_payload<<" = "<<result<<std::endl;
       return result;
     }
   }

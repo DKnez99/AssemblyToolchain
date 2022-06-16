@@ -272,7 +272,7 @@ bool Emulator::threeOrFiveByteInstr(){
     Emulator::instr_size+=2;
   }
   else{
-    Emulator::addWarning("Invalid addressing mode for instruction on pc="+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid addressing mode for instruction on pc = "+std::to_string(Emulator::rpc));
     return false;
   }
 
@@ -282,7 +282,7 @@ bool Emulator::threeOrFiveByteInstr(){
      Emulator::instr_updateType!=UpdateType::inca &&
      Emulator::instr_updateType!=UpdateType::incb)
   { 
-    Emulator::addWarning("Invalid update type for instruction on pc="+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid update type for instruction on pc = "+std::to_string(Emulator::rpc));
     return false;
   }
   return true;
@@ -303,26 +303,26 @@ bool Emulator::execInstr(){
       //just pop pc and psw
       Emulator::rpsw=Emulator::popFromStack();
       Emulator::rpc=Emulator::popFromStack();
-      Emulator::helperOutputFileStream<<"New psw = "<<std::hex<<rpsw<<std::endl;
-      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::helperOutputFileStream<<"New psw = 0x"<<std::hex<<rpsw<<std::endl;
+      Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       return true;
     }
     case Instruction::instr_call:{
       Emulator::updateBeforeInstr();
       Emulator::rpc=Emulator::getOperandByAddrMode();
-      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       Emulator::updateAfterInstr();
       return true;
     }
     case Instruction::instr_ret:{
       Emulator::rpc=Emulator::getOperandByAddrMode();
-      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       return true;
     }
     case Instruction::instr_jmp:{
       Emulator::updateBeforeInstr();
       Emulator::rpc=Emulator::getOperandByAddrMode();
-      Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+      Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       Emulator::updateAfterInstr();
       return true;
     }
@@ -331,7 +331,7 @@ bool Emulator::execInstr(){
       if(Emulator::conditionMet(Instruction::instr_jeq)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
-        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+        Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       }
       Emulator::updateAfterInstr();
       return true;
@@ -341,7 +341,7 @@ bool Emulator::execInstr(){
       if(Emulator::conditionMet(Instruction::instr_jne)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
-        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+        Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       }
       Emulator::updateAfterInstr();
       return true;
@@ -351,7 +351,7 @@ bool Emulator::execInstr(){
       if(Emulator::conditionMet(Instruction::instr_jgt)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
-        Emulator::helperOutputFileStream<<"New pc = "<<std::hex<<rpc<<std::endl;
+        Emulator::helperOutputFileStream<<"New pc = 0x"<<std::hex<<rpc<<std::endl;
       }
       Emulator::updateAfterInstr();
       return true;

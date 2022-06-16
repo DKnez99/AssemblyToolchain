@@ -3,8 +3,8 @@
 void Emulator::getRegDescr(short value){
   Emulator::instr_destReg=(value>>4)&0xF;
   Emulator::instr_srcReg=value & 0xF;
-  Emulator::writeLineToHelperOutputTxt("Dest reg: "+std::to_string(Emulator::instr_destReg));
-  Emulator::writeLineToHelperOutputTxt("Src reg: "+std::to_string(Emulator::instr_srcReg));
+  Emulator::helperOutputFileStream<<"Dest reg: "<<std::hex<<(int)Emulator::instr_destReg<<std::endl;
+  Emulator::helperOutputFileStream<<"Src reg: "<<std::hex<<(int)Emulator::instr_srcReg<<std::endl;
 }
 
 void Emulator::getAddrDescr(short value){
@@ -70,8 +70,8 @@ void Emulator::printSrcAndDestReg(bool instrExecuted){
   else{
     Emulator::helperOutputFileStream<<"Before: ";
   }
-  Emulator::helperOutputFileStream<<"Reg["<<std::hex<<Emulator::instr_srcReg<<"] = "
-  <<Emulator::reg[Emulator::instr_srcReg]<<", Reg["<<Emulator::instr_destReg<<"] = "
+  Emulator::helperOutputFileStream<<"Reg["<<std::hex<<(int)Emulator::instr_srcReg<<"] = "
+  <<Emulator::reg[Emulator::instr_srcReg]<<", Reg["<<std::hex<<(int)Emulator::instr_destReg<<"] = "
   <<Emulator::reg[Emulator::instr_destReg]<<std::endl;
 }
 
