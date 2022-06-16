@@ -1,7 +1,7 @@
 # file: interrupts.s
 .section ivt
  .word isr_reset
- .skip 2 # isr_error
+ .word isr_error # isr_error
  .skip 2 # isr_timer
  .skip 2 # isr_terminal
  .skip 8
@@ -10,4 +10,6 @@
 # prekidna rutina za reset
 isr_reset:
  jmp myStart
+isr_error:
+halt
 .end

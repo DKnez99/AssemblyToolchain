@@ -1,6 +1,6 @@
 .section ivt
 .word isr_reset
-.skip 2
+.word isr_error
 .skip 2
 .skip 2
 .skip 8
@@ -8,4 +8,6 @@
 .section isr
 isr_reset:
 jmp myStart
+isr_error:
+halt
 .end

@@ -4,29 +4,30 @@ bool Emulator::emulationLoop(){
   Emulator::writeLineToHelperOutputTxt("ENTERING EMULATION LOOP");
   //user program location is in ivt[0]
   Emulator::rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD,true);
-  Emulator::writeLineToHelperOutputTxt("pc = "+std::to_string(Emulator::rpc));
+  Emulator::helperOutputFileStream<<"pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
   //sp points to last occupied location and grows towards lower addresses
   Emulator::rsp=MEMORY_MAPPED_REGISTERS;
-  Emulator::writeLineToHelperOutputTxt("sp = "+std::to_string(Emulator::rsp));
+  Emulator::helperOutputFileStream<<"sp = 0x"<<std::hex<<Emulator::rsp<<std::endl;
   //psw = 0 at the start
   Emulator::resetAllFlags();
 
   Emulator::isRunning=true;
   while(Emulator::isRunning){
-    Emulator::prevPc=Emulator::rpc;
+
+    Emulator::prevPc=Emulator::rpc; //in case of an error
 
     if(!Emulator::fetchAndDecodeInstr()){ //can't read/decode instr
-      std::cout<<"Can't fetch and decode instruction at pc = "<<std::hex<<Emulator::rpc;
+      std::cout<<"Can't fetch and decode instruction at pc = 0x"<<std::hex<<Emulator::rpc;
       Emulator::rpc=Emulator::prevPc;
-      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR);
+      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
     }
     else{
       Emulator::writeLineToHelperOutputTxt("Instruction fetched and decoded");
     }
     if(!Emulator::execInstr()){ //can't execute the instruction
-      std::cout<<"Can't execute instruction at pc = "<<Emulator::rpc;
+      std::cout<<"Can't execute instruction at pc = 0x"<<std::hex<<Emulator::rpc;
       Emulator::rpc=Emulator::prevPc;
-      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR);
+      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
     }
     else{
       Emulator::writeLineToHelperOutputTxt("Instruction executed");
@@ -41,7 +42,7 @@ bool Emulator::emulationLoop(){
 }
 
 bool Emulator::fetchAndDecodeInstr(){
-  Emulator::helperOutputFileStream<<"\n\nReading instruction description (pc="<<std::hex<<rpc<<")"<<std::endl;
+  Emulator::helperOutputFileStream<<"\n\nReading instruction description (pc=0x"<<std::hex<<rpc<<")"<<std::endl;
   Emulator::instr_descr=Emulator::readFromMemory(Emulator::rpc,BYTE);
   Emulator::rpc+=1;
   switch(Emulator::instr_descr){
@@ -551,7 +552,7 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_str:{
       Emulator::updateBeforeInstr();
-      if(Emulator::setOperandByAddrMode(Emulator::reg[Emulator::instr_destReg])){
+      if(!Emulator::setOperandByAddrMode(Emulator::reg[Emulator::instr_destReg])){
         return false;
       }
       Emulator::updateAfterInstr();
@@ -560,5 +561,5 @@ bool Emulator::execInstr(){
   }
   Emulator::addWarning("Instruction didn't match any of the mnemonics.");
   Emulator::writeLineToHelperOutputTxt("Instruction didn't match any of the mnemonics.");
-  return true;
+  return false;
 }

@@ -202,11 +202,14 @@ bool Linker::createGlobalSymbolTable(){
 }
 
 bool Linker::createGlobalRelocTable(){
+  Linker::writeLineToHelperOutputTxt("\nCREATING GLOBAL RELOC TABLE");
   for(auto &fileName: Linker::inputFileNames){
     Linker::currentFileName=fileName;
-    for(auto &relocs: Linker::relocationTablesForAllFiles.getRelocationTable(Linker::currentFileName).getTable()){
-      for(auto &reloc: relocs.second){
-        Linker::globalRelocTable.addRelocEntry(relocs.first, reloc);
+    if(Linker::relocationTablesForAllFiles.sectionTableExists(Linker::currentFileName)){
+      for(auto &relocs: Linker::relocationTablesForAllFiles.getRelocationTable(Linker::currentFileName).getTable()){
+        for(auto &reloc: relocs.second){
+          Linker::globalRelocTable.addRelocEntry(relocs.first, reloc);
+        }
       }
     }
   }
@@ -455,6 +458,7 @@ void Linker::link(){
   }
   Linker::calculateSymbolOffsets();
   Linker::calculateRelocOffsetsAndAddends();
+
   if(!Linker::createGlobalRelocTable()){
     Linker::printResults();
     return;
