@@ -309,13 +309,14 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_call:{
       Emulator::updateBeforeInstr();
+      Emulator::pushOnStack(Emulator::rpc);
       Emulator::rpc=Emulator::getOperandByAddrMode();
       Emulator::updateAfterInstr();
       Emulator::printPcPswSpStateToTxt();
       return true;
     }
     case Instruction::instr_ret:{
-      Emulator::rpc=Emulator::getOperandByAddrMode();
+      Emulator::rpc=Emulator::popFromStack();
       Emulator::printPcPswSpStateToTxt();
       return true;
     }

@@ -66,7 +66,7 @@ bool Emulator::loadDataToMemory(){
       Emulator::memory[i+segment.startAddress]=segment.data[i];
     }
   }
-  Emulator::printMemory();
+  //Emulator::printMemory();
   return true;
 }
 

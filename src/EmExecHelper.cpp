@@ -60,7 +60,7 @@ short Emulator::getOperandByAddrMode(){
     }
     case AddressingMode::regindmv:{
       result=Emulator::readFromMemory(Emulator::reg[Emulator::instr_srcReg]+Emulator::instr_payload, WORD, true);
-      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Regind with displ | Operand = Mem(Reg["<<(int)Emulator::instr_srcReg<<"] + 0x"<<Emulator::instr_payload<<") = Mem (0x"<<Emulator::reg[Emulator::instr_srcReg]<<" + 0x"<<Emulator::instr_payload<<") = 0x"<<result<<std::endl;
+      Emulator::helperOutputFileStream<<std::hex<<"AddrMode: Regind with displ | Operand = Mem(Reg["<<(int)Emulator::instr_srcReg<<"] + 0x"<<Emulator::instr_payload<<") = Mem (0x"<<Emulator::reg[Emulator::instr_srcReg]<<" + 0x"<<Emulator::instr_payload<<") = Mem (0x"<<Emulator::reg[Emulator::instr_srcReg]+Emulator::instr_payload<<") = 0x"<<result<<std::endl;
       return result;
     }
     case AddressingMode::memdir:{
