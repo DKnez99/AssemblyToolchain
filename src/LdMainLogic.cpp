@@ -208,7 +208,7 @@ bool Linker::createGlobalRelocTable(){
   Linker::writeLineToHelperOutputTxt("\nCREATING GLOBAL RELOC TABLE");
   for(auto &fileName: Linker::inputFileNames){
     Linker::currentFileName=fileName;
-    if(Linker::relocationTablesForAllFiles.sectionTableExists(Linker::currentFileName)){
+    if(Linker::relocationTablesForAllFiles.relocTableExists(Linker::currentFileName)){
       for(auto &relocs: Linker::relocationTablesForAllFiles.getRelocationTable(Linker::currentFileName).getTable()){
         for(auto &reloc: relocs.second){
           Linker::globalRelocTable.addRelocEntry(relocs.first, reloc);
@@ -316,10 +316,10 @@ void Linker::calculateRelocOffsetsAndAddends(){
   Linker::writeLineToHelperOutputTxt("\nCALCULATING NEW RELOC OFFSETS AND ADDENDS");
   for(auto &fileName: Linker::inputFileNames){
     Linker::currentFileName=fileName;
-    Linker::writeLineToHelperOutputTxt("Going through file "+Linker::currentFileName);
-    if(Linker::relocationTablesForAllFiles.sectionTableExists(fileName)){//maybe file doesn't have reloc table
-      for(auto &relocTable:Linker::relocationTablesForAllFiles.getRelocationTable(fileName).getTable()){
-        Linker::currentSection=relocTable.first;
+    Linker::writeLineToHelperOutputTxt("\nGoing through file "+Linker::currentFileName);
+    if(Linker::relocationTablesForAllFiles.relocTableExists(fileName)){//maybe file doesn't have reloc table
+      for(auto &relocsForSection:Linker::relocationTablesForAllFiles.getRelocationTable(fileName).getTable()){
+        Linker::currentSection=relocsForSection.first;
         Linker::writeLineToHelperOutputTxt("\tGoing through reloc section "+Linker::currentSection);
         unsigned int offsetIncrease=Linker::sectionTablesForAllFiles.getSectionMemAddr(Linker::currentFileName, Linker::currentSection);
         Linker::relocationTablesForAllFiles.increaseOffsetsForFileAndSection(Linker::currentFileName, Linker::currentSection, offsetIncrease);
@@ -332,7 +332,7 @@ void Linker::calculateRelocOffsetsAndAddends(){
               Linker::relocationTablesForAllFiles.increaseAddendsForFileAndSection(Linker::currentFileName, Linker::currentSection, symbol, addendIncrease);
             }
             catch(...){
-              Linker::helperOutputFileStream<<"\t\tFile '"<<Linker::currentFileName<<"' does not have section '"<<Linker::currentSection<<"'."<<std::endl;
+              Linker::helperOutputFileStream<<"\t\tFile '"<<Linker::currentFileName<<"' does not have section '"<<symbol<<"'."<<std::endl;
             }  
           }
         }
@@ -357,10 +357,10 @@ void Linker::calculateRelocsHex(){  //test
         data=(int)Linker::globalSymbolTable.getSymbolValue(entry.symbol)+entry.addend-(int)entry.offset-Linker::globalSymbolTable.getSymbolValue(relocSection.first); //check
       }
       if(entry.isData){
-        Linker::helperOutputFileStream<<"Inserting value 0x"<<std::hex<<data<<" to section '"<<relocSection.first<<"' at offset (0x"<<entry.offset+1<<", 0x"<<entry.offset<<")."<<std::endl;
+        Linker::helperOutputFileStream<<"Inserting value 0x"<<std::hex<<data<<" to section '"<<relocSection.first<<"' at offsets (0x"<<entry.offset+1<<", 0x"<<entry.offset<<")."<<std::endl;
       }
       else{
-        Linker::helperOutputFileStream<<"Inserting value 0x"<<std::hex<<data<<" to section '"<<relocSection.first<<"' at offset (0x"<<entry.offset<<", 0x"<<entry.offset+1<<")."<<std::endl;
+        Linker::helperOutputFileStream<<"Inserting value 0x"<<std::hex<<data<<" to section '"<<relocSection.first<<"' at offsets (0x"<<entry.offset<<", 0x"<<entry.offset+1<<")."<<std::endl;
       }
       Linker::globalSectionTable.setDataAtOffset(relocSection.first, entry.offset, size, data, entry.isData);
     }

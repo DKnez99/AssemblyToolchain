@@ -3,8 +3,8 @@
 class RelocTablesForAllAsFiles{
   std::unordered_map<std::string, RelocationTable> table; //file name, reloc table
 public:
-  //sectionTable's existential dread
-  bool sectionTableExists(const std::string &fileName);
+  //relocTable's existential dread
+  bool relocTableExists(const std::string &fileName);
   bool isEmpty();
   //relocationTable
   RelocationTable getRelocationTable(const std::string &fileName);

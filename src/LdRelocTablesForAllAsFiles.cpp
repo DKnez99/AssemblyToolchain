@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iomanip>
 
-//sectionTable's existential dread
-bool RelocTablesForAllAsFiles::sectionTableExists(const std::string &fileName){
+//relocTable's existential dread
+bool RelocTablesForAllAsFiles::relocTableExists(const std::string &fileName){
   return RelocTablesForAllAsFiles::table.find(fileName)!=RelocTablesForAllAsFiles::table.end();
 }
 bool RelocTablesForAllAsFiles::isEmpty(){

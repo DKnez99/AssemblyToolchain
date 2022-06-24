@@ -25,6 +25,13 @@ struct Data{
 #define MEMORY_MAPPED_REGISTERS 0xFF00
 
 #define NUMBER_OF_PERIFERIES 2
+#define TERMINAL_INTR_REQUEST_LINE_NUMBER 0
+#define TIMER_INTR_REQUEST_LINE_NUMBER 1
+
+#define TERM_OUT 0xFF00
+#define TERM_IN 0xFF02
+#define TIM_CFG 0xFF10
+
 #define IVT_ENTRY_PROGRAM_START 0
 #define IVT_ENTRY_INSTRUCTION_ERROR 1
 #define IVT_ENTRY_TIMER 2
@@ -188,7 +195,8 @@ class Emulator{
   bool emulationLoop();
 
   //terminal
-  //add
+  bool configureTerminal();
+  void readCharFromTerminal();
 
   //timer
   //add
