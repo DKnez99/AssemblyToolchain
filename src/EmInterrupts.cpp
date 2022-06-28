@@ -10,7 +10,7 @@ void Emulator::requestIntOnLine(char intLineNumber){
   }
 }
 
-void Emulator::processInterrupt(){
+void Emulator::processInterrupts(){
   Emulator::writeLineToHelperOutputTxt("Processing interrupt");
   if(Emulator::getFlag(Flag::I)){
     //add code for timer and terminal - check Tr and Tl
@@ -26,4 +26,26 @@ void Emulator::jmpOnInterruptRoutine(char ivtEntry){
   Emulator::setFlag(Flag::I);
   Emulator::setFlag(Flag::Tr);
   Emulator::setFlag(Flag::Tl);
+}
+
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+//||                       TERMINAL                          ||
+//||=========================================================||
+//||=========================================================||
+//||=========================================================||
+
+//check https://pubs.opengroup.org/onlinepubs/7908799/xsh/termios.h.html
+
+bool Emulator::startTerminal(){
+  
+}
+
+void Emulator::readCharFromTerminal(){
+
+}
+
+void Emulator::stopTerminal(){
+
 }

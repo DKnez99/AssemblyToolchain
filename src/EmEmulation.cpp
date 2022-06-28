@@ -3,14 +3,16 @@
 bool Emulator::emulationLoop(){
   Emulator::writeLineToHelperOutputTxt("ENTERING EMULATION LOOP");
   //user program location is in ivt[0]
-  Emulator::rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD,true);
+  Emulator::rpc=Emulator::readFromMemory(IVT_ENTRY_PROGRAM_START, WORD, true);
   Emulator::helperOutputFileStream<<"pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
   //sp points to last occupied location and grows towards lower addresses
   Emulator::rsp=MEMORY_MAPPED_REGISTERS;
   Emulator::helperOutputFileStream<<"sp = 0x"<<std::hex<<Emulator::rsp<<std::endl;
   //psw = 0 at the start
   Emulator::resetAllFlags();
-
+  if(!Emulator::startTerminal()){
+    return false;
+  }
   Emulator::isRunning=true;
   while(Emulator::isRunning){
 
@@ -34,8 +36,11 @@ bool Emulator::emulationLoop(){
     }
 
     //check for interrupts
+    Emulator::readCharFromTerminal();
+    Emulator::processInterrupts();
   }
 
+  Emulator::stopTerminal();
   Emulator::writeLineToHelperOutputTxt("\nFINISHED WITH EMULATION");
   Emulator::printMemory();
   return true;

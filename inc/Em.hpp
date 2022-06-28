@@ -169,8 +169,8 @@ class Emulator{
   //instruction stuff
   uint instr_size;
   short instr_descr;
-  void getRegDescr(short value); //regDescr
-  void getAddrDescr(short value); //regDescr
+  void getRegDescr(short value);
+  void getAddrDescr(short value);
   Instruction instr_mnemonic;
   char instr_destReg;
   char instr_srcReg;
@@ -188,14 +188,15 @@ class Emulator{
   //interrupts
   std::vector<bool> interruptRequests;
   void requestIntOnLine(char intLineNumber);
-  void processInterrupt();
+  void processInterrupts();
   void jmpOnInterruptRoutine(char ivtEntry);  //push(pc); push(psw); pc=mem[(ivtEntry%8)*2];
 
   //setup
   bool emulationLoop();
 
   //terminal
-  bool configureTerminal();
+  bool startTerminal();
+  void stopTerminal();
   void readCharFromTerminal();
 
   //timer
