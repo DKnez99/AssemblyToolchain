@@ -19,6 +19,12 @@ short Emulator::readFromMemory(uint offset, uint size, bool isData){
 
 void Emulator::writeToMemory(short value, uint offset, uint size, bool isData){
   offset&=0xFFFF;
+
+  if(offset==TERM_OUT){ //if we are writing to term_out, display the data
+    Emulator::writeLineToHelperOutputTxt("Outputing data from Mem(TERM_OUT) to display.");
+    std::cout<<(char)value<<std::endl;
+  }
+
   if(size==1){
     Emulator::helperOutputFileStream<<"Writing data to memory @0x"<<std::hex<<offset<<" = 0x"<<value<<std::endl;
     Emulator::memory[offset].set(value);
