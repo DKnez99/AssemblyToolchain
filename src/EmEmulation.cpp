@@ -11,6 +11,8 @@ bool Emulator::emulationLoop(){
   //psw = 0 at the start
   Emulator::resetAllFlags();
   if(!Emulator::startTerminal()){
+    Emulator::addError("Terminal failed to start.");
+    Emulator::writeLineToHelperOutputTxt("Terminal failed to start.");
     return false;
   }
   Emulator::isRunning=true;
@@ -47,7 +49,7 @@ bool Emulator::emulationLoop(){
 }
 
 bool Emulator::fetchAndDecodeInstr(){
-  Emulator::helperOutputFileStream<<"\n\nReading instruction description (pc=0x"<<std::hex<<rpc<<")"<<std::endl;
+  Emulator::helperOutputFileStream<<"\nReading instruction description (pc=0x"<<std::hex<<rpc<<")"<<std::endl;
   Emulator::instr_descr=Emulator::readFromMemory(Emulator::rpc,BYTE);
   Emulator::rpc+=1;
   switch(Emulator::instr_descr){

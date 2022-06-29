@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <termios.h>
 
 struct Data{
   int hex1;
@@ -198,7 +199,9 @@ class Emulator{
   bool startTerminal();
   void stopTerminal();
   void readCharFromTerminal();
-
+  termios defaultTerminalSettings;
+  void restoreDefaultTermSettings();
+  void printTerminalSettings(const std::string& str, termios settings);
   //timer
   //add
 public:
