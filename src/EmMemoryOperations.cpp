@@ -1,6 +1,7 @@
 #include "../inc/Em.hpp"
 
 short Emulator::readFromMemory(uint offset, uint size, bool isData){
+  offset&=0xFFFF;
   if(size==1){
     Emulator::helperOutputFileStream<<"Reading data from memory @0x"<<std::hex<<offset<<" = 0x"<<Emulator::memory[offset].get()<<std::endl;
     return Emulator::memory[offset].get();
@@ -17,6 +18,7 @@ short Emulator::readFromMemory(uint offset, uint size, bool isData){
 }
 
 void Emulator::writeToMemory(short value, uint offset, uint size, bool isData){
+  offset&=0xFFFF;
   if(size==1){
     Emulator::helperOutputFileStream<<"Writing data to memory @0x"<<std::hex<<offset<<" = 0x"<<value<<std::endl;
     Emulator::memory[offset].set(value);

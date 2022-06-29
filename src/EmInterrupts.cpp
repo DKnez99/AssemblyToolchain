@@ -13,9 +13,25 @@ void Emulator::requestIntOnLine(char intLineNumber){
 }
 
 void Emulator::processInterrupts(){
-  Emulator::writeLineToHelperOutputTxt("Processing interrupt");
-  if(Emulator::getFlag(Flag::I)){
-    //add code for timer and terminal - check Tr and Tl
+  Emulator::writeLineToHelperOutputTxt("Processing interrupts:");
+  if(!Emulator::getFlag(Flag::I)){
+    
+    //add code for timer intr
+
+    if(Emulator::interruptRequests[TERMINAL_INTR_REQUEST_LINE_NUMBER]==true){
+      Emulator::writeLineToHelperOutputTxt("Pending terminal request.");
+      if(!Emulator::getFlag(Flag::Tl)){
+        Emulator::writeLineToHelperOutputTxt("Processing terminal interrupt:");
+        Emulator::interruptRequests[TERMINAL_INTR_REQUEST_LINE_NUMBER]=false;
+        Emulator::jmpOnInterruptRoutine(IVT_ENTRY_TERMINAL);
+      }
+      else{
+        Emulator::writeLineToHelperOutputTxt("Terminal interrupts are masked.");
+      }
+    }
+  }
+  else{
+    Emulator::writeLineToHelperOutputTxt("External interrupts are masked.");
   }
 }
 
