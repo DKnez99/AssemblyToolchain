@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <bitset>
+#include <regex>
 
 void Emulator::writeLineToHelperOutputTxt(const std::string &line){
     Emulator::helperOutputFileStream<<line<<std::endl;
@@ -28,7 +29,7 @@ bool Emulator::readDataFromInputFile(){
   Emulator::writeLineToHelperOutputTxt("READING DATA FROM INPUT FILE");
   std::ifstream inputFileStream(Emulator::inputFileName, std::ios::in | std::ios::binary);
   if(inputFileStream.fail()){
-    Emulator::addError("Can't find file '"+Emulator::inputFileName+"'.");
+    Emulator::addError("Can't find file '"+std::regex_replace(Emulator::inputFileName, std::regex("_binary.o"), ".hex")+"'.");
     return false;
   }
 

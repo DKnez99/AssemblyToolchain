@@ -1,5 +1,6 @@
 #include "../inc/Ld.hpp"
 #include <iostream>
+#include <regex>
 
 Linker::Linker(std::vector<std::string> inputFileNames, const std::string &outputFileName, std::unordered_map<std::string, unsigned int> placeAt, bool isRelocatable)
 :outputFileName(outputFileName), placeSectionAt(placeAt), isRelocatable(isRelocatable), errorOccured(false), warningOccured(false) {
@@ -19,7 +20,7 @@ bool Linker::readFromInputFiles(){
     Linker::writeLineToHelperOutputTxt("FILE '"+Linker::currentFileName+"':");
     std::ifstream inputFile(Linker::currentFileName, std::ios::in | std::ios::binary);
     if(inputFile.fail()){
-      Linker::addError("Can't find file '"+Linker::currentFileName+"'.");
+      Linker::addError("Can't find file '"+std::regex_replace(Linker::currentFileName, std::regex("_binary.o"), ".o")+"'.");
       return false;
     }
 
@@ -272,7 +273,7 @@ bool Linker::calculatePlaceAtSectionAddresses(){
   //check for intersections
   for(auto &sectionOne:Linker::placeSectionAt){ //ineffiecient
     if(Linker::globalSectionTable.getSectionData(sectionOne.first).memAddr+Linker::globalSectionTable.getSectionData(sectionOne.first).size >= Linker::memoryMappedRegisters){
-      Linker::addError("Section '"+sectionOne.first+"' overlaps with memory mapped registers at addr. 65280 (0xFF00).");
+      Linker::addError("Section '"+sectionOne.first+"' overlaps with memory mapped registers at address 0xFF00.");
       return false;
     }
     for(auto &sectionTwo:Linker::placeSectionAt){
