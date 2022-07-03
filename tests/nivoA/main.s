@@ -1,6 +1,7 @@
 # file: main.s
 
 .extern mathAdd, mathSub, mathMul, mathDiv
+.extern logicNot, logicAnd, logicOr, logicXor, logicTest, logicShl, logicShr
 
 .global my_start
 
@@ -39,7 +40,7 @@ my_start:
 
   ldr r0, $2
   push r0
-  ldr r0, $2
+  ldr r0, $0xFFFE
   push r0
   ldr r0, $4
   call *[r0 + destinations] # pc <= mem16[r0 + destinations] ~ mathMul
@@ -81,10 +82,18 @@ value5:
 .word 0
 value6:
 .word 0
+value7:
+.word 0
 destinations:
 .word mathAdd
 .word mathSub
 .word mathMul
 .word mathDiv
-
+.word logicNot
+.word logicAnd
+.word logicOr
+.word logicXor
+.word logicTest
+.word logicShl
+.word logicShr
 .end

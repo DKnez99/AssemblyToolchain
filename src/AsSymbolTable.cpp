@@ -217,7 +217,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
   file.open(fileName);  //starts from 0!!!
   file<<std::left<<"#.symtab\n"
       <<std::setw(idW)<<"ID"
-      <<std::setw(valW)<<"Value(HX)"
+      <<std::setw(valW)<<" Value(HX) "
       <<std::setw(typW)<<"Type"
       <<std::setw(bndW)<<"Bind"
       <<std::setw(ndxW)<<"Ndx"
@@ -229,7 +229,7 @@ void SymbolTable::printToOutput(const std::string &fileName){
       SymbolData symbolData = symbol.second;
       file<<"\n"
           <<std::setw(idW)<<symbolData.symbolID  //id
-          <<std::setw(valW)<<std::hex<<std::right<<(std::to_string(symbolData.value)+" ")<<std::left<<std::dec;        //value
+          <<std::setw(valW)<<std::hex<<std::right<<symbolData.value<<" "<<std::left<<std::dec;        //value
 
       switch (symbolData.type)   //type
       {

@@ -1,7 +1,4 @@
-# file: ivt.s
-
-.extern isr_reset, isr_timer, isr_terminal, isr_user0
-
+.extern isr_reset,isr_timer,isr_terminal,isr_user0
 .section ivt
 .word isr_reset
 .word isr_error
