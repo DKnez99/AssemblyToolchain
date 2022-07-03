@@ -30,7 +30,7 @@ call *[r0]
 str r0,value3
 ldr r0,$2
 push r0
-ldr r0,$0xFFFE
+ldr r0,$-2
 push r0
 ldr r0,$4
 call *[r0+destinations]

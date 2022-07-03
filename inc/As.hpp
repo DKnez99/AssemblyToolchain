@@ -75,6 +75,5 @@ class Assembler{
     int processPCRelAddr(const std::string &operand, int offsetInsideInstr, int diffBetweenOffsetAndNextInstr);
   public:
     Assembler(const std::string &inputFileName, const std::string &outputFileName);
-    void assemble();
-    
+    void assemble();   
 };

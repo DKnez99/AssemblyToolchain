@@ -257,7 +257,7 @@ bool Emulator::fetchAndDecodeInstr(){
       return Emulator::threeOrFiveByteInstr();
     }
     default:{
-      Emulator::addWarning("Instruction not recognized!");
+      Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::rpc)+") not recognized!");
       return false; //might need to return true
     }
   }

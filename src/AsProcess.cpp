@@ -395,7 +395,7 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
     else{
       jmpValue = Assembler::stringToDec(operand);
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + jmpValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_match(operand, rgx_addr_jmp_pcrel)){//pc relative jmp
@@ -407,7 +407,7 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
     if(jmpValue==-1){
       return false;
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + jmpValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_match(operand, rgx_addr_jmp_regdir)){  //reg dir - important to put it b4 memdir
@@ -429,7 +429,7 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
       return false;
     }
     jmpValue = (std::regex_match(extractedOperand, rgx_symbol))?absOperand:Assembler::stringToDec(extractedOperand);
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + jmpValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_search(operand, matchedRegex, rgx_addr_jmp_regind)){
@@ -457,7 +457,7 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
     else{
       jmpValue = Assembler::stringToDec(extractedDisp);
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + jmpValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
   }
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, lcAdder, instructionCode, false));
@@ -502,7 +502,7 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
     else{
       opValue = Assembler::stringToDec(extractedOperand);
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + opValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (opValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_match(operand, rgx_addr_ld_str_regdir)){ //must be b4 memdir
@@ -527,7 +527,7 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
     else{
       opValue = Assembler::stringToDec(operand);
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + opValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (opValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_match(operand, rgx_addr_ld_str_mempcrel)){
@@ -540,7 +540,7 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
       Assembler::addError("Error while performing absolute PC relative addressing calculation.");
       return false;
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + opValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (opValue&0xFFFF);
     lcAdder=5;
   }
   else if(std::regex_search(operand, matchedRegex, rgx_addr_ld_str_regind)){
@@ -569,7 +569,7 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
     else{
       opValue = Assembler::stringToDec(extractedDisp);
     }
-    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + opValue;
+    instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (opValue&0xFFFF);
     lcAdder=5;
   }
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, lcAdder, instructionCode, false));

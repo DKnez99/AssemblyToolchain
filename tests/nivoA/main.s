@@ -40,7 +40,7 @@ my_start:
 
   ldr r0, $2
   push r0
-  ldr r0, $0xFFFE
+  ldr r0, $-2
   push r0
   ldr r0, $4
   call *[r0 + destinations] # pc <= mem16[r0 + destinations] ~ mathMul
