@@ -7,7 +7,7 @@ my_start:
 ldr r6,$0xFEFE
 ldr r0,$4
 int r0
-ldr r0,$0xF0F5
+ldr r0,$0xff5
 not r0
 str r0,value1
 ldr r0,$0xF0

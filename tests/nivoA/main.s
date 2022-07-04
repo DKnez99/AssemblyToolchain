@@ -60,7 +60,7 @@ my_start:
 # logic testing
 
   # not
-  ldr r0, $0xF0F5
+  ldr r0, $0xff5
   not r0
   # push r0
   # call logicNot # pc <= logicNot

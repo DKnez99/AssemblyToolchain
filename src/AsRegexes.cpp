@@ -19,7 +19,7 @@ std::regex rgx_symbol("("+symbol+")");
 
 //literals
 std::string literal_dec="-?[0-9]+";
-std::string literal_hex="0x[0-9A-F]+";
+std::string literal_hex="0x[0-9a-fA-F]+";
 std::string literal_bin="0b[0-1]+";
 std::string literal=literal_dec+"|"+literal_hex+"|"+literal_bin;
 

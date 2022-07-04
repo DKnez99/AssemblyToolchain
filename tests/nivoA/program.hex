@@ -11,7 +11,7 @@ Section 'isr' (33B) @0x1cd:
 1ed: 20 
 Section 'my_code' (216B) @0xd7:
 d7: a0 6f 00 fe fe a0 0f 00 
-df: 00 04 10 0f a0 0f 00 f0 
+df: 00 04 10 0f a0 0f 00 0f 
 e7: f5 80 0f b0 0f 04 01 b1 
 ef: a0 0f 00 00 f0 b0 06 12 
 f7: a0 0f 00 0f f0 b0 06 12 
