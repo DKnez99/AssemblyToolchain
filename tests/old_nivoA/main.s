@@ -61,9 +61,8 @@ my_start:
 
   # not
   ldr r0, $0xff5
-  not r0
-  # push r0
-  # call logicNot # pc <= logicNot
+  push r0
+  call logicNot # pc <= logicNot
   str r0, value1
 
   # and
@@ -105,6 +104,7 @@ my_start:
   push r0
   call logicShl # pc <= logicShl
   str r0, value5
+  jeq end
 
   # shr
   ldr r0, $0x2
