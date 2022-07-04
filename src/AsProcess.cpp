@@ -355,7 +355,7 @@ bool Assembler::processTwoRegIns(const std::string &instruction, const std::stri
 }
 
 bool Assembler::processOneOpIns(const std::string &instruction, const std::string &operand){
-    //call, jmp, jeq, jne, jgt
+  //call, jmp, jeq, jne, jgt
   std::smatch matchedRegex;
   if(Assembler::currentSection==""){
     Assembler::writeLineToHelperOutputTxt("ERROR! Instruction is defined outside of a section!");
@@ -466,7 +466,7 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
 }
 
 bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std::string &reg, const std::string &operand){
-    //ldr, str
+  //ldr, str
   if(Assembler::currentSection==""){
     Assembler::writeLineToHelperOutputTxt("ERROR! Instruction is defined outside of a section!");
     Assembler::addError("Instruction "+instruction+" is defined outside of a section.");
@@ -571,6 +571,11 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
     }
     instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (opValue&0xFFFF);
     lcAdder=5;
+  }
+  else{ //none matched
+    Assembler::addError("Load/store operand invalid.");
+    Assembler::writeLineToHelperOutputTxt("Operand didn't match any available cases.");
+    return false;
   }
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, lcAdder, instructionCode, false));
   Assembler::locationCnt+=lcAdder;

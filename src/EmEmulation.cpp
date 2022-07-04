@@ -451,7 +451,7 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_not:{
       Emulator::printSrcAndDestReg();
-      Emulator::reg[Emulator::instr_destReg]=!Emulator::reg[Emulator::instr_destReg];
+      Emulator::reg[Emulator::instr_destReg]=~Emulator::reg[Emulator::instr_destReg];
       Emulator::printSrcAndDestReg(true);
       Emulator::printPcPswSpStateToTxt();
       return true;
