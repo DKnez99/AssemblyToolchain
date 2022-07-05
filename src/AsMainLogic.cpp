@@ -36,8 +36,8 @@ bool Assembler::formatInputFile(){
     Assembler::addError("Can't open input file.");
     return false;
   }
-  int inputLineCnt=0;
-  int outputLineCnt=0;
+  unsigned int inputLineCnt=0;
+  unsigned int outputLineCnt=0;
   std::string line;
   bool eof=false;
   while(getline(inputFile,line)){
@@ -57,7 +57,6 @@ bool Assembler::formatInputFile(){
     formattedLine=std::regex_replace(formattedLine, rgx_reduce_line_start_spaces, "");
     
     if(formattedLine!="" && formattedLine!=" "){
-      //add smth
       std::vector<std::string> tokens = Assembler::splitString(formattedLine, '\n');  //have to do this because of labels
       for(auto const &token:tokens){
         Assembler::lineMap[outputLineCnt++]=inputLineCnt;   //map input file lines to formatted input file lanes (for error handling)
@@ -75,7 +74,6 @@ bool Assembler::formatInputFile(){
         break;
       }
     }
-  
   }
   inputFile.close();
   formattedInputFile.close();

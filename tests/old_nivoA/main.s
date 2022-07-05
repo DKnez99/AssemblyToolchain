@@ -126,7 +126,11 @@ my_start:
   cmp r1, r0
   jeq end
   xchg r0, r6
-  # jmp *1234
+  # jmp end works
+  # jmp 0x1234 works
+  # jmp *0x1234 works
+  # jmp *1234 works
+  # jmp *[r0 + 0xff0] works
 end:
   halt
 

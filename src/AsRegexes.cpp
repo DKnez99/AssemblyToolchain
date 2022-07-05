@@ -60,17 +60,17 @@ std::regex rgx_one_op_ins("^(call|jmp|jeq|jne|jgt) (.+)$");
 std::regex rgx_one_reg_one_op_ins("^(ldr|str) ("+register_+"),(.+)$");
 
 //load/store operands CHECK THESE
-std::regex rgx_addr_ld_str_immed("\\$"+symbol_or_literal);
-std::regex rgx_addr_ld_str_memdir(symbol_or_literal);
-std::regex rgx_addr_ld_str_mempcrel("%("+symbol+")");
-std::regex rgx_addr_ld_str_regdir("("+register_+")");
-std::regex rgx_addr_ld_str_regind("\\[("+register_+")\\]");
-std::regex rgx_addr_ld_str_regdisp("\\[("+register_+")\\+"+symbol_or_literal+"\\]");
+std::regex rgx_addr_ld_str_immed("\\$"+symbol_or_literal+"$");
+std::regex rgx_addr_ld_str_memdir(symbol_or_literal+"$");
+std::regex rgx_addr_ld_str_mempcrel("%("+symbol+")$");
+std::regex rgx_addr_ld_str_regdir("("+register_+")$");
+std::regex rgx_addr_ld_str_regind("\\[("+register_+")\\]$");
+std::regex rgx_addr_ld_str_regdisp("\\[("+register_+")\\+"+symbol_or_literal+"\\]$");
 
 //jmp operands CHECK THESE
-std::regex rgx_addr_jmp_abs(symbol_or_literal);
-std::regex rgx_addr_jmp_pcrel("%("+symbol+")");
-std::regex rgx_addr_jmp_memdir("\\*("+symbol_or_literal+")");
-std::regex rgx_addr_jmp_regdir("\\*("+register_+")");
-std::regex rgx_addr_jmp_regind("\\*\\[("+register_+")\\]");
-std::regex rgx_addr_jmp_regdisp("\\*\\[("+register_+")\\+"+symbol_or_literal+"\\]");
+std::regex rgx_addr_jmp_abs(symbol_or_literal+"$");
+std::regex rgx_addr_jmp_pcrel("%("+symbol+")$");
+std::regex rgx_addr_jmp_memdir("\\*("+symbol_or_literal+")$");
+std::regex rgx_addr_jmp_regdir("\\*("+register_+")$");
+std::regex rgx_addr_jmp_regind("\\*\\[("+register_+")\\]$");
+std::regex rgx_addr_jmp_regdisp("\\*\\[("+register_+")\\+"+symbol_or_literal+"\\]$");
