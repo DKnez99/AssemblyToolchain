@@ -98,16 +98,16 @@ my_start:
   jne end
 
   # shl
-  ldr r0, $0x2
+  ldr r0, $0x9
   push r0
   ldr r0, $0xF0
   push r0
   call logicShl # pc <= logicShl
   str r0, value5
-  jeq end
+  jgt end
 
   # shr
-  ldr r0, $0x2
+  ldr r0, $0x5
   push r0
   ldr r0, $0xF0
   push r0
@@ -122,7 +122,11 @@ my_start:
   ldr r4, value4
   ldr r5, value5
   ldr r6, value6
+
+  cmp r1, r0
+  jeq end
   xchg r0, r6
+  # jmp *1234
 end:
   halt
 

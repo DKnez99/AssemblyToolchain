@@ -51,16 +51,31 @@ void Emulator::setFlag(short flag){
 }
 
 bool Emulator::conditionMet(Instruction instr){
+  Emulator::writeLineToHelperOutputTxt("Current condition:");
+  Emulator::writeLineToHelperOutputTxt("Z:"+std::to_string(Emulator::getFlag(Flag::Z)));
+  Emulator::writeLineToHelperOutputTxt("O:"+std::to_string(Emulator::getFlag(Flag::O)));
+  Emulator::writeLineToHelperOutputTxt("C:"+std::to_string(Emulator::getFlag(Flag::C)));
+  Emulator::writeLineToHelperOutputTxt("N:"+std::to_string(Emulator::getFlag(Flag::N)));
+  Emulator::writeLineToHelperOutputTxt("Condition needed:");
   switch (instr)
   {
     case Instruction::instr_jeq:{
+      Emulator::writeLineToHelperOutputTxt("Z:1");
       return Emulator::getFlag(Flag::Z);
     }
     case Instruction::instr_jne:{
+      Emulator::writeLineToHelperOutputTxt("Z:0");
       return !Emulator::getFlag(Flag::Z);
     }
     case Instruction::instr_jgt:{
-      return !(Emulator::getFlag(Flag::N) ^ Emulator::getFlag(Flag::O)) & !Emulator::getFlag(Flag::Z);
+      Emulator::writeLineToHelperOutputTxt("Z:0");
+      Emulator::writeLineToHelperOutputTxt("O:0");
+      Emulator::writeLineToHelperOutputTxt("N:0");
+      Emulator::writeLineToHelperOutputTxt("OR");
+      Emulator::writeLineToHelperOutputTxt("Z:0");
+      Emulator::writeLineToHelperOutputTxt("O:1");
+      Emulator::writeLineToHelperOutputTxt("N:1");
+      return !(Emulator::getFlag(Flag::N) ^ Emulator::getFlag(Flag::O)) && !Emulator::getFlag(Flag::Z);
     }
   }
   return false;

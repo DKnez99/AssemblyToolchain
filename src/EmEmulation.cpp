@@ -21,25 +21,26 @@ bool Emulator::emulationLoop(){
     Emulator::prevPc=Emulator::rpc; //in case of an error
 
     if(!Emulator::fetchAndDecodeInstr()){ //can't read/decode instr
-      std::cout<<"Can't fetch and decode instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
+      // Emulator::helperOutputFileStream<<"Can't fetch and decode instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
+      // Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::prevPc)+") not recognized!");
       Emulator::rpc=Emulator::prevPc;
-      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
+      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //programmer is responsible for what happens here
     }
     else{
       Emulator::writeLineToHelperOutputTxt("Instruction fetched and decoded");
+      if(!Emulator::execInstr()){ //can't execute the instruction
+        // Emulator::helperOutputFileStream<<"Can't execute instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
+        // Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::prevPc)+") can't be executed!");
+        Emulator::rpc=Emulator::prevPc;
+        Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //programmer is responsible for what happens here
+      }
+      else{
+        Emulator::writeLineToHelperOutputTxt("Instruction executed");
+        //check for interrupts
+        Emulator::readCharFromTerminal();
+        Emulator::processInterrupts();
+      }
     }
-    if(!Emulator::execInstr()){ //can't execute the instruction
-      std::cout<<"Can't execute instruction at pc = 0x"<<std::hex<<Emulator::rpc<<std::endl;
-      Emulator::rpc=Emulator::prevPc;
-      Emulator::jmpOnInterruptRoutine(IVT_ENTRY_INSTRUCTION_ERROR); //should halt the processor
-    }
-    else{
-      Emulator::writeLineToHelperOutputTxt("Instruction executed");
-    }
-
-    //check for interrupts
-    Emulator::readCharFromTerminal();
-    Emulator::processInterrupts();
   }
 
   Emulator::stopTerminal();
@@ -56,13 +57,11 @@ bool Emulator::fetchAndDecodeInstr(){
     case Instruction::instr_halt:{
       Emulator::writeLineToHelperOutputTxt("Recognized HALT");
       Emulator::instr_mnemonic=Instruction::instr_halt;
-      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_int:{
       Emulator::writeLineToHelperOutputTxt("Recognized INT");
       Emulator::instr_mnemonic=Instruction::instr_int;
-      //Emulator::instr_size=2;
       Emulator::getRegDescr(Emulator::readFromMemory(Emulator::rpc,BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_srcReg!=Register::noreg){
@@ -74,7 +73,6 @@ bool Emulator::fetchAndDecodeInstr(){
     case Instruction::instr_iret:{
       Emulator::writeLineToHelperOutputTxt("Recognized IRET");
       Emulator::instr_mnemonic=Instruction::instr_iret;
-      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_call:{
@@ -91,7 +89,6 @@ bool Emulator::fetchAndDecodeInstr(){
     case Instruction::instr_ret:{
       Emulator::writeLineToHelperOutputTxt("Recognized RET");
       Emulator::instr_mnemonic=Instruction::instr_ret;
-      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_jmp:{
@@ -143,7 +140,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_xchg;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_add:{
@@ -151,7 +147,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_add;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_sub:{
@@ -159,7 +154,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_sub;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_mul:{
@@ -167,7 +161,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_mul;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_div:{
@@ -175,7 +168,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_div;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_cmp:{
@@ -183,7 +175,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_cmp;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_not:{
@@ -191,7 +182,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_not;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_and:{
@@ -199,7 +189,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_and;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_or:{
@@ -207,7 +196,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_or;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_xor:{
@@ -215,7 +203,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_xor;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_test:{
@@ -223,7 +210,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_test;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_shl:{
@@ -231,7 +217,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_shl;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_shr:{
@@ -239,7 +224,6 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_shr;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_ldr:{
@@ -257,7 +241,8 @@ bool Emulator::fetchAndDecodeInstr(){
       return Emulator::threeOrFiveByteInstr();
     }
     default:{
-      Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::rpc)+") not recognized!");
+      Emulator::writeLineToHelperOutputTxt("Instruction not recognized!");
+      Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::prevPc)+") not recognized!");
       return false; //might need to return true
     }
   }
@@ -267,7 +252,7 @@ bool Emulator::threeOrFiveByteInstr(){
   Emulator::getAddrDescr(Emulator::readFromMemory(Emulator::rpc, BYTE));
   Emulator::rpc+=1;
   if(Emulator::instr_addrMode==AddressingMode::regdir || Emulator::instr_addrMode==AddressingMode::regind){
-    //Emulator::instr_size=3;
+    //empty
   }
   else if(Emulator::instr_addrMode == AddressingMode::immed ||
       Emulator::instr_addrMode == AddressingMode::regindmv ||
@@ -276,10 +261,9 @@ bool Emulator::threeOrFiveByteInstr(){
   {
     Emulator::instr_payload=Emulator::readFromMemory(Emulator::rpc, WORD);
     Emulator::rpc+=2;
-    //Emulator::instr_size+=2;
   }
   else{
-    Emulator::addWarning("Invalid addressing mode for instruction on pc = "+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid addressing mode for instruction on pc = "+std::to_string(Emulator::prevPc));
     return false;
   }
 
@@ -289,7 +273,7 @@ bool Emulator::threeOrFiveByteInstr(){
      Emulator::instr_updateType!=UpdateType::inca &&
      Emulator::instr_updateType!=UpdateType::incb)
   { 
-    Emulator::addWarning("Invalid update type for instruction on pc = "+std::to_string(Emulator::rpc));
+    Emulator::addWarning("Invalid update type for instruction on pc = "+std::to_string(Emulator::prevPc));
     return false;
   }
   return true;
@@ -336,6 +320,7 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_jeq:{
       Emulator::updateBeforeInstr();
+      Emulator::printPswReg(false);
       if(Emulator::conditionMet(Instruction::instr_jeq)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
@@ -349,6 +334,7 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_jne:{
       Emulator::updateBeforeInstr();
+      Emulator::printPswReg(false);
       if(Emulator::conditionMet(Instruction::instr_jne)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
@@ -362,6 +348,7 @@ bool Emulator::execInstr(){
     }
     case Instruction::instr_jgt:{
       Emulator::updateBeforeInstr();
+      Emulator::printPswReg(false);
       if(Emulator::conditionMet(Instruction::instr_jgt)){
         Emulator::rpc=Emulator::getOperandByAddrMode();
         Emulator::writeLineToHelperOutputTxt("Condition met!");
@@ -589,7 +576,7 @@ bool Emulator::execInstr(){
       return true;
     }
   }
-  Emulator::addWarning("Instruction didn't match any of the mnemonics.");
+  Emulator::addWarning("Instruction (pc="+std::to_string(Emulator::prevPc)+") didn't match any of the mnemonics.");
   Emulator::writeLineToHelperOutputTxt("Instruction didn't match any of the mnemonics.");
   return false;
 }

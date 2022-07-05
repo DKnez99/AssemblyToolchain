@@ -439,11 +439,15 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
     Assembler::writeLineToHelperOutputTxt("Mem dir jump, operand = "+extractedOperand);
     regDescr=0xFF;  //no reg
     addrMode=0x04;  //mem dir from the address marked by the operand
-    int absOperand=Assembler::processAbsoluteAddr(extractedOperand, 3);
-    if(absOperand==-1){
-      return false;
+    if(std::regex_match(extractedOperand, rgx_symbol)){
+      jmpValue=Assembler::processAbsoluteAddr(extractedOperand, 3);
+      if(jmpValue==-1){
+        return false;
+      }
     }
-    jmpValue = (std::regex_match(extractedOperand, rgx_symbol))?absOperand:Assembler::stringToDec(extractedOperand);
+    else{
+      jmpValue=Assembler::stringToDec(extractedOperand);
+    }
     instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
   }

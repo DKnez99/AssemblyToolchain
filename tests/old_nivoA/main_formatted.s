@@ -34,14 +34,14 @@ ldr r0,$1
 push r0
 call logicTest
 jne end
-ldr r0,$0x2
+ldr r0,$0x9
 push r0
 ldr r0,$0xF0
 push r0
 call logicShl
 str r0,value5
-jeq end
-ldr r0,$0x2
+jgt end
+ldr r0,$0x5
 push r0
 ldr r0,$0xF0
 push r0
@@ -55,6 +55,8 @@ ldr r3,value3
 ldr r4,value4
 ldr r5,value5
 ldr r6,value6
+cmp r1,r0
+jeq end
 xchg r0,r6
 end:
 halt

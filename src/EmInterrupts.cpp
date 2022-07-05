@@ -39,7 +39,8 @@ void Emulator::jmpOnInterruptRoutine(char ivtEntry){
   Emulator::writeLineToHelperOutputTxt("Jumping to interrupt routine in entry "+std::to_string(ivtEntry));
   Emulator::pushOnStack(Emulator::rpc);
   Emulator::pushOnStack(Emulator::rpsw);
-  Emulator::rpc=Emulator::readFromMemory((ivtEntry%8)*2, WORD, true); 
+  Emulator::rpc=Emulator::readFromMemory((ivtEntry%8)*2, WORD, true);
+  Emulator::helperOutputFileStream<<"PC set to 0x"<<std::hex<<Emulator::rpc<<std::endl;
   //enable intr
   Emulator::setFlag(Flag::I);
   Emulator::setFlag(Flag::Tr);
