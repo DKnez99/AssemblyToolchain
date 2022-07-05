@@ -225,13 +225,18 @@ bool Assembler::processZeroOpIns(const std::string &instruction){
     Assembler::writeLineToHelperOutputTxt("halt (0x00)");
     instructionCode=0x00;
   }
-  if(instruction=="iret"){
+  else if(instruction=="iret"){
     Assembler::writeLineToHelperOutputTxt("iret (0x20)");
     instructionCode=0x20;
   }
-  if(instruction=="ret"){
+  else if(instruction=="ret"){
     Assembler::writeLineToHelperOutputTxt("ret (0x40)");
     instructionCode=0x40;
+  }
+  else{ //none matched
+    Assembler::addError("Instruction invalid.");
+    Assembler::writeLineToHelperOutputTxt("Instruction didn't match any available cases.");
+    return false;
   }
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, 1, instructionCode, false));
   Assembler::locationCnt+=1;
@@ -279,6 +284,11 @@ bool Assembler::processOneRegIns(const std::string &instruction, const std::stri
     Assembler::writeLineToHelperOutputTxt("s (source) = F(not used)");
     instructionCode=0x800F + (regNum<<4);
     lcAdder=2;
+  }
+  else{ //none matched
+    Assembler::addError("Instruction invalid.");
+    Assembler::writeLineToHelperOutputTxt("Instruction didn't match any available cases.");
+    return false;
   }
 
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, lcAdder, instructionCode, false));
@@ -347,6 +357,11 @@ bool Assembler::processTwoRegIns(const std::string &instruction, const std::stri
   else if(instruction=="shr"){
     Assembler::writeLineToHelperOutputTxt("0x91(Rd)(Rs)");
     instructionCode=0x9100;
+  }
+  else{ //none matched
+    Assembler::addError("Instruction invalid.");
+    Assembler::writeLineToHelperOutputTxt("Instruction didn't match any available cases.");
+    return false;
   }
   instructionCode +=reg;
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, 2, instructionCode, false));
@@ -459,6 +474,11 @@ bool Assembler::processOneOpIns(const std::string &instruction, const std::strin
     }
     instructionCode = (instrDescr << (8 * 4)) + (regDescr << (8 * 3)) + (addrMode <<(8 * 2)) + (jmpValue&0xFFFF);
     lcAdder=5;
+  }
+  else{ //none matched
+    Assembler::addError("Operand invalid.");
+    Assembler::writeLineToHelperOutputTxt("Operand didn't match any available cases.");
+    return false;
   }
   Assembler::sectionTable.addSectionEntry(Assembler::currentSection, SectionEntry(Assembler::locationCnt, lcAdder, instructionCode, false));
   Assembler::locationCnt+=lcAdder;
@@ -573,7 +593,7 @@ bool Assembler::processOneRegOneOpIns(const std::string &instruction, const std:
     lcAdder=5;
   }
   else{ //none matched
-    Assembler::addError("Load/store operand invalid.");
+    Assembler::addError("Operand invalid.");
     Assembler::writeLineToHelperOutputTxt("Operand didn't match any available cases.");
     return false;
   }
@@ -618,7 +638,6 @@ int Assembler::processPCRelAddr(const std::string &operand, int offsetInsideInst
     Assembler::symbolTable.addSymbol(operand, SymbolData(SECTION_UNDEFINED, 0, SymbolType::NONE, false));
   }
   SymbolData symbol = Assembler::symbolTable.getSymbol(operand);
-  ///////////////////////////////////////////////////////////////
 
   //absolute, global, extern or undefined
   if(symbol.section==SECTION_ABSOLUTE || symbol.type==SymbolType::GLOBAL || symbol.type==SymbolType::EXTERN || symbol.type==SymbolType::NONE){

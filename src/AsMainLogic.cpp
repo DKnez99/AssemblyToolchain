@@ -225,7 +225,11 @@ bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables
   std::vector<std::string> invalidSymbols=Assembler::symbolTable.invalidSymbols();
 
   for(const auto &invalidSymbol: invalidSymbols){
-    Assembler::addError("Symbol "+invalidSymbol+" is not defined anywhere.");
+    Assembler::addError("Symbol "+invalidSymbol+" is not defined anywhere.");    
+  }
+
+  if(invalidSymbols.size()>0){
+    return false;
   }
 
   std::vector<std::string> localSymbols = Assembler::symbolTable.getSymbolsOfType(SymbolType::LOCAL);

@@ -13,13 +13,23 @@ void Assembler::writeLineToHelperOutputTxt(const std::string &line){
 //||=========================================================||
 
 void Assembler::addError(const std::string &errorMsg){
-  Assembler::errorMap[Assembler::lineCnt]=errorMsg;
-  Assembler::errorOccured=true;
+  if(Assembler::errorMap[Assembler::lineCnt]==""){
+    Assembler::errorMap[Assembler::lineCnt]=errorMsg;
+    Assembler::errorOccured=true;
+  }
+  else{
+    Assembler::errorMap[Assembler::lineCnt].append("\n"+errorMsg);
+  }
 }
 
 void Assembler::addWarning(const std::string &warningMsg){
-  Assembler::warningMap[Assembler::lineCnt]=warningMsg;
-  Assembler::warningOccured=true;
+  if(Assembler::warningMap[Assembler::lineCnt]==""){
+    Assembler::warningMap[Assembler::lineCnt]=warningMsg;
+    Assembler::warningOccured=true;
+  }
+  else{
+    Assembler::warningMap[Assembler::lineCnt].append("\n"+warningMsg);
+  }
 }
 
 void Assembler::printErrors(){
