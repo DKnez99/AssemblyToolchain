@@ -1,6 +1,6 @@
 # file: main.s
 
-.extern mathAdd, mathSub, mathMul, mathDiv
+# .extern mathAdd, mathSub, mathMul, mathDiv
 .extern logicNot, logicAnd, logicOr, logicXor, logicTest, logicShl, logicShr
 
 .global my_start
@@ -121,6 +121,7 @@ my_start:
   ldr r4, value4
   ldr r5, value5
   ldr r6, value6
+  xchg r0, r6
 end:
   halt
 

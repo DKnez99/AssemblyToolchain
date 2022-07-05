@@ -377,7 +377,7 @@ bool Emulator::execInstr(){
       Emulator::printSrcAndDestReg();
       short temp=Emulator::reg[Emulator::instr_srcReg];
       Emulator::reg[Emulator::instr_srcReg]=Emulator::reg[Emulator::instr_destReg];
-      Emulator::reg[instr_destReg]=Emulator::reg[Emulator::instr_srcReg];
+      Emulator::reg[Emulator::instr_destReg]=temp;
       Emulator::printSrcAndDestReg(true);
       Emulator::printPcPswSpStateToTxt();
       return true;

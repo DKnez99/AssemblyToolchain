@@ -1,4 +1,3 @@
-.extern mathAdd,mathSub,mathMul,mathDiv
 .extern logicNot,logicAnd,logicOr,logicXor,logicTest,logicShl,logicShr
 .global my_start
 .global value0,value1,value2,value3,value4,value5,value6
@@ -55,6 +54,7 @@ ldr r3,value3
 ldr r4,value4
 ldr r5,value5
 ldr r6,value6
+xchg r0,r6
 end:
 halt
 .section my_data
