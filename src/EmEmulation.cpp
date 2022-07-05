@@ -56,13 +56,13 @@ bool Emulator::fetchAndDecodeInstr(){
     case Instruction::instr_halt:{
       Emulator::writeLineToHelperOutputTxt("Recognized HALT");
       Emulator::instr_mnemonic=Instruction::instr_halt;
-      Emulator::instr_size=1;
+      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_int:{
       Emulator::writeLineToHelperOutputTxt("Recognized INT");
       Emulator::instr_mnemonic=Instruction::instr_int;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       Emulator::getRegDescr(Emulator::readFromMemory(Emulator::rpc,BYTE));
       Emulator::rpc+=1;
       if(Emulator::instr_srcReg!=Register::noreg){
@@ -74,7 +74,7 @@ bool Emulator::fetchAndDecodeInstr(){
     case Instruction::instr_iret:{
       Emulator::writeLineToHelperOutputTxt("Recognized IRET");
       Emulator::instr_mnemonic=Instruction::instr_iret;
-      Emulator::instr_size=1;
+      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_call:{
@@ -89,9 +89,9 @@ bool Emulator::fetchAndDecodeInstr(){
       return Emulator::threeOrFiveByteInstr();
     }
     case Instruction::instr_ret:{
-      Emulator::writeLineToHelperOutputTxt("Recognized IRET");
+      Emulator::writeLineToHelperOutputTxt("Recognized RET");
       Emulator::instr_mnemonic=Instruction::instr_ret;
-      Emulator::instr_size=1;
+      //Emulator::instr_size=1;
       return true;
     }
     case Instruction::instr_jmp:{
@@ -143,7 +143,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_xchg;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_add:{
@@ -151,7 +151,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_add;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_sub:{
@@ -159,7 +159,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_sub;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_mul:{
@@ -167,7 +167,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_mul;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_div:{
@@ -175,7 +175,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_div;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_cmp:{
@@ -183,7 +183,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_cmp;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_not:{
@@ -191,7 +191,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_not;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_and:{
@@ -199,7 +199,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_and;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_or:{
@@ -207,7 +207,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_or;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_xor:{
@@ -215,7 +215,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_xor;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_test:{
@@ -223,7 +223,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_test;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_shl:{
@@ -231,7 +231,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_shl;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_shr:{
@@ -239,7 +239,7 @@ bool Emulator::fetchAndDecodeInstr(){
       Emulator::instr_mnemonic=Instruction::instr_shr;
       Emulator::getRegDescr(Emulator::readFromMemory(rpc, BYTE));
       Emulator::rpc+=1;
-      Emulator::instr_size=2;
+      //Emulator::instr_size=2;
       return true;
     }
     case Instruction::instr_ldr:{
@@ -267,7 +267,7 @@ bool Emulator::threeOrFiveByteInstr(){
   Emulator::getAddrDescr(Emulator::readFromMemory(Emulator::rpc, BYTE));
   Emulator::rpc+=1;
   if(Emulator::instr_addrMode==AddressingMode::regdir || Emulator::instr_addrMode==AddressingMode::regind){
-    Emulator::instr_size=3;
+    //Emulator::instr_size=3;
   }
   else if(Emulator::instr_addrMode == AddressingMode::immed ||
       Emulator::instr_addrMode == AddressingMode::regindmv ||
@@ -276,7 +276,7 @@ bool Emulator::threeOrFiveByteInstr(){
   {
     Emulator::instr_payload=Emulator::readFromMemory(Emulator::rpc, WORD);
     Emulator::rpc+=2;
-    Emulator::instr_size+=2;
+    //Emulator::instr_size+=2;
   }
   else{
     Emulator::addWarning("Invalid addressing mode for instruction on pc = "+std::to_string(Emulator::rpc));

@@ -113,6 +113,7 @@ my_start:
   push r0
   call logicShr # pc <= logicShr
   str r0, value6
+  jeq end
 
   ldr r0, value0
   ldr r1, value1
