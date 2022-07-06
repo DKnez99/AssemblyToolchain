@@ -1,3 +1,4 @@
+.extern mathAdd,mathSub,mathMul,mathDiv
 .extern logicNot,logicAnd,logicOr,logicXor,logicTest,logicShl,logicShr
 .global my_start
 .global value0,value1,value2,value3,value4,value5,value6

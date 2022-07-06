@@ -47,6 +47,13 @@
     "memory_resource": "cpp",
     "numeric": "cpp",
     "random": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "chrono": "cpp",
+    "condition_variable": "cpp",
+    "cstring": "cpp",
+    "map": "cpp",
+    "ratio": "cpp",
+    "regex": "cpp",
+    "shared_mutex": "cpp"
   }
 }

@@ -8,25 +8,31 @@ Assembler::Assembler(const std::string &inputFileName, const std::string &output
 }
 
 void Assembler::assemble(){
+  Assembler::helperOutputFileStream.open(Assembler::helperOutputFileName);
   if(!Assembler::formatInputFile()){  //pre-processing of input file
     Assembler::printResults();
+    Assembler::helperOutputFileStream.close();
     return;
   }
 
   if(!Assembler::goThroughFormattedInputFile()){     //main processing       
     Assembler::printResults();
+    Assembler::helperOutputFileStream.close();
     return;
   }
   if(!Assembler::goThroughFlinksAndRelocs()){ //post processing of reloc table
     Assembler::printResults();
+    Assembler::helperOutputFileStream.close();
     return;
   }
   
   Assembler::printResults();                //print results of assemblying (success, errors, warnings) to terminal
   Assembler::writeToOutputFiles();          //write to output files
+  Assembler::helperOutputFileStream.close();
 }
 
 bool Assembler::formatInputFile(){
+  Assembler::writeLineToHelperOutputTxt("FORMATTING INPUT FILE\n");
   std::ifstream inputFile;
   std::ofstream formattedInputFile; 
   inputFile.open(Assembler::inputFileName);
@@ -37,7 +43,7 @@ bool Assembler::formatInputFile(){
     return false;
   }
   unsigned int inputLineCnt=0;
-  unsigned int outputLineCnt=0;
+  unsigned int outputLineCnt=1;
   std::string line;
   bool eof=false;
   while(getline(inputFile,line)){
@@ -59,6 +65,7 @@ bool Assembler::formatInputFile(){
     if(formattedLine!="" && formattedLine!=" "){
       std::vector<std::string> tokens = Assembler::splitString(formattedLine, '\n');  //have to do this because of labels
       for(auto const &token:tokens){
+        Assembler::writeLineToHelperOutputTxt("Mapping "+std::to_string(outputLineCnt)+" to "+std::to_string(inputLineCnt));
         Assembler::lineMap[outputLineCnt++]=inputLineCnt;   //map input file lines to formatted input file lanes (for error handling)
         Assembler::formattedInputFileLines.push_back(token);
         formattedInputFile<<token;
@@ -81,7 +88,6 @@ bool Assembler::formatInputFile(){
 }
 
 bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input file and categorizes data
-  Assembler::helperOutputFileStream.open(Assembler::helperOutputFileName);
   Assembler::writeLineToHelperOutputTxt("GOING THROUGH THE FORMATTED INPUT FILE:");
   Assembler::lineCnt=1;
   Assembler::locationCnt=0;
@@ -206,8 +212,8 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
     }
     Assembler::lineCnt++;
   }
-  Assembler::helperOutputFileStream.close();
   if(eof){
+    Assembler::lineCnt=0; //for better error/warning display
     return true;
   }
   else{
@@ -217,7 +223,6 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
 }  
 
 bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables
-  Assembler::helperOutputFileStream.open(Assembler::helperOutputFileName, std::ios::app);
   Assembler::writeLineToHelperOutputTxt("\nGOING THROUGH FLINKS AND RELOCS");
 
   std::vector<std::string> invalidSymbols=Assembler::symbolTable.invalidSymbols();
@@ -258,7 +263,6 @@ bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables
     }
   }
   Assembler::writeLineToHelperOutputTxt("");
-  Assembler::helperOutputFileStream.close();
   return true;
 }  
 

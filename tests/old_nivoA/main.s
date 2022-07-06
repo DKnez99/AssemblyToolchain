@@ -1,6 +1,6 @@
 # file: main.s
 
-# .extern mathAdd, mathSub, mathMul, mathDiv
+.extern mathAdd, mathSub, mathMul, mathDiv
 .extern logicNot, logicAnd, logicOr, logicXor, logicTest, logicShl, logicShr
 
 .global my_start
