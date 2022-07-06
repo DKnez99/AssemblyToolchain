@@ -67,6 +67,8 @@ enum Flag{
   I=1<<15
 };
 
+std::ostream& operator<<(std::ostream& out, Flag flag);
+
 enum AddressingMode{
   immed=0x0,
   regdir=0x1,
@@ -157,9 +159,9 @@ class Emulator{
   ushort &rpsw=reg[Register::psw];
   void pushOnStack(short value);
   short popFromStack();
-  void setFlag(short flag);
-  bool getFlag(short flag);
-  void resetFlag(short flag);
+  void setFlag(Flag flag);
+  bool getFlag(Flag flag);
+  void resetFlag(Flag flag);
   void resetAllFlags();
   bool conditionMet(Instruction instr);
   void printSrcAndDestReg(bool instrExecuted=false);

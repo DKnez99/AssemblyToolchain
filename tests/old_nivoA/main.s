@@ -1,6 +1,6 @@
 # file: main.s
 
-.extern mathAdd, mathSub, mathMul, mathDiv
+# .extern mathAdd, mathSub, mathMul, mathDiv
 .extern logicNot, logicAnd, logicOr, logicXor, logicTest, logicShl, logicShr
 
 .global my_start
@@ -124,13 +124,24 @@ my_start:
   ldr r6, value6
 
   cmp r1, r0
-  jeq end
+  jgt end
   xchg r0, r6
-  # jmp end works
-  # jmp 0x1234 works
-  # jmp *0x1234 works
-  # jmp *1234 works
-  # jmp *[r0 + 0xff0] works
+
+  # jmp end
+  # jmp 0x1234
+  # jmp *0x1234
+  # jmp *1234
+  # jmp *[r0 + 0xff0]
+
+  # ldr r0, $0b11
+  # ldr r1, $value1
+  # ldr r2, 0x1e9
+  # ldr r3, %value5
+  # ldr r4, r0
+  
+  # ldr r0, [r1]
+  # ldr r0, [r1+2]
+  # ldr r0, [r2+end]
 end:
   halt
 

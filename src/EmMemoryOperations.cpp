@@ -22,7 +22,7 @@ void Emulator::writeToMemory(short value, uint offset, uint size, bool isData){
 
   if(offset==TERM_OUT){ //if we are writing to term_out, display the data
     Emulator::writeLineToHelperOutputTxt("Outputing data from Mem(TERM_OUT) to display.");
-    std::cout<<(char)value<<std::endl;
+    std::cout<<(char)value<<std::flush;
   }
 
   if(size==1){

@@ -4,6 +4,22 @@
 #include <bitset>
 #include <regex>
 
+std::ostream& operator<<(std::ostream& out, Flag flag){
+    const char* s = 0;
+#define PROCESS_VAL(p) case(p): s = #p; break;
+    switch(flag){
+        PROCESS_VAL(Z);
+        PROCESS_VAL(O);   
+        PROCESS_VAL(C);     
+        PROCESS_VAL(N);
+        PROCESS_VAL(Tr);
+        PROCESS_VAL(Tl);
+        PROCESS_VAL(I);
+    }
+#undef PROCESS_VAL
+    return out << std::string(s);
+}
+
 void Emulator::writeLineToHelperOutputTxt(const std::string &line){
     Emulator::helperOutputFileStream<<line<<std::endl;
 }
@@ -72,7 +88,7 @@ bool Emulator::loadDataToMemory(){
 }
 
 void Emulator::printState(){
-  std::cout<<"------------------------------------------------"<<std::endl;
+  std::cout<<"\n------------------------------------------------"<<std::endl;
   std::cout<<"Emulated processor executed halt instruction"<<std::endl;
   std::cout<<"Emulated processor state: psw=0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
   std::cout<<"r0=0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<Emulator::reg[Register::r0];

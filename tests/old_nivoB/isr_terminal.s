@@ -9,7 +9,7 @@ isr_terminal:
   push r0
   push r1
   ldr r0, 0xFF02 # term_in
-  ldr r1, $2 # character_offset
+  ldr r1, $1 # character_offset
   add r0, r1
   str r0, 0xFF00 # term_out
   ldr r0, %my_counter # pcrel

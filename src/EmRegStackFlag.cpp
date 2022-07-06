@@ -36,18 +36,18 @@ void Emulator::resetAllFlags(){
   Emulator::helperOutputFileStream<<"ALL flags reset. PSW = 0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
 }
 
-void Emulator::resetFlag(short flag){
+void Emulator::resetFlag(Flag flag){
   Emulator::rpsw&=~flag;
-  Emulator::helperOutputFileStream<<"Flag reset. PSW = 0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
+  Emulator::helperOutputFileStream<<"Flag "<<flag<<" reset. PSW = 0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
 }
 
-bool Emulator::getFlag(short flag){
+bool Emulator::getFlag(Flag flag){
   return Emulator::rpsw & flag;
 }
 
-void Emulator::setFlag(short flag){
+void Emulator::setFlag(Flag flag){
   Emulator::rpsw|=flag;
-  Emulator::helperOutputFileStream<<"Flag set. PSW = 0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
+  Emulator::helperOutputFileStream<<"Flag "<<flag<<" set. PSW = 0b"<<std::bitset<8*sizeof(Emulator::rpsw)>(Emulator::rpsw)<<std::endl;
 }
 
 bool Emulator::conditionMet(Instruction instr){

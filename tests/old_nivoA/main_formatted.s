@@ -1,4 +1,3 @@
-.extern mathAdd,mathSub,mathMul,mathDiv
 .extern logicNot,logicAnd,logicOr,logicXor,logicTest,logicShl,logicShr
 .global my_start
 .global value0,value1,value2,value3,value4,value5,value6
@@ -57,7 +56,7 @@ ldr r4,value4
 ldr r5,value5
 ldr r6,value6
 cmp r1,r0
-jeq end
+jgt end
 xchg r0,r6
 end:
 halt
