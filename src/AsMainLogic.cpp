@@ -207,19 +207,19 @@ bool Assembler::goThroughFormattedInputFile(){ //goes through formatted input fi
       }
     }
     else{
-      Assembler::writeLineToHelperOutputTxt("ERROR! Unknown instruction/directive.");
-      Assembler::addError("Unknown instruction/directive.");
+      Assembler::writeLineToHelperOutputTxt("ERROR! Unknown instruction/directive/operand.");
+      Assembler::addError("Invalid instruction/directive/operand.");
+      return false;
     }
     Assembler::lineCnt++;
   }
   if(eof){
     Assembler::lineCnt=0; //for better error/warning display
-    return true;
   }
   else{
-    Assembler::addError("Missing .end directive.");
-    return false;
+    Assembler::addWarning("Missing .end directive.");
   }
+  return true;
 }  
 
 bool Assembler::goThroughFlinksAndRelocs(){ //fixes stuff in tables

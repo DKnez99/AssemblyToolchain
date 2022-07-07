@@ -36,7 +36,7 @@ void Assembler::printErrors(){
   std::cout<<"Errors:"<<std::endl;
   for(auto err: Assembler::errorMap){
     if(Assembler::lineMap[err.first]>0)
-      std::cout<<"Line "<<Assembler::lineMap[err.first]<<": "<<err.second<<std::endl;
+      std::cout<<"Line "<<Assembler::lineMap[err.first]<<":"<<Assembler::inputFileLines[Assembler::lineMap[err.first]-1]<<"\n"<<err.second<<std::endl;
     else
       std::cout<<err.second<<std::endl;
   }
@@ -46,7 +46,7 @@ void Assembler::printWarnings(){
   std::cout<<"Warnings:"<<std::endl;
   for(auto warning: Assembler::warningMap){
     if(Assembler::lineMap[warning.first]>0)
-      std::cout<<"Line "<<Assembler::lineMap[warning.first]<<": "<<warning.second<<std::endl;
+      std::cout<<"Line "<<Assembler::lineMap[warning.first]<<":"<<Assembler::inputFileLines[Assembler::lineMap[warning.first]-1]<<"\n"<<warning.second<<std::endl;
     else
       std::cout<<warning.second<<std::endl;
   }

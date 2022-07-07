@@ -21,8 +21,6 @@ class Assembler{
     std::vector<std::string> formattedInputFileLines;
     void writeLineToHelperOutputTxt(const std::string &line);
     std::ofstream helperOutputFileStream;
-    //std::ofstream helperOutputTxtFile;
-    //std::fstream formattedInputFile;
     
     //important internal assembler variables
     int lineCnt;

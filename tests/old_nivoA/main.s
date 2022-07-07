@@ -167,11 +167,5 @@ destinations:
 # .word mathSub
 # .word mathMul
 # .word mathDiv
-.word logicNot
-.word logicAnd
-.word logicOr
-.word logicXor
-.word logicTest
-.word logicShl
-.word logicShr
+.word logicNot, logicAnd, logicOr, logicXor, logicTest,logicShl,logicShr
 .end
